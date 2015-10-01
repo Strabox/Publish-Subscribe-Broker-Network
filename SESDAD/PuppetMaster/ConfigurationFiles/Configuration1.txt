@@ -1,0 +1,7 @@
+﻿Site site0 Parent none
+Site site1 Parent site0
+Site site2 Parent site0
+Process broker0 Is broker On site0 URL tcp://localhost:3333/broker0
+Process publisher0 Is publisher On site0 URL tcp://localhost:3334/publisher0
+Process subscriber0 Is subscriber On site0 URL tcp://localhost:3335/subscriber0
+Process subscriber1 Is subscriber On site0 URL tcp://localhost:3336/subscriber1
