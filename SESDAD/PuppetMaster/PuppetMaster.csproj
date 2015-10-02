@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ParseUtil.cs" />
     <Compile Include="ConfigurationManager.cs" />
     <Compile Include="FormPuppetMaster.cs">
       <SubType>Form</SubType>
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="ConfigurationFiles\Configuration2.txt" />
     <Content Include="ConfigurationFiles\Configuration1.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
