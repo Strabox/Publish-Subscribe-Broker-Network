@@ -6,14 +6,27 @@ using System.Threading.Tasks;
 
 namespace CommonTypes
 {
-    public class Event
+    [Serializable]
+    public class Subscription
     {
 
         private string topic;
 
+        public Subscription(string topic)
+        {
+            this.topic = topic;
+        }
+
+    }
+
+    [Serializable]
+    public class Messages
+    {
+        private string topic;
+
         private string content;
 
-        public Event(string topic,string content)
+        public Messages(string topic,string content)
         {
             this.topic = topic;
             this.content = content;

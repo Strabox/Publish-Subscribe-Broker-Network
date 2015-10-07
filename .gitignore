@@ -194,3 +194,7 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+#Application Log Files
+
+/SESDAD/PuppetMaster/LogFiles
