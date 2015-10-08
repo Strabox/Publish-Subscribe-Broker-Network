@@ -13,8 +13,10 @@ namespace Subscriber
     {
         static void Main(string[] args)
         {
-            if (args[0] == null || args[1] == null)
-                return;
+            if (args.Length < 2 || args[0] == null || args[1] == null) {
+                Console.Error.WriteLine("Wrong usage.");
+                return;                                
+            }
             TcpChannel channel = new TcpChannel(int.Parse(args[0]));
             ChannelServices.RegisterChannel(channel, false);
             SubscriberServer subscriber = new SubscriberServer();
