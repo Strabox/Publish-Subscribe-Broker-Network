@@ -35,6 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,8 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LogManager.cs" />
     <Compile Include="ParseUtil.cs" />
-    <Compile Include="ConfigurationManager.cs" />
+    <Compile Include="ProcessesManager.cs" />
     <Compile Include="FormPuppetMaster.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -56,7 +58,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PuppetMasterServer.cs" />
+    <Compile Include="LogServer.cs" />
     <EmbeddedResource Include="FormPuppetMaster.resx">
       <DependentUpon>FormPuppetMaster.cs</DependentUpon>
     </EmbeddedResource>

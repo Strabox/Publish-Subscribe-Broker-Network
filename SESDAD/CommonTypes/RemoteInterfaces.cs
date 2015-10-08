@@ -10,7 +10,7 @@ namespace CommonTypes
 
     public interface ICommon
     {
-        [OneWayAttribute]
+        [OneWay]
         void Crash();
         void Freeze();
         void Unfreeze();
@@ -28,9 +28,9 @@ namespace CommonTypes
         void Unsubscribe(string topicName);
     }
 
-    public interface IPuppetMaster
+    public interface ILogServer
     {
-        //TODO Logging Calls ....
+        void LogAction(string logMessage);
     }
 
 }

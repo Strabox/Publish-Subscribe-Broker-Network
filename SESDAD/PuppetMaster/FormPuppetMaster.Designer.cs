@@ -144,6 +144,7 @@
             this.buttonSubscribe.TabIndex = 6;
             this.buttonSubscribe.Text = "Subscribe";
             this.buttonSubscribe.UseVisualStyleBackColor = true;
+            this.buttonSubscribe.Click += new System.EventHandler(this.buttonSubscribe_Click);
             // 
             // label2
             // 

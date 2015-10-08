@@ -17,7 +17,8 @@ namespace PuppetMaster
     public partial class FormPuppetMaster : Form
     {
 
-        private ConfigurationManager manager;
+        private ProcessesManager manager;
+
 
         public FormPuppetMaster()
         {
@@ -43,18 +44,30 @@ namespace PuppetMaster
         {
             treeViewLogFiles.Nodes.Clear();
             IEnumerable<string> files = Directory.GetFiles(
-                ConfigurationManager.LOG_FILES_DIRECTORY);
+                LogManager.LOG_FILES_DIRECTORY);
             foreach (string file in files)
                 treeViewLogFiles.Nodes.Add(Path.GetFileName(file));
         }
 
+        /* ########################## Events ########################### */
+
         private void FormPuppetMaster_Load(object sender, EventArgs e)
         {
-            manager = new ConfigurationManager(this);
+            manager = new ProcessesManager(this);
             IEnumerable<string> files = Directory.GetFiles(
-                ConfigurationManager.CONFIG_FILES_DIRECTORY);
+                ProcessesManager.CONFIG_FILES_DIRECTORY);
             foreach(string file in files)
                 treeViewConfigFiles.Nodes.Add(Path.GetFileName(file));
+            ReloadLogFiles();
+        }
+
+        private void treeViewLogFiles_KeyUp(object sender, KeyEventArgs e)
+        {
+            TreeView tree = sender as TreeView;
+            if (null != tree.SelectedNode && e.KeyCode == Keys.Delete)
+            {
+                File.Delete(LogManager.LOG_FILES_DIRECTORY + tree.SelectedNode.Text);
+            }
             ReloadLogFiles();
         }
 
@@ -62,19 +75,15 @@ namespace PuppetMaster
         {
             TreeView tree = sender as TreeView;
             manager.ReadConfigurationFile(
-                ConfigurationManager.CONFIG_FILES_DIRECTORY + tree.SelectedNode.Text);
+                ProcessesManager.CONFIG_FILES_DIRECTORY + tree.SelectedNode.Text);
         }
 
         private void treeViewLogFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             TreeView tree = sender as TreeView;
-            Process.Start(ConfigurationManager.LOG_FILES_DIRECTORY+tree.SelectedNode.Text);
+            Process.Start(LogManager.LOG_FILES_DIRECTORY+tree.SelectedNode.Text);
         }
 
-        private void buttonStatus_Click(object sender, EventArgs e)
-        {
-            //TODO
-        }
 
         private void buttonCrashAll_Click(object sender, EventArgs e)
         {
@@ -113,14 +122,14 @@ namespace PuppetMaster
             //TODO
         }
 
-        private void treeViewLogFiles_KeyUp(object sender, KeyEventArgs e)
+        private void buttonStatus_Click(object sender, EventArgs e)
         {
-            TreeView tree = sender as TreeView;
-            if(null != tree.SelectedNode && e.KeyCode == Keys.Delete)
-            {
-                File.Delete(ConfigurationManager.LOG_FILES_DIRECTORY + tree.SelectedNode.Text);
-            }
-            ReloadLogFiles();
+            manager.Status();
+        }
+
+        private void buttonSubscribe_Click(object sender, EventArgs e)
+        {
+            //TODO
         }
     }
 }
