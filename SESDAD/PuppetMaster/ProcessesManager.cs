@@ -51,6 +51,9 @@ namespace PuppetMaster
         {
             string[] tokens = null, lines = File.ReadAllLines(filePath);
             string loggingLevel = "light", routingPolicy = "flooding",orderingPolicy = "FIFO";
+            Dictionary<string, string> sitesAndBrokers = new Dictionary<string, string>(); 
+            Dictionary<string, List<string>> sites = new Dictionary<string, List<string>>();
+
             logServer.LogFile = "Log" + Path.GetFileName(filePath);
             LogManager.CreateLogFile(logServer.LogFile);
             parentForm.ReloadLogFiles();
@@ -70,11 +73,19 @@ namespace PuppetMaster
                     parentForm.Invoke(new AddProcess(parentForm.AddToGenericProcesses),
                         tokens[1]);
                     if (processType.Equals("Publisher"))
+                    {
                         parentForm.Invoke(new AddProcess(parentForm.AddToPublishersProcesses),
                             tokens[1]);
+                    }
                     else if (processType.Equals("Subscriber"))
+                    {
                         parentForm.Invoke(new AddProcess(parentForm.AddToSubscribersProcesses),
                             tokens[1]);
+                    }
+                    else if (processType.Equals("Broker"))
+                    {
+                        sitesAndBrokers.Add(tokens[5],tokens[7]);
+                    }
                     Process.Start(PROJECT_ROOT + processType + EXE_PATH + processType,
                         String.Join(" ",urlParse));
                 }

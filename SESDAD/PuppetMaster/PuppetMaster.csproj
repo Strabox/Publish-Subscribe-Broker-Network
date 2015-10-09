@@ -89,11 +89,12 @@
       <Name>CommonTypes</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="LogFiles\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="ConfigurationFiles\Configuration2.txt" />
     <Content Include="ConfigurationFiles\Configuration1.txt" />
-    <Content Include="LogFiles\FileToForceGitToCreateLogFiles.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

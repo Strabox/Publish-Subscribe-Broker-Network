@@ -46,7 +46,10 @@ namespace PuppetMaster
             IEnumerable<string> files = Directory.GetFiles(
                 LogManager.LOG_FILES_DIRECTORY);
             foreach (string file in files)
-                treeViewLogFiles.Nodes.Add(Path.GetFileName(file));
+            {
+                if(!Path.GetFileName(file).Equals(".gitkeep"))
+                    treeViewLogFiles.Nodes.Add(Path.GetFileName(file));
+            }
         }
 
         /* ########################## Events ########################### */
