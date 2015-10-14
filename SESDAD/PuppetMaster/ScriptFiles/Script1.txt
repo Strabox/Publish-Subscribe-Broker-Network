@@ -1,0 +1,4 @@
+﻿Crash broker0
+Wait 100
+Freeze broker1
+Crash broker1

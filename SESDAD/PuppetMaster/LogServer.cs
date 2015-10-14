@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PuppetMaster
 {
-    public class LogServer : MarshalByRefObject, ILogServer
+    public class LogServer : MarshalByRefObject, IPuppetMasterLog
     {
 
         private LogManager logManager;

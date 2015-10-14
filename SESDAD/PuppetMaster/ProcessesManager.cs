@@ -9,6 +9,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PuppetMaster
@@ -20,13 +21,10 @@ namespace PuppetMaster
                             Path.DirectorySeparatorChar+
                             ".."+ Path.DirectorySeparatorChar+
                             "ConfigurationFiles" + Path.DirectorySeparatorChar;
-        private static string PROJECT_ROOT = ".." + 
-                            Path.DirectorySeparatorChar + ".." + 
-                            Path.DirectorySeparatorChar + ".." + 
-                            Path.DirectorySeparatorChar;
-        private static string EXE_PATH = Path.DirectorySeparatorChar+
-                            "bin"+ Path.DirectorySeparatorChar + 
-                            "Debug"+ Path.DirectorySeparatorChar;
+        public static string SCRIPT_FILES_DIRECTORY = ".." +
+                            Path.DirectorySeparatorChar +
+                            ".." + Path.DirectorySeparatorChar +
+                            "ScriptFiles" + Path.DirectorySeparatorChar;
 
         private FormPuppetMaster parentForm;
 
@@ -40,73 +38,126 @@ namespace PuppetMaster
         {
             processes = new Dictionary<string, string>();
             logServer = new LogServer();
-            TcpChannel channel = new TcpChannel(CommonUtil.PUPPET_MASTER_PORT);
+            TcpChannel channel = new TcpChannel(CommonConstants.PUPPET_MASTER_PORT);
             ChannelServices.RegisterChannel(channel, false);
-            RemotingServices.Marshal(logServer, CommonUtil.PUPPET_MASTER_NAME, typeof(LogServer));
+            RemotingServices.Marshal(logServer, CommonConstants.PUPPET_MASTER_NAME, typeof(LogServer));
             this.parentForm = form;
         }
 
         /* TODO We need to pass the tree structure to the other processes. */
         public void ReadConfigurationFile(string filePath)
         {
+            ManageSites sites = new ManageSites();
+            ProcessLauncher launcher = new ProcessLauncher();
             string[] tokens = null, lines = File.ReadAllLines(filePath);
-            string loggingLevel = "light", routingPolicy = "flooding",orderingPolicy = "FIFO";
-            Dictionary<string, string> sitesAndBrokers = new Dictionary<string, string>(); 
-            Dictionary<string, List<string>> sites = new Dictionary<string, List<string>>();
-
             logServer.LogFile = "Log" + Path.GetFileName(filePath);
             LogManager.CreateLogFile(logServer.LogFile);
             parentForm.ReloadLogFiles();
             foreach (string line in lines)
             {
-                if (Regex.IsMatch(line,ParseUtil.SITE))
+                if (Regex.IsMatch(line, ParseUtil.SITE))
                 {
                     tokens = Regex.Split(line, ParseUtil.SPACE);
+                    Site children = sites.CreateSite(tokens[1]);
+                    if (!tokens[3].Equals("none"))
+                    {
+                        Site parent = sites.CreateSite(tokens[3]);
+                        children.Parent = parent;
+                        parent.AddChildrenSite(children);
+                    }
+                    else
+                        children.Parent = null;
                 }
-                else if (Regex.IsMatch(line,ParseUtil.PROCESS))
+                else if (Regex.IsMatch(line, ParseUtil.PROCESS))
                 {
                     tokens = Regex.Split(line, ParseUtil.SPACE);
-                    string processType = tokens[3].First().ToString().ToUpper() 
-                          + tokens[3].Substring(1);
-                    string[] urlParse = ParseUtil.ParseURL(tokens[7]);
+                    string processType = tokens[3];
+                    string port = ParseUtil.ExtractPorFromURLS(tokens[7]);
                     processes.Add(tokens[1], tokens[7]);
                     parentForm.Invoke(new AddProcess(parentForm.AddToGenericProcesses),
                         tokens[1]);
-                    if (processType.Equals("Publisher"))
+                    if (processType.Equals("publisher"))
                     {
                         parentForm.Invoke(new AddProcess(parentForm.AddToPublishersProcesses),
                             tokens[1]);
+                        launcher.AddNode(new LaunchPublisher(tokens[1],
+                            ParseUtil.ExtractIPFromURL(tokens[7]), port, tokens[5]));
                     }
-                    else if (processType.Equals("Subscriber"))
+                    else if (processType.Equals("subscriber"))
                     {
                         parentForm.Invoke(new AddProcess(parentForm.AddToSubscribersProcesses),
                             tokens[1]);
+                        launcher.AddNode(new LaunchSubscriber(tokens[1],
+                            ParseUtil.ExtractIPFromURL(tokens[7]), port, tokens[5]));
                     }
-                    else if (processType.Equals("Broker"))
+                    else if (processType.Equals("broker"))
                     {
-                        sitesAndBrokers.Add(tokens[5],tokens[7]);
+                        sites.GetSiteByName(tokens[5]).AddBrokerUrlToSite(tokens[7]);
+                        launcher.AddNode(new LaunchBroker(tokens[1],
+                           ParseUtil.ExtractIPFromURL(tokens[7]), port, tokens[5]));
                     }
-                    Process.Start(PROJECT_ROOT + processType + EXE_PATH + processType,
-                        String.Join(" ",urlParse));
                 }
-                else if (Regex.IsMatch(line,ParseUtil.ROUTING))
+                else if (Regex.IsMatch(line, ParseUtil.ROUTING))
                 {
                     tokens = Regex.Split(line, ParseUtil.SPACE);
-                    routingPolicy = tokens[1];
+                    launcher.RoutingPolicy = tokens[1];
                 }
-                else if (Regex.IsMatch(line,ParseUtil.ORDERING))
+                else if (Regex.IsMatch(line, ParseUtil.ORDERING))
                 {
                     tokens = Regex.Split(line, ParseUtil.SPACE);
-                    orderingPolicy = tokens[1];
+                    launcher.OrderingPolicy = tokens[1];
                 }
-                else if(Regex.IsMatch(line, ParseUtil.LOGGING_LEVEL))
+                else if (Regex.IsMatch(line, ParseUtil.LOGGING_LEVEL))
                 {
                     tokens = Regex.Split(line, ParseUtil.SPACE);
-                    loggingLevel = tokens[1];
+                    launcher.LogPolicy = tokens[1];
+                }
+            }
+            launcher.LaunchAllProcesses(sites); 
+        }
+
+        public void ReadScriptFile(string scriptFilePath)
+        {
+            string[] lines = File.ReadAllLines(scriptFilePath);
+            foreach (string line in lines)
+            {
+                if (Regex.IsMatch(line, "^Publisher"))
+                {
+                    string[] tokens = line.Split(' ');
+                    Publish(tokens[1], int.Parse(tokens[7]), int.Parse(tokens[3]),
+                        tokens[5]);
+                }
+                else if (Regex.IsMatch(line, "^Subscriber"))
+                {
+                    string[] tokens = line.Split(' ');
+                    Subscribe(tokens[1], tokens[3]);
+                }
+                else if (Regex.IsMatch(line, "^Crash"))
+                {
+                    string[] tokens = line.Split(' ');
+                    Crash(tokens[1]);
+                }
+                else if (Regex.IsMatch(line, "^Freeze"))
+                {
+                    string[] tokens = line.Split(' ');
+                    Freeze(tokens[1]);
+                }
+                else if (Regex.IsMatch(line, "^Unfreeze"))
+                {
+                    string[] tokens = line.Split(' ');
+                    Unfreeze(tokens[1]);
+                }
+                else if (Regex.IsMatch(line, "^Status"))
+                {
+                    Status();
+                }
+                else if (Regex.IsMatch(line, "^Wait"))
+                {
+                    string[] tokens = line.Split(' ');
+                    Thread.Sleep(int.Parse(tokens[1]));
                 }
             }
         }
-
         /* ########################## Remote Calls ########################## */
 
         public void Status()
@@ -191,7 +242,7 @@ namespace PuppetMaster
                 processes[processName]) as IPublisher;
             node.Publish(topic, numberOfEvents, interval);
             logServer.LogAction("Publisher " + processName + " Publish " + numberOfEvents
-               + " Ontopic " + topic + " Inteval " + interval);
+               + " Ontopic " + topic + " Interval " + interval);
         }
 
     }

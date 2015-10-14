@@ -40,6 +40,7 @@ namespace PuppetMaster
             comboBoxProcesses.Items.Add(processName);
         }
 
+
         public void ReloadLogFiles()
         {
             treeViewLogFiles.Nodes.Clear();
@@ -61,6 +62,10 @@ namespace PuppetMaster
                 ProcessesManager.CONFIG_FILES_DIRECTORY);
             foreach(string file in files)
                 treeViewConfigFiles.Nodes.Add(Path.GetFileName(file));
+            files = Directory.GetFiles(
+                ProcessesManager.SCRIPT_FILES_DIRECTORY);
+            foreach (string file in files)
+                treeViewScriptFiles.Nodes.Add(Path.GetFileName(file));
             ReloadLogFiles();
         }
 
@@ -72,6 +77,13 @@ namespace PuppetMaster
                 File.Delete(LogManager.LOG_FILES_DIRECTORY + tree.SelectedNode.Text);
             }
             ReloadLogFiles();
+        }
+
+        private void treeViewScriptFiles_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            TreeView tree = sender as TreeView;
+            manager.ReadScriptFile(
+                ProcessesManager.SCRIPT_FILES_DIRECTORY + tree.SelectedNode.Text);
         }
 
         private void treeViewConfigFiles_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -134,5 +146,7 @@ namespace PuppetMaster
         {
             //TODO
         }
+
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PuppetMaster
@@ -14,17 +15,20 @@ namespace PuppetMaster
         public static string PROCESS = "^Process";
         public static string LOGGING_LEVEL = "^LoggingLevel";
         public static string SPACE = "[ \t]+";
-        public static string NAME = "([0-9]|[A-Z]|[a-z])+";
 
-        // Very AD HOC method :) - Parse the URL to get Port and Name
-        // So ad hoc that only works with ports with 4 digits :)
-        public static string[] ParseURL(string url)
+        public static int ExtractPortFromURL(string url)
         {
-            //res[0] = port, res[1] = name
-            string[] res = new string[2];
-            res[0] = url.Substring(16, 4);
-            res[1] = url.Substring(21, url.Length - 21);
-            return res;
+            return new Uri(url).Port;
+        }
+
+        public static string ExtractPorFromURLS(string url)
+        {
+            return new Uri(url).Port.ToString();
+        }
+
+        public static string ExtractIPFromURL(string url)
+        {
+            return new Uri(url).Host;
         }
 
     }

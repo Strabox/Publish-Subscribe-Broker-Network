@@ -59,6 +59,8 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.treeViewLogFiles = new System.Windows.Forms.TreeView();
             this.label10 = new System.Windows.Forms.Label();
+            this.treeViewScriptFiles = new System.Windows.Forms.TreeView();
+            this.label11 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -69,7 +71,7 @@
             // 
             this.treeViewConfigFiles.Location = new System.Drawing.Point(760, 50);
             this.treeViewConfigFiles.Name = "treeViewConfigFiles";
-            this.treeViewConfigFiles.Size = new System.Drawing.Size(192, 147);
+            this.treeViewConfigFiles.Size = new System.Drawing.Size(192, 99);
             this.treeViewConfigFiles.TabIndex = 0;
             this.treeViewConfigFiles.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.treeViewConfigFiles_MouseDoubleClick);
             // 
@@ -355,13 +357,13 @@
             this.groupBox4.Size = new System.Drawing.Size(369, 94);
             this.groupBox4.TabIndex = 19;
             this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "No idea what to put here";
+            this.groupBox4.Text = "Broadcast Operations";
             // 
             // treeViewLogFiles
             // 
-            this.treeViewLogFiles.Location = new System.Drawing.Point(760, 223);
+            this.treeViewLogFiles.Location = new System.Drawing.Point(760, 168);
             this.treeViewLogFiles.Name = "treeViewLogFiles";
-            this.treeViewLogFiles.Size = new System.Drawing.Size(192, 141);
+            this.treeViewLogFiles.Size = new System.Drawing.Size(192, 86);
             this.treeViewLogFiles.TabIndex = 20;
             this.treeViewLogFiles.KeyUp += new System.Windows.Forms.KeyEventHandler(this.treeViewLogFiles_KeyUp);
             this.treeViewLogFiles.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.treeViewLogFiles_MouseDoubleClick);
@@ -369,17 +371,36 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(757, 207);
+            this.label10.Location = new System.Drawing.Point(760, 152);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(49, 13);
             this.label10.TabIndex = 21;
             this.label10.Text = "Log Files";
             // 
+            // treeViewScriptFiles
+            // 
+            this.treeViewScriptFiles.Location = new System.Drawing.Point(763, 280);
+            this.treeViewScriptFiles.Name = "treeViewScriptFiles";
+            this.treeViewScriptFiles.Size = new System.Drawing.Size(192, 94);
+            this.treeViewScriptFiles.TabIndex = 22;
+            this.treeViewScriptFiles.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.treeViewScriptFiles_MouseDoubleClick);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(760, 261);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(58, 13);
+            this.label11.TabIndex = 23;
+            this.label11.Text = "Script Files";
+            // 
             // FormPuppetMaster
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(960, 376);
+            this.ClientSize = new System.Drawing.Size(960, 382);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.treeViewScriptFiles);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.treeViewLogFiles);
             this.Controls.Add(this.groupBox4);
@@ -438,6 +459,8 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.TreeView treeViewLogFiles;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TreeView treeViewScriptFiles;
+        private System.Windows.Forms.Label label11;
     }
 }
 

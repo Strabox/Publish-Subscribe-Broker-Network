@@ -28,9 +28,14 @@ namespace CommonTypes
         void Unsubscribe(string topicName);
     }
 
-    public interface ILogServer
+    public interface IPuppetMasterLog
     {
         void LogAction(string logMessage);
+    }
+
+    public interface IPuppetMasterLauncher
+    {
+        void LaunchProcess(string name,string args);
     }
 
 }
