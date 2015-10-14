@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonTypes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -6,6 +7,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,6 +16,8 @@ using System.Windows.Forms;
 namespace PuppetMaster
 {
     public delegate void AddProcess(string processName);
+
+    public delegate void Enable(bool enable);
 
     public partial class FormPuppetMaster : Form
     {
@@ -40,12 +45,16 @@ namespace PuppetMaster
             comboBoxProcesses.Items.Add(processName);
         }
 
+        public void EnableConfigFiles(bool enable)
+        {
+            treeViewConfigFiles.Enabled = enable;
+        }
 
         public void ReloadLogFiles()
         {
             treeViewLogFiles.Nodes.Clear();
             IEnumerable<string> files = Directory.GetFiles(
-                LogManager.LOG_FILES_DIRECTORY);
+                LogServer.LOG_FILES_DIRECTORY);
             foreach (string file in files)
             {
                 if(!Path.GetFileName(file).Equals(".gitkeep"))
@@ -57,6 +66,8 @@ namespace PuppetMaster
 
         private void FormPuppetMaster_Load(object sender, EventArgs e)
         {
+            TcpChannel channel = new TcpChannel(CommonConstants.PUPPET_MASTER_PORT);
+            ChannelServices.RegisterChannel(channel, false);
             manager = new ProcessesManager(this);
             IEnumerable<string> files = Directory.GetFiles(
                 ProcessesManager.CONFIG_FILES_DIRECTORY);
@@ -74,7 +85,7 @@ namespace PuppetMaster
             TreeView tree = sender as TreeView;
             if (null != tree.SelectedNode && e.KeyCode == Keys.Delete)
             {
-                File.Delete(LogManager.LOG_FILES_DIRECTORY + tree.SelectedNode.Text);
+                File.Delete(LogServer.LOG_FILES_DIRECTORY + tree.SelectedNode.Text);
             }
             ReloadLogFiles();
         }
@@ -91,12 +102,13 @@ namespace PuppetMaster
             TreeView tree = sender as TreeView;
             manager.ReadConfigurationFile(
                 ProcessesManager.CONFIG_FILES_DIRECTORY + tree.SelectedNode.Text);
+            tree.Enabled = false;
         }
 
         private void treeViewLogFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             TreeView tree = sender as TreeView;
-            Process.Start(LogManager.LOG_FILES_DIRECTORY+tree.SelectedNode.Text);
+            Process.Start(LogServer.LOG_FILES_DIRECTORY+tree.SelectedNode.Text);
         }
 
 
@@ -119,22 +131,23 @@ namespace PuppetMaster
 
         private void buttonFreeze_Click(object sender, EventArgs e)
         {
-            //TODO
+            manager.Freeze(comboBoxProcesses.Text);
         }
 
         private void buttonPublish_Click(object sender, EventArgs e)
         {
-            //TODO
+            manager.Publish(comboBoxTopicPublish.Text, int.Parse(textBoxInterval.Text),
+                int.Parse(textBoxNrEvents.Text), comboBoxTopicPublish.Text);
         }
 
         private void buttonUnsubscribe_Click(object sender, EventArgs e)
         {
-            //TODO
+            manager.Unsubscribe(comboBoxSubUnsub.Text, comboBoxTopicSub.Text);
         }
 
         private void buttonUnfreeze_Click(object sender, EventArgs e)
         {
-            //TODO
+            manager.Unfreeze(comboBoxProcesses.Text);
         }
 
         private void buttonStatus_Click(object sender, EventArgs e)
@@ -144,7 +157,7 @@ namespace PuppetMaster
 
         private void buttonSubscribe_Click(object sender, EventArgs e)
         {
-            //TODO
+            manager.Subscribe(comboBoxSubUnsub.Text, comboBoxTopicSub.Text);
         }
 
 

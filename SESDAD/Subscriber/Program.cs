@@ -23,9 +23,7 @@ namespace Subscriber
                 args[0], args[1], args[2],args[3],args[4]);
             Console.WriteLine("Brokers copies:");
             for(int i = 5; i < args.Length; i++)
-            {
                 Console.WriteLine(args[i]);
-            }
 
             TcpChannel channel = new TcpChannel(int.Parse(args[0]));
             ChannelServices.RegisterChannel(channel, false);

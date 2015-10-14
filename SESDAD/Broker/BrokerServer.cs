@@ -31,8 +31,6 @@ namespace Broker
             //TODO
         }
 
-        /*As far as I know this is necessary to override the
-        .NET Remoting lease times. */
         public override object InitializeLifetimeService()
         {
             return null;

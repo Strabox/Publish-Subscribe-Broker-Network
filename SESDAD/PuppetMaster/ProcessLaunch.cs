@@ -129,12 +129,13 @@ namespace PuppetMaster
             this.site = site;
         }
 
-        protected void LaunchRemoteProcess(string name,string args)
+        protected void LaunchRemoteProcess(string processName,string args)
         {
             IPuppetMasterLauncher launcher = Activator.GetObject(
-                    typeof(IPuppetMasterLauncher), "tcp://" + Ip + ":" + Port + '/' +
+                    typeof(IPuppetMasterLauncher), "tcp://" + Ip + ":" +
+                    CommonConstants.PUPPET_MASTER_PORT + '/' +
                     CommonConstants.PUPPET_MASTER_NAME) as IPuppetMasterLauncher;
-            launcher.LaunchProcess(Name, args);
+            launcher.LaunchProcess(processName, args);
         }
 
         public abstract void Launch(ManageSites sites,string orderingPolicy

@@ -5,7 +5,7 @@ Process broker0 Is broker On site0 URL tcp://localhost:3333/broker0
 Process broker1 Is broker On site1 URL tcp://localhost:3338/broker1
 Process broker2 Is broker On site2 URL tcp://localhost:3339/broker2
 Process publisher0 Is publisher On site0 URL tcp://localhost:3334/publisher0
-Process subscriber0 Is subscriber On site0 URL tcp://192.168.1.5:3335/subscriber0
+Process subscriber0 Is subscriber On site0 URL tcp://localhost:3335/subscriber0
 Process subscriber1 Is subscriber On site0 URL tcp://localhost:3336/subscriber1
 Process subscriber2 Is subscriber On site0 URL tcp://localhost:3337/subscriber2
 RoutingPolicy flooding

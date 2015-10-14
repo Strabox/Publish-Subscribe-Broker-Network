@@ -25,6 +25,10 @@ namespace PuppetMaster
                             Path.DirectorySeparatorChar +
                             ".." + Path.DirectorySeparatorChar +
                             "ScriptFiles" + Path.DirectorySeparatorChar;
+        public static string LOG_FILES_DIRECTORY = ".."
+                             + Path.DirectorySeparatorChar +
+                             ".." + Path.DirectorySeparatorChar +
+                             "LogFiles" + Path.DirectorySeparatorChar;
 
         private FormPuppetMaster parentForm;
 
@@ -38,20 +42,18 @@ namespace PuppetMaster
         {
             processes = new Dictionary<string, string>();
             logServer = new LogServer();
-            TcpChannel channel = new TcpChannel(CommonConstants.PUPPET_MASTER_PORT);
-            ChannelServices.RegisterChannel(channel, false);
-            RemotingServices.Marshal(logServer, CommonConstants.PUPPET_MASTER_NAME, typeof(LogServer));
+            RemotingServices.Marshal(logServer, CommonConstants.PUPPET_MASTER_NAME,
+                typeof(LogServer));
             this.parentForm = form;
         }
 
-        /* TODO We need to pass the tree structure to the other processes. */
         public void ReadConfigurationFile(string filePath)
         {
             ManageSites sites = new ManageSites();
             ProcessLauncher launcher = new ProcessLauncher();
             string[] tokens = null, lines = File.ReadAllLines(filePath);
             logServer.LogFile = "Log" + Path.GetFileName(filePath);
-            LogManager.CreateLogFile(logServer.LogFile);
+            File.CreateText(LOG_FILES_DIRECTORY + logServer.LogFile).Close(); 
             parentForm.ReloadLogFiles();
             foreach (string line in lines)
             {
@@ -181,6 +183,7 @@ namespace PuppetMaster
                 logServer.LogAction("Crash " + pair.Key);
             }
             processes.Clear();
+            parentForm.BeginInvoke(new Enable(parentForm.EnableConfigFiles), true);
         }
 
         public void Crash(string processName)
@@ -192,6 +195,8 @@ namespace PuppetMaster
             node.Crash();
             logServer.LogAction("Crash " + processName);
             processes.Remove(processName);
+            if(processes.Count == 0)
+                parentForm.BeginInvoke(new Enable(parentForm.EnableConfigFiles), true);
         }
 
         public void Freeze(string processName)

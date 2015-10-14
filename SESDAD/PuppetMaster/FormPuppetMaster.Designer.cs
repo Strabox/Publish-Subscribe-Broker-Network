@@ -41,10 +41,10 @@
             this.label7 = new System.Windows.Forms.Label();
             this.comboBoxPublish = new System.Windows.Forms.ComboBox();
             this.comboBoxTopicPublish = new System.Windows.Forms.ComboBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBoxInterval = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBoxNrEvents = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.buttonPublish = new System.Windows.Forms.Button();
             this.buttonStatus = new System.Windows.Forms.Button();
@@ -162,10 +162,10 @@
             this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.comboBoxPublish);
             this.groupBox2.Controls.Add(this.comboBoxTopicPublish);
-            this.groupBox2.Controls.Add(this.textBox2);
+            this.groupBox2.Controls.Add(this.textBoxInterval);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Controls.Add(this.textBox1);
+            this.groupBox2.Controls.Add(this.textBoxNrEvents);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.buttonPublish);
             this.groupBox2.Location = new System.Drawing.Point(385, 34);
@@ -204,12 +204,12 @@
             this.comboBoxTopicPublish.Size = new System.Drawing.Size(349, 21);
             this.comboBoxTopicPublish.TabIndex = 8;
             // 
-            // textBox2
+            // textBoxInterval
             // 
-            this.textBox2.Location = new System.Drawing.Point(182, 149);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(181, 20);
-            this.textBox2.TabIndex = 11;
+            this.textBoxInterval.Location = new System.Drawing.Point(182, 149);
+            this.textBoxInterval.Name = "textBoxInterval";
+            this.textBoxInterval.Size = new System.Drawing.Size(181, 20);
+            this.textBoxInterval.TabIndex = 11;
             // 
             // label5
             // 
@@ -229,12 +229,12 @@
             this.label4.TabIndex = 9;
             this.label4.Text = "Number of Events";
             // 
-            // textBox1
+            // textBoxNrEvents
             // 
-            this.textBox1.Location = new System.Drawing.Point(9, 149);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(167, 20);
-            this.textBox1.TabIndex = 6;
+            this.textBoxNrEvents.Location = new System.Drawing.Point(9, 149);
+            this.textBoxNrEvents.Name = "textBoxNrEvents";
+            this.textBoxNrEvents.Size = new System.Drawing.Size(167, 20);
+            this.textBoxNrEvents.TabIndex = 6;
             // 
             // label3
             // 
@@ -437,10 +437,10 @@
         private System.Windows.Forms.Button buttonPublish;
         private System.Windows.Forms.Button buttonUnsubscribe;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox textBoxInterval;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxNrEvents;
         private System.Windows.Forms.Button buttonStatus;
         private System.Windows.Forms.Button buttonCrashAll;
         private System.Windows.Forms.Button buttonCrashProcess;

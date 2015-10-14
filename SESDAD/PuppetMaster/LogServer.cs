@@ -10,8 +10,10 @@ namespace PuppetMaster
 {
     public class LogServer : MarshalByRefObject, IPuppetMasterLog
     {
-
-        private LogManager logManager;
+        public static string LOG_FILES_DIRECTORY = ".."
+                             + Path.DirectorySeparatorChar +
+                             ".." + Path.DirectorySeparatorChar +
+                             "LogFiles" + Path.DirectorySeparatorChar;
 
         private string logFile = null;
 
@@ -21,25 +23,25 @@ namespace PuppetMaster
             {
                 return logFile;
             }
-
             set
             {
                 logFile = value;
             }
         }
 
-        public LogServer()
-        {
-            logManager = new LogManager();
-        }
-
         public void LogAction(string logMessage)
         {
-            logManager.LogSystemAction(logMessage,LogFile);
+            lock (this)
+            {
+                if (logFile == null)
+                    return;
+                StreamWriter writer = File.AppendText(
+                LOG_FILES_DIRECTORY + logFile);
+                writer.Write(logMessage + Environment.NewLine);
+                writer.Close();
+            }
         }
 
-        /*As far as I know this is necessary to override the
-       .NET lease times. */
         public override object InitializeLifetimeService()
         {
             return null;

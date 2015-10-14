@@ -1,4 +1,7 @@
 ﻿Crash broker0
-Wait 100
+Wait 1000
 Freeze broker1
 Crash broker1
+Crash broker2
+Wait 200
+Crash subscriber0
