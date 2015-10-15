@@ -24,7 +24,7 @@ namespace PuppetMasterProcessLauncher
             if(IsLinux)
                 Process.Start("mono",
                 string.Join(" ", CommonConstants.PROJECT_ROOT + name +
-                CommonConstants.EXE_PATH + name, args));
+                CommonConstants.EXE_PATH + name+".exe", args));
             else
                 Process.Start(CommonConstants.PROJECT_ROOT + name +
                 CommonConstants.EXE_PATH + name, args);
