@@ -1,7 +1,7 @@
 ﻿Site site0 Parent none
 Site site1 Parent site0
 Site site2 Parent site0
-Process broker0 Is broker On site0 URL tcp://localhost:3333/broker0
+Process broker0 Is broker On site0 URL tcp://192.168.1.69:3333/broker0
 Process broker3 Is broker On site0 URL tcp://localhost:3331/broker3
 Process broker1 Is broker On site1 URL tcp://localhost:3338/broker1
 Process broker2 Is broker On site2 URL tcp://localhost:10000/broker2
