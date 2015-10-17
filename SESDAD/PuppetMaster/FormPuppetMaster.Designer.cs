@@ -61,6 +61,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.treeViewScriptFiles = new System.Windows.Forms.TreeView();
             this.label11 = new System.Windows.Forms.Label();
+            this.checkBoxDebug = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -379,6 +380,7 @@
             // 
             // treeViewScriptFiles
             // 
+            this.treeViewScriptFiles.Enabled = false;
             this.treeViewScriptFiles.Location = new System.Drawing.Point(763, 280);
             this.treeViewScriptFiles.Name = "treeViewScriptFiles";
             this.treeViewScriptFiles.Size = new System.Drawing.Size(192, 94);
@@ -394,11 +396,25 @@
             this.label11.TabIndex = 23;
             this.label11.Text = "Script Files";
             // 
+            // checkBoxDebug
+            // 
+            this.checkBoxDebug.AutoSize = true;
+            this.checkBoxDebug.Checked = true;
+            this.checkBoxDebug.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxDebug.Location = new System.Drawing.Point(760, 12);
+            this.checkBoxDebug.Name = "checkBoxDebug";
+            this.checkBoxDebug.Size = new System.Drawing.Size(58, 17);
+            this.checkBoxDebug.TabIndex = 25;
+            this.checkBoxDebug.Text = "Debug";
+            this.checkBoxDebug.UseVisualStyleBackColor = true;
+            this.checkBoxDebug.CheckedChanged += new System.EventHandler(this.checkBoxDebug_CheckedChanged);
+            // 
             // FormPuppetMaster
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(960, 382);
+            this.Controls.Add(this.checkBoxDebug);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.treeViewScriptFiles);
             this.Controls.Add(this.label10);
@@ -461,6 +477,7 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TreeView treeViewScriptFiles;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.CheckBox checkBoxDebug;
     }
 }
 

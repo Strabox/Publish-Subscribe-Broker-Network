@@ -1,6 +1,7 @@
 ﻿using CommonTypes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -74,7 +75,7 @@ namespace PuppetMaster
                 {
                     tokens = Regex.Split(line, ParseUtil.SPACE);
                     string processType = tokens[3];
-                    string port = ParseUtil.ExtractPorFromURLS(tokens[7]);
+                    string port = ParseUtil.ExtractPortFromURL(tokens[7]);
                     processes.Add(tokens[1], tokens[7]);
                     parentForm.Invoke(new AddProcess(parentForm.AddToGenericProcesses),
                         tokens[1]);
@@ -118,11 +119,10 @@ namespace PuppetMaster
             launcher.LaunchAllProcesses(sites); 
         }
 
-        public void ExecuteScriptFile(string scriptFilePath)
+        public void ExecuteScriptFile(string scriptFilePath,BackgroundWorker worker)
         {
             string[] lines = File.ReadAllLines(scriptFilePath);
-            ExecuteScriptForm form = new ExecuteScriptForm(lines.Length);
-            form.Show();
+            int scriptLines = lines.Length,percentageCompleted = 0;
             foreach (string line in lines)
             {
                 if (Regex.IsMatch(line, ParseUtil.PUBLISH))
@@ -152,15 +152,20 @@ namespace PuppetMaster
                     Unfreeze(tokens[1]);
                 }
                 else if (Regex.IsMatch(line, ParseUtil.STATUS))
-                {
-                    Status();
-                }
+                    Status();         
                 else if (Regex.IsMatch(line, ParseUtil.WAIT))
                 {
                     string[] tokens = line.Split(' ');
                     Thread.Sleep(int.Parse(tokens[1]));
                 }
-                form.IncreaseBar();
+                else if(Regex.IsMatch(line, ParseUtil.UNSUBSCRIBE))
+                {
+                    string[] tokens = line.Split(' ');
+                    Unsubscribe(tokens[1], tokens[3]);
+                }
+                percentageCompleted += (int)Math.Ceiling(((double)1 / (double)scriptLines) * 100);
+                percentageCompleted = (percentageCompleted > 100) ? 100 : percentageCompleted;
+                worker.ReportProgress(percentageCompleted);
             }
         }
         /* ########################## Remote Calls ########################## */
@@ -187,6 +192,7 @@ namespace PuppetMaster
             }
             processes.Clear();
             parentForm.BeginInvoke(new Enable(parentForm.EnableConfigFiles), true);
+            parentForm.BeginInvoke(new Enable(parentForm.EnableScriptFiles), false);
         }
 
         public void Crash(string processName)
@@ -198,8 +204,12 @@ namespace PuppetMaster
             node.Crash();
             logServer.LogAction("Crash " + processName);
             processes.Remove(processName);
-            if(processes.Count == 0)
+            if (processes.Count == 0)
+            {
                 parentForm.BeginInvoke(new Enable(parentForm.EnableConfigFiles), true);
+                parentForm.BeginInvoke(new Enable(parentForm.EnableScriptFiles), false);
+            }
+
         }
 
         public void Freeze(string processName)

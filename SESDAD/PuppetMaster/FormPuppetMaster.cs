@@ -24,6 +24,16 @@ namespace PuppetMaster
 
         private ProcessesManager manager;
 
+        private static bool debug;
+
+        //Used do activate de Debug Messages to Debug Console.
+        public static bool Debug
+        {
+            get
+            {
+                return debug;
+            }
+        }
 
         public FormPuppetMaster()
         {
@@ -43,6 +53,11 @@ namespace PuppetMaster
         public void AddToGenericProcesses(string processName)
         {
             comboBoxProcesses.Items.Add(processName);
+        }
+
+        public void EnableScriptFiles(bool enable)
+        {
+            treeViewScriptFiles.Enabled = enable;
         }
 
         public void EnableConfigFiles(bool enable)
@@ -93,8 +108,9 @@ namespace PuppetMaster
         private void treeViewScriptFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             TreeView tree = sender as TreeView;
-            manager.ExecuteScriptFile(
-                ProcessesManager.SCRIPT_FILES_DIRECTORY + tree.SelectedNode.Text);
+            ExecuteScriptForm form = new ExecuteScriptForm(
+                ProcessesManager.SCRIPT_FILES_DIRECTORY + tree.SelectedNode.Text,manager);
+            form.ShowDialog();
         }
 
         private void treeViewConfigFiles_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -103,6 +119,7 @@ namespace PuppetMaster
             manager.LaunchConfigurationFile(
                 ProcessesManager.CONFIG_FILES_DIRECTORY + tree.SelectedNode.Text);
             tree.Enabled = false;
+            treeViewScriptFiles.Enabled = true;
         }
 
         private void treeViewLogFiles_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -160,6 +177,9 @@ namespace PuppetMaster
             manager.Subscribe(comboBoxSubUnsub.Text, comboBoxTopicSub.Text);
         }
 
-
+        private void checkBoxDebug_CheckedChanged(object sender, EventArgs e)
+        {
+            debug = (sender as CheckBox).Checked;
+        }
     }
 }

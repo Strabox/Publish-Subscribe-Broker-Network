@@ -12,6 +12,7 @@ namespace PuppetMaster
     {
         public static string NAME = "([0-9]|[A-Z]|[a-z])+";
         public static string SPACE = "[ \t]+";
+        public static string TOPIC_NAME = "([0-9]|[A-Z]|[a-z]|\\*|/)+"; //TODO correct it :)
 
         //Configuration File
         public static string SITE = "^Site" + SPACE + NAME + SPACE +  "Parent" + SPACE + NAME;
@@ -20,7 +21,7 @@ namespace PuppetMaster
         public static string LOGGING_LEVEL = "^LoggingLevel" + SPACE + "(light|full)";
         public static string PROCESS = "^Process" + SPACE + NAME + SPACE + "Is" + SPACE +
             "(broker|publisher|subscriber)" + SPACE + "On" + SPACE + NAME + SPACE
-            + "URL";
+            + "URL";    //TODO unfinished match for URL
 
         //Script files
         public static string CRASH = "^Crash" + SPACE + NAME;
@@ -28,15 +29,15 @@ namespace PuppetMaster
         public static string FREEZE = "^Freeze" + SPACE + NAME;
         public static string WAIT = "^Wait" + SPACE + "[0-9]+";
         public static string UNFREEZE = "^Unfreeze" + SPACE + NAME;
-        public static string PUBLISH = "^PubEvent";
-        public static string SUBSCRIBE = "^SubEvent";
+        public static string PUBLISH = "^Publisher" + SPACE + NAME + SPACE + "Publish"
+            + SPACE + "[0-9]+" + SPACE + "Ontopic" + SPACE + TOPIC_NAME + SPACE + "Interval" 
+            + SPACE + "[0-9]+";
+        public static string SUBSCRIBE = "^Subscriber" + SPACE + NAME + SPACE 
+            + "Subscribe" + SPACE + TOPIC_NAME;
+        public static string UNSUBSCRIBE = "^Subscriber" + SPACE + NAME + SPACE
+            + "Unsubscribe" + SPACE + TOPIC_NAME;
 
-        public static int ExtractPortFromURL(string url)
-        {
-            return new Uri(url).Port;
-        }
-
-        public static string ExtractPorFromURLS(string url)
+        public static string ExtractPortFromURL(string url)
         {
             return new Uri(url).Port.ToString();
         }
