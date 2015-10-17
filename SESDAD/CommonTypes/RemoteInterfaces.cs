@@ -9,17 +9,19 @@ namespace CommonTypes
 {
     // Interfaces to system nodes communication.
 
-    public interface Broker
+    public interface IBroker
     {
-        //TODO
+        void Diffuse(Message message);
+        void Subscribe(string subscriber, string topic);
+        void Unsubscribe(string subscriber, string topic);
     }
 
-    public interface Subscriber
+    public interface ISubscriber
     {
-        //TODO
+        void Receive(Message message);
     }
 
-    public interface Publisher
+    public interface IPublisher
     {
         //TODO
     }

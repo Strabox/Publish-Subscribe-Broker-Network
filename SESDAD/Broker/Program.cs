@@ -31,7 +31,7 @@ namespace Broker
             TcpChannel channel = new TcpChannel(int.Parse(args[0]));
             ChannelServices.RegisterChannel(channel, false);
             //TODO detect and distinguish parents and children, and pass them to the server.
-            BrokerServer broker = new BrokerServer(args[2], args[3], args[4], args[5]);
+            BrokerServer broker = new BrokerServer(args[2], args[3], args[4], args[5], args[6], args.Skip(7).ToArray());
             RemotingServices.Marshal(broker, args[1], typeof(BrokerServer));
             Console.WriteLine("Broker up and running...");
             Console.ReadLine();
