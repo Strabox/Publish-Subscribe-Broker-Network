@@ -145,7 +145,7 @@ namespace PuppetMaster
             {
                 IPuppetMasterLauncher launcher = Activator.GetObject(
                     typeof(IPuppetMasterLauncher), CommonUtil.MakeUrl("tcp",
-                    Ip, CommonUtil.PUPPET_MASTER_NAME, CommonUtil.PUPPET_MASTER_NAME))
+                    Ip, CommonUtil.PUPPET_MASTER_PORT.ToString(), CommonUtil.PUPPET_MASTER_NAME))
                     as IPuppetMasterLauncher;
                 launcher.LaunchProcess(processType, args);
             }
