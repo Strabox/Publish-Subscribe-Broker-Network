@@ -12,8 +12,8 @@ namespace CommonTypes
     public interface IBroker
     {
         void Diffuse(Message message);
-        void Subscribe(string subscriber, string topic);
-        void Unsubscribe(string subscriber, string topic);
+        void Subscribe(ISubscriber subscriber, string topic);
+        void Unsubscribe(ISubscriber subscriber, string topic);
     }
 
     public interface ISubscriber
@@ -39,6 +39,7 @@ namespace CommonTypes
 
     public interface IPublisherControlServices
     {
+        [OneWay]
         void Publish(string topicName,int numberOfEvents,int interval);
     }
 
@@ -50,6 +51,7 @@ namespace CommonTypes
 
     public interface IPuppetMasterLog
     {
+        [OneWay]
         void LogAction(string logMessage);
     }
 

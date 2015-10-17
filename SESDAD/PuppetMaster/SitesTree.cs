@@ -44,26 +44,14 @@ namespace PuppetMaster
 
         public string Name
         {
-            get
-            {
-                return name;
-            }
-            set
-            {
-                name = value;
-            }
+            get { return name; }
+            set { name = value; }
         }
 
         public Site Parent
         {
-            get
-            {
-                return parent;
-            }
-            set
-            {
-                parent = value;
-            }
+            get { return parent; }
+            set { parent = value; }
         }
 
         public Site(string name)

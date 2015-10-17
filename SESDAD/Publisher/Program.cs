@@ -32,7 +32,7 @@ namespace Publisher
 
             TcpChannel channel = new TcpChannel(int.Parse(args[0]));
             ChannelServices.RegisterChannel(channel, false);
-            PublisherServer publisher = new PublisherServer(args[5],args[4],brokers);
+            PublisherServer publisher = new PublisherServer(args[1],args[5],args[4],brokers);
             RemotingServices.Marshal(publisher, args[1], typeof(PublisherServer));
             Console.WriteLine("Publisher up and running....");
             Console.ReadLine();

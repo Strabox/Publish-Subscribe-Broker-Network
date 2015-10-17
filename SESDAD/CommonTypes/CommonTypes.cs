@@ -2,6 +2,7 @@ using System;
 using System.Runtime.Serialization;
 
 namespace CommonTypes {
+
     [Serializable]
     public class Message : ISerializable
     {
@@ -18,6 +19,12 @@ namespace CommonTypes {
 			get { return content; }
 			set { content = value; }
 		}
+
+        public Message(string topic)
+        {
+            Topic = topic;
+        }
+
 		public Message(SerializationInfo info, StreamingContext context) 
 		{
 			topic = info.GetValue("topic", typeof(string)) as string;

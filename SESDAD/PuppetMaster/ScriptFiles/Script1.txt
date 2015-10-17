@@ -1,5 +1,4 @@
-﻿Crash broker0
-Wait 1000
+﻿Wait 1000
 Freeze broker1
 Crash broker1
 Crash broker2

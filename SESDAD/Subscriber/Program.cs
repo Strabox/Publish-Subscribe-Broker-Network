@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,19 +22,19 @@ namespace Subscriber
             string nl = Environment.NewLine;
             Console.WriteLine("Port: {0}" + nl + "Name: {1}" + nl + "OrderingPolicy: {2}"
                 + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}" + nl
-                + "PuppetMasterLogService: {5}",
+                + "PuppetMasterLogService: {5} Brokers:",
                 args[0], args[1], args[2], args[3], args[4], args[5]);
-            Console.WriteLine("Brokers:");
-            string[] brokers = new string[args.Length - 6];
             for (int i = 6; i < args.Length; i++)
-            {
-                brokers[i - 6] = args[i];
                 Console.WriteLine(args[i]);
-            }
 
-            TcpChannel channel = new TcpChannel(int.Parse(args[0]));
+            BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
+            provider.TypeFilterLevel = TypeFilterLevel.Full;
+            IDictionary props = new Hashtable();
+            props["port"] = int.Parse(args[0]);
+            TcpChannel channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(channel, false);
-            SubscriberServer subscriber = new SubscriberServer(args[5],args[4],brokers);
+            SubscriberServer subscriber = new SubscriberServer(args[1],args[5], 
+                args[4], args.Skip(6).ToArray());
             RemotingServices.Marshal(subscriber, args[1], typeof(SubscriberServer));
             Console.WriteLine("Subscriber up and running....");
             Console.ReadLine();

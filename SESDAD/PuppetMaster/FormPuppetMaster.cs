@@ -153,7 +153,7 @@ namespace PuppetMaster
 
         private void buttonPublish_Click(object sender, EventArgs e)
         {
-            manager.Publish(comboBoxTopicPublish.Text, int.Parse(textBoxInterval.Text),
+            manager.Publish(comboBoxPublish.Text, int.Parse(textBoxInterval.Text),
                 int.Parse(textBoxNrEvents.Text), comboBoxTopicPublish.Text);
         }
 

@@ -172,13 +172,13 @@ namespace PuppetMaster
 
         public void Status()
         {
-            foreach(KeyValuePair<string,string> pair in processes)
+            foreach (KeyValuePair<string,string> pair in processes)
             {
                 IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices), pair.Value)
                     as IGeneralControlServices;
+                logServer.LogAction("Status");
                 node.Status();
             }
-            logServer.LogAction("Status");
         }
 
         public void CrashAll()
@@ -187,8 +187,8 @@ namespace PuppetMaster
             {
                 IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices),pair.Value)
                     as IGeneralControlServices;
-                node.Crash();
                 logServer.LogAction("Crash " + pair.Key);
+                node.Crash();
             }
             processes.Clear();
             parentForm.BeginInvoke(new Enable(parentForm.EnableConfigFiles), true);
@@ -201,8 +201,8 @@ namespace PuppetMaster
                 return;
             IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices), 
                 processes[processName]) as IGeneralControlServices;
-            node.Crash();
             logServer.LogAction("Crash " + processName);
+            node.Crash();
             processes.Remove(processName);
             if (processes.Count == 0)
             {
@@ -218,8 +218,8 @@ namespace PuppetMaster
                 return;
             IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices), 
                 processes[processName]) as IGeneralControlServices;
-            node.Freeze();
             logServer.LogAction("Freeze " + processName);
+            node.Freeze();
         }
 
         public void Unfreeze(string processName)
@@ -228,8 +228,8 @@ namespace PuppetMaster
                 return;
             IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices),
                 processes[processName]) as IGeneralControlServices;
-            node.Unfreeze();
             logServer.LogAction("Unfreeze " + processName);
+            node.Unfreeze();
         }
 
         public void Subscribe(string processName,string topic)
@@ -238,8 +238,8 @@ namespace PuppetMaster
                 return;
             ISubscriberControlServices node = Activator.GetObject(typeof(ISubscriberControlServices),
                 processes[processName]) as ISubscriberControlServices;
-            node.Subscribe(topic);
             logServer.LogAction("Subscriber " + processName + " Subscribe " + topic);
+            node.Subscribe(topic);
         }
 
         public void Unsubscribe(string processName,string topic)
@@ -248,8 +248,8 @@ namespace PuppetMaster
                 return;
             ISubscriberControlServices node = Activator.GetObject(typeof(ISubscriberControlServices),
                 processes[processName]) as ISubscriberControlServices;
-            node.Unsubscribe(topic);
             logServer.LogAction("Subscriber " + processName + " Unsubscribe " + topic);
+            node.Unsubscribe(topic);
         }
 
         public void Publish(string processName,int interval,int numberOfEvents,string topic)
@@ -258,9 +258,9 @@ namespace PuppetMaster
                 return;
             IPublisherControlServices node = Activator.GetObject(typeof(IPublisherControlServices),
                 processes[processName]) as IPublisherControlServices;
-            node.Publish(topic, numberOfEvents, interval);
             logServer.LogAction("Publisher " + processName + " Publish " + numberOfEvents
                + " Ontopic " + topic + " Interval " + interval);
+            node.Publish(topic, numberOfEvents, interval);
         }
 
     }

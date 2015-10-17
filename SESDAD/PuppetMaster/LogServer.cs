@@ -19,14 +19,8 @@ namespace PuppetMaster
 
         public string LogFile
         {
-            get
-            {
-                return logFile;
-            }
-            set
-            {
-                logFile = value;
-            }
+            get { return logFile; }
+            set { logFile = value; }
         }
 
         public void LogAction(string logMessage)

@@ -26,38 +26,20 @@ namespace PuppetMaster
 
         public string RoutingPolicy
         {
-            get
-            {
-                return routingPolicy;
-            }
-            set
-            {
-                routingPolicy = value;
-            }
+            get { return routingPolicy; }
+            set { routingPolicy = value; }
         }
 
         public string LogLevel
         {
-            get
-            {
-                return logLevel;
-            }
-            set
-            {
-                logLevel = value;
-            }
+            get { return logLevel; }
+            set { logLevel = value; }
         }
 
         public string OrderingPolicy
         {
-            get
-            {
-                return orderingPolicy;
-            }
-            set
-            {
-                orderingPolicy = value;
-            }
+            get { return orderingPolicy; }
+            set { orderingPolicy = value; }
         }
 
         public ProcessLauncher()
@@ -91,34 +73,22 @@ namespace PuppetMaster
 
         public string Name
         {
-            get
-            {
-                return name;
-            }
+            get { return name; }
         }
 
         public string Ip
         {
-            get
-            {
-                return ip;
-            }
+            get { return ip; }
         }
 
         public string Port
         {
-            get
-            {
-                return port;
-            }
+            get { return port; }
         }
 
         public string Site
         {
-            get
-            {
-                return site;
-            }
+            get { return site; }
         }
 
         public LaunchNode(string name, string ip, string port, string site)
