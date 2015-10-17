@@ -135,8 +135,8 @@ namespace PuppetMaster
             {
                 if (CommonUtil.IsLinux)
                     Process.Start("mono",
-                        string.Join(" ", CommonUtil.PROJECT_ROOT + name +
-                        CommonUtil.EXE_PATH + name + ".exe", args));
+                        string.Join(" ", CommonUtil.PROJECT_ROOT + processType +
+                        CommonUtil.EXE_PATH + processType + ".exe", args));
                 else
                     Process.Start(CommonUtil.PROJECT_ROOT + processType +
                         CommonUtil.EXE_PATH + processType, args);
