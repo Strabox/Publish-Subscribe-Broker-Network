@@ -7,8 +7,26 @@ using System.Threading.Tasks;
 
 namespace CommonTypes
 {
+    // Interfaces to system nodes communication.
 
-    public interface ICommon
+    public interface Broker
+    {
+        //TODO
+    }
+
+    public interface Subscriber
+    {
+        //TODO
+    }
+
+    public interface Publisher
+    {
+        //TODO
+    }
+
+    // Interfaces to test and control of system processes.
+
+    public interface IGeneralControlServices
     {
         [OneWay]
         void Crash();
@@ -17,16 +35,16 @@ namespace CommonTypes
         void Status();
     }
 
-    public interface IPublisher
+    public interface IPublisherControlServices
     {
         void Publish(string topicName,int numberOfEvents,int interval);
     }
 
-    public interface ISubscriber
+    public interface ISubscriberControlServices
     {
         void Subscribe(string topicName);
         void Unsubscribe(string topicName);
-    }
+    }  
 
     public interface IPuppetMasterLog
     {

@@ -66,7 +66,7 @@ namespace PuppetMaster
 
         private void FormPuppetMaster_Load(object sender, EventArgs e)
         {
-            TcpChannel channel = new TcpChannel(CommonConstants.PUPPET_MASTER_PORT);
+            TcpChannel channel = new TcpChannel(CommonUtil.PUPPET_MASTER_PORT);
             ChannelServices.RegisterChannel(channel, false);
             manager = new ProcessesManager(this);
             IEnumerable<string> files = Directory.GetFiles(
@@ -93,14 +93,14 @@ namespace PuppetMaster
         private void treeViewScriptFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             TreeView tree = sender as TreeView;
-            manager.ReadScriptFile(
+            manager.ExecuteScriptFile(
                 ProcessesManager.SCRIPT_FILES_DIRECTORY + tree.SelectedNode.Text);
         }
 
         private void treeViewConfigFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             TreeView tree = sender as TreeView;
-            manager.ReadConfigurationFile(
+            manager.LaunchConfigurationFile(
                 ProcessesManager.CONFIG_FILES_DIRECTORY + tree.SelectedNode.Text);
             tree.Enabled = false;
         }

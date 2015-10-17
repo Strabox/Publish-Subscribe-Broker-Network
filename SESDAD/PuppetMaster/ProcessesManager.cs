@@ -42,12 +42,12 @@ namespace PuppetMaster
         {
             processes = new Dictionary<string, string>();
             logServer = new LogServer();
-            RemotingServices.Marshal(logServer, CommonConstants.PUPPET_MASTER_NAME,
+            RemotingServices.Marshal(logServer, CommonUtil.PUPPET_MASTER_NAME,
                 typeof(LogServer));
             this.parentForm = form;
         }
 
-        public void ReadConfigurationFile(string filePath)
+        public void LaunchConfigurationFile(string filePath)
         {
             ManageSites sites = new ManageSites();
             ProcessLauncher launcher = new ProcessLauncher();
@@ -112,52 +112,55 @@ namespace PuppetMaster
                 else if (Regex.IsMatch(line, ParseUtil.LOGGING_LEVEL))
                 {
                     tokens = Regex.Split(line, ParseUtil.SPACE);
-                    launcher.LogPolicy = tokens[1];
+                    launcher.LogLevel = tokens[1];
                 }
             }
             launcher.LaunchAllProcesses(sites); 
         }
 
-        public void ReadScriptFile(string scriptFilePath)
+        public void ExecuteScriptFile(string scriptFilePath)
         {
             string[] lines = File.ReadAllLines(scriptFilePath);
+            ExecuteScriptForm form = new ExecuteScriptForm(lines.Length);
+            form.Show();
             foreach (string line in lines)
             {
-                if (Regex.IsMatch(line, "^Publisher"))
+                if (Regex.IsMatch(line, ParseUtil.PUBLISH))
                 {
                     string[] tokens = line.Split(' ');
                     Publish(tokens[1], int.Parse(tokens[7]), int.Parse(tokens[3]),
                         tokens[5]);
                 }
-                else if (Regex.IsMatch(line, "^Subscriber"))
+                else if (Regex.IsMatch(line, ParseUtil.SUBSCRIBE))
                 {
                     string[] tokens = line.Split(' ');
                     Subscribe(tokens[1], tokens[3]);
                 }
-                else if (Regex.IsMatch(line, "^Crash"))
+                else if (Regex.IsMatch(line, ParseUtil.CRASH))
                 {
                     string[] tokens = line.Split(' ');
                     Crash(tokens[1]);
                 }
-                else if (Regex.IsMatch(line, "^Freeze"))
+                else if (Regex.IsMatch(line, ParseUtil.FREEZE))
                 {
                     string[] tokens = line.Split(' ');
                     Freeze(tokens[1]);
                 }
-                else if (Regex.IsMatch(line, "^Unfreeze"))
+                else if (Regex.IsMatch(line, ParseUtil.UNFREEZE))
                 {
                     string[] tokens = line.Split(' ');
                     Unfreeze(tokens[1]);
                 }
-                else if (Regex.IsMatch(line, "^Status"))
+                else if (Regex.IsMatch(line, ParseUtil.STATUS))
                 {
                     Status();
                 }
-                else if (Regex.IsMatch(line, "^Wait"))
+                else if (Regex.IsMatch(line, ParseUtil.WAIT))
                 {
                     string[] tokens = line.Split(' ');
                     Thread.Sleep(int.Parse(tokens[1]));
                 }
+                form.IncreaseBar();
             }
         }
         /* ########################## Remote Calls ########################## */
@@ -166,8 +169,8 @@ namespace PuppetMaster
         {
             foreach(KeyValuePair<string,string> pair in processes)
             {
-                ICommon node = Activator.GetObject(typeof(ICommon), pair.Value)
-                    as ICommon;
+                IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices), pair.Value)
+                    as IGeneralControlServices;
                 node.Status();
             }
             logServer.LogAction("Status");
@@ -177,8 +180,8 @@ namespace PuppetMaster
         {
             foreach(KeyValuePair<string,string> pair in processes)
             {
-                ICommon node = Activator.GetObject(typeof(ICommon),pair.Value)
-                    as ICommon;
+                IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices),pair.Value)
+                    as IGeneralControlServices;
                 node.Crash();
                 logServer.LogAction("Crash " + pair.Key);
             }
@@ -190,8 +193,8 @@ namespace PuppetMaster
         {
             if (!processes.ContainsKey(processName))
                 return;
-            ICommon node = Activator.GetObject(typeof(ICommon), 
-                processes[processName]) as ICommon;
+            IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices), 
+                processes[processName]) as IGeneralControlServices;
             node.Crash();
             logServer.LogAction("Crash " + processName);
             processes.Remove(processName);
@@ -203,8 +206,8 @@ namespace PuppetMaster
         {
             if (!processes.ContainsKey(processName))
                 return;
-            ICommon node = Activator.GetObject(typeof(ICommon), 
-                processes[processName]) as ICommon;
+            IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices), 
+                processes[processName]) as IGeneralControlServices;
             node.Freeze();
             logServer.LogAction("Freeze " + processName);
         }
@@ -213,8 +216,8 @@ namespace PuppetMaster
         {
             if (!processes.ContainsKey(processName))
                 return;
-            ICommon node = Activator.GetObject(typeof(ICommon),
-                processes[processName]) as ICommon;
+            IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices),
+                processes[processName]) as IGeneralControlServices;
             node.Unfreeze();
             logServer.LogAction("Unfreeze " + processName);
         }
@@ -223,8 +226,8 @@ namespace PuppetMaster
         {
             if (!processes.ContainsKey(processName))
                 return;
-            ISubscriber node = Activator.GetObject(typeof(ISubscriber),
-                processes[processName]) as ISubscriber;
+            ISubscriberControlServices node = Activator.GetObject(typeof(ISubscriberControlServices),
+                processes[processName]) as ISubscriberControlServices;
             node.Subscribe(topic);
             logServer.LogAction("Subscriber " + processName + " Subscribe " + topic);
         }
@@ -233,8 +236,8 @@ namespace PuppetMaster
         {
             if (!processes.ContainsKey(processName))
                 return;
-            ISubscriber node = Activator.GetObject(typeof(ISubscriber),
-                processes[processName]) as ISubscriber;
+            ISubscriberControlServices node = Activator.GetObject(typeof(ISubscriberControlServices),
+                processes[processName]) as ISubscriberControlServices;
             node.Unsubscribe(topic);
             logServer.LogAction("Subscriber " + processName + " Unsubscribe " + topic);
         }
@@ -243,8 +246,8 @@ namespace PuppetMaster
         {
             if (!processes.ContainsKey(processName))
                 return;
-            IPublisher node = Activator.GetObject(typeof(IPublisher),
-                processes[processName]) as IPublisher;
+            IPublisherControlServices node = Activator.GetObject(typeof(IPublisherControlServices),
+                processes[processName]) as IPublisherControlServices;
             node.Publish(topic, numberOfEvents, interval);
             logServer.LogAction("Publisher " + processName + " Publish " + numberOfEvents
                + " Ontopic " + topic + " Interval " + interval);

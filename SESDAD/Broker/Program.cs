@@ -15,21 +15,23 @@ namespace Broker
         
         static void Main(string[] args)
         {
-            if (args.Length < 5 || args[0] == null || args[1] == null) {
+            if (args.Length < 5) {
                 Console.Error.WriteLine("Wrong usage.");
                 return;                                
             }
             string nl = Environment.NewLine;
             Console.WriteLine("Port: {0}" + nl + "Name: {1}" + nl + "OrderingPolicy: {2}"
-                + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}",
-                args[0], args[1], args[2], args[3], args[4]);
-            Console.WriteLine("Brokers copies:");
-            for (int i = 5; i < args.Length; i++)
+                + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}"+ nl
+                + "PuppetMasterLogService: {5}",
+                args[0], args[1], args[2], args[3], args[4],args[5]);
+            Console.WriteLine("Brokers parents and children:");
+            for (int i = 6; i < args.Length; i++)
                 Console.WriteLine(args[i]);
 
             TcpChannel channel = new TcpChannel(int.Parse(args[0]));
             ChannelServices.RegisterChannel(channel, false);
-            BrokerServer broker = new BrokerServer();
+            //TODO detect and distinguish parents and children, and pass them to the server.
+            BrokerServer broker = new BrokerServer(args[2], args[3], args[4], args[5]);
             RemotingServices.Marshal(broker, args[1], typeof(BrokerServer));
             Console.WriteLine("Broker up and running...");
             Console.ReadLine();

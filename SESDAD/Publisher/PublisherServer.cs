@@ -1,15 +1,30 @@
 ﻿using CommonTypes;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Publisher
 {
-    public class PublisherServer : MarshalByRefObject, ICommon, IPublisher
+    public class PublisherServer : MarshalByRefObject, IGeneralControlServices,
+        IPublisherControlServices
     {
+        private string pmLogServerUrl;
+
+        private string loggingLevel;
+
+        private string[] brokers;
+
+        public PublisherServer(string pmLogServerUrl,string loggingLevel,
+            string[] brokers)
+        {
+            this.pmLogServerUrl = pmLogServerUrl;
+            this.loggingLevel = loggingLevel;
+            this.brokers = brokers;
+        }
+
+        // General test and control methods.
 
         public void Publish(string topicName, int numberOfEvents, int interval)
         {
@@ -18,7 +33,7 @@ namespace Publisher
 
         public void Crash()
         {
-            Process.GetCurrentProcess().Kill();
+            System.Environment.Exit(-1);
         }
 
         public void Freeze()

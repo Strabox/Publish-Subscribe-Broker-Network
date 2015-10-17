@@ -10,24 +10,16 @@ namespace PuppetMasterProcessLauncher
 {
     public class ProcessLauncherServer : MarshalByRefObject, IPuppetMasterLauncher
     {
-        private static bool IsLinux
-        {
-            get
-            {
-                int p = (int)Environment.OSVersion.Platform;
-                return (p == 4) || (p == 6) || (p == 128);
-            }
-        }
 
         public void LaunchProcess(string name, string args)
         {
-            if(IsLinux)
+            if(CommonUtil.IsLinux)
                 Process.Start("mono",
-                string.Join(" ", CommonConstants.PROJECT_ROOT + name +
-                CommonConstants.EXE_PATH + name+".exe", args));
+                string.Join(" ", CommonUtil.PROJECT_ROOT + name +
+                CommonUtil.EXE_PATH + name+".exe", args));
             else
-                Process.Start(CommonConstants.PROJECT_ROOT + name +
-                CommonConstants.EXE_PATH + name, args);
+                Process.Start(CommonUtil.PROJECT_ROOT + name +
+                CommonUtil.EXE_PATH + name, args);
         }
 
         public override object InitializeLifetimeService()

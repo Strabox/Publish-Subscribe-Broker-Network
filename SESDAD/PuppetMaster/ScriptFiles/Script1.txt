@@ -3,5 +3,5 @@ Wait 1000
 Freeze broker1
 Crash broker1
 Crash broker2
-Wait 200
+Wait 2000
 Crash subscriber0

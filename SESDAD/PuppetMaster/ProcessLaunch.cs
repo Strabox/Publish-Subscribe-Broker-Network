@@ -13,16 +13,16 @@ namespace PuppetMaster
     public class ProcessLauncher
     {
         public static string DEFAULT_ROUTING_POLICY = "flooding";
-        public static string DEFAULT_LOG_POLICY = "FIFO";
+        public static string DEFAULT_LOG_LEVEL = "FIFO";
         public static string DEFAULT_ORDERING_POLICY = "light";
 
         private string routingPolicy = DEFAULT_ROUTING_POLICY;
 
-        private string logPolicy = DEFAULT_LOG_POLICY;
+        private string logLevel = DEFAULT_LOG_LEVEL;
 
         private string orderingPolicy = DEFAULT_ORDERING_POLICY;
 
-        private LinkedList<LaunchNode> launchNodes;
+        private List<LaunchNode> launchNodes;
 
         public string RoutingPolicy
         {
@@ -36,15 +36,15 @@ namespace PuppetMaster
             }
         }
 
-        public string LogPolicy
+        public string LogLevel
         {
             get
             {
-                return logPolicy;
+                return logLevel;
             }
             set
             {
-                logPolicy = value;
+                logLevel = value;
             }
         }
 
@@ -62,19 +62,19 @@ namespace PuppetMaster
 
         public ProcessLauncher()
         {
-            launchNodes = new LinkedList<LaunchNode>();
+            launchNodes = new List<LaunchNode>();
         }
 
         public void AddNode(LaunchNode node)
         {
-            launchNodes.AddLast(node);
+            launchNodes.Add(node);
         }
 
         public void LaunchAllProcesses(ManageSites sites)
         {
             foreach(LaunchNode node in launchNodes)
             {
-                node.Launch(sites,OrderingPolicy,RoutingPolicy,LogPolicy);
+                node.Launch(sites,OrderingPolicy,RoutingPolicy,LogLevel);
             }
         }
     }
@@ -129,13 +129,26 @@ namespace PuppetMaster
             this.site = site;
         }
 
-        protected void LaunchRemoteProcess(string processName,string args)
+        protected void LaunchProcess(string processType,string args)
         {
-            IPuppetMasterLauncher launcher = Activator.GetObject(
-                    typeof(IPuppetMasterLauncher), "tcp://" + Ip + ":" +
-                    CommonConstants.PUPPET_MASTER_PORT + '/' +
-                    CommonConstants.PUPPET_MASTER_NAME) as IPuppetMasterLauncher;
-            launcher.LaunchProcess(processName, args);
+            if (Ip.Equals("localhost") || Ip.Equals("127.0.0.1"))
+            {
+                if (CommonUtil.IsLinux)
+                    Process.Start("mono",
+                        string.Join(" ", CommonUtil.PROJECT_ROOT + name +
+                        CommonUtil.EXE_PATH + name + ".exe", args));
+                else
+                    Process.Start(CommonUtil.PROJECT_ROOT + processType +
+                        CommonUtil.EXE_PATH + processType, args);
+            }
+            else
+            {
+                IPuppetMasterLauncher launcher = Activator.GetObject(
+                    typeof(IPuppetMasterLauncher), CommonUtil.MakeUrl("tcp",
+                    Ip, CommonUtil.PUPPET_MASTER_NAME, CommonUtil.PUPPET_MASTER_NAME))
+                    as IPuppetMasterLauncher;
+                launcher.LaunchProcess(processType, args);
+            }
         }
 
         public abstract void Launch(ManageSites sites,string orderingPolicy
@@ -154,13 +167,11 @@ namespace PuppetMaster
         {
             string args = string.Join(" ", Port, Name,
                 orderingPolicy,routingPolicy,logPolicy,
+                CommonUtil.MakeUrl("tcp",CommonUtil.GetLocalIPAddress()
+                , CommonUtil.PUPPET_MASTER_PORT.ToString(), CommonUtil.PUPPET_MASTER_NAME),
                 sites.GetSiteByName(Site).GetBrokersUrl());
             string processType = this.GetType().Name.Substring(6);
-            if (Ip.Equals("localhost") || Ip.Equals("127.0.0.1"))
-                Process.Start(CommonConstants.PROJECT_ROOT + processType +
-                    CommonConstants.EXE_PATH + processType, args);
-            else
-                LaunchRemoteProcess(processType, args);
+            LaunchProcess(processType, args);
         }
     }
 
@@ -179,12 +190,11 @@ namespace PuppetMaster
             string children = sites.GetSiteByName(Site).GetChildUrl();
             if (sites.GetSiteByName(Site).Parent != null)
                 parent = sites.GetSiteByName(Site).Parent.GetBrokersUrl();
-            string args = string.Join(" ",temp, parent, children);
-            if (Ip.Equals("localhost") || Ip.Equals("127.0.0.1"))
-                Process.Start(CommonConstants.PROJECT_ROOT + "Broker" +
-                    CommonConstants.EXE_PATH + "Broker",args);
-            else
-                LaunchRemoteProcess("Broker", args);
+            string args = string.Join(" ",temp
+                , CommonUtil.MakeUrl("tcp", CommonUtil.GetLocalIPAddress()
+                , CommonUtil.PUPPET_MASTER_PORT.ToString(), 
+                CommonUtil.PUPPET_MASTER_NAME), parent, children);
+            LaunchProcess(this.GetType().Name.Substring(6), args);
         }
     }
 

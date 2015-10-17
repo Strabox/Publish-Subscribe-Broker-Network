@@ -8,8 +8,24 @@ using System.Threading.Tasks;
 
 namespace Subscriber
 {
-    public class SubscriberServer : MarshalByRefObject, ICommon, ISubscriber
+    public class SubscriberServer : MarshalByRefObject, IGeneralControlServices,
+        ISubscriberControlServices
     {
+        private string pmLogServerUrl;
+
+        private string loggingLevel;
+
+        private string[] brokers;
+
+        public SubscriberServer(string pmLogServerUrl,string loggingLevel,
+            string[] brokers)
+        {
+            this.pmLogServerUrl = pmLogServerUrl;
+            this.loggingLevel = loggingLevel;
+            this.brokers = brokers;
+        }
+
+        // General test and control methods.
 
         public void Subscribe(string topicName)
         {
@@ -23,7 +39,7 @@ namespace Subscriber
 
         public void Crash()
         {
-            Process.GetCurrentProcess().Kill();
+            System.Environment.Exit(-1);
         }
 
         public void Freeze()
