@@ -1,8 +1,7 @@
-Crash subscriber0
 Crash broker0
 Crash broker3
 Crash broker1
 Crash broker2
 Crash publisher0
+Crash subscriber0
 Crash subscriber1
-Status

@@ -36,11 +36,11 @@ namespace Subscriber
 
         // Subscriber specific methods.
 
-        public void Receive(Message message)
+        public void Receive(Event e)
         {
             //TODO if we need save messages or something like that.
             logServer.LogAction("SubEvent " + name+", " + "MissingPublisherName" 
-                + ", " + message.Topic + ", " + "MissingEventNumber");
+                + ", " + e.Topic + ", " + "MissingEventNumber");
         }
 
         // General test and control methods.
@@ -48,13 +48,16 @@ namespace Subscriber
         public void Subscribe(string topicName)
         {
             IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Subscribe(this as ISubscriber, topicName);
+            broker.Subscribe(new Subscription(this.name, topicName, this));
+
+            logServer.LogAction("SubSubscribe " + name + " Subscribe " + topicName);
+            Console.WriteLine("SubSubscribe " + name + " Subscribe " + topicName);
         }
 
         public void Unsubscribe(string topicName)
         {
             IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Unsubscribe(this as ISubscriber, topicName);
+            broker.Unsubscribe(new Subscription(this.name, topicName, this));
         }
 
         public void Crash()
@@ -80,6 +83,11 @@ namespace Subscriber
         public override object InitializeLifetimeService()
         {
             return null;
+        }
+
+        public string GetName()
+        {
+            return this.name;
         }
 
     }

@@ -40,7 +40,7 @@ namespace Publisher
             for(int i = 0; i < numberOfEvents; i++)
             {
                 broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-                broker.Diffuse(new Message(topicName));
+                broker.Diffuse(new Event(this.name, topicName, "content"));
                 logServer.LogAction("PubEvent " + name + ", " + "???????" + ", " +
                     topicName + ", " + i);
                 Thread.Sleep(interval);
@@ -72,5 +72,9 @@ namespace Publisher
             return null;
         }
 
+        string GetName()
+        {
+            return this.name;
+        }
     }
 }

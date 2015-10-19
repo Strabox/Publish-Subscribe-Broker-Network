@@ -157,13 +157,14 @@ namespace PuppetMaster
             string temp = string.Join(" ", Port, Name,
                 orderingPolicy,routingPolicy,logPolicy);
             string parent = "NoParent";
+            string url = CommonUtil.MakeUrl("tcp", Ip, Port, Name);
             string children = sites.GetSiteByName(Site).GetChildUrl();
             if (sites.GetSiteByName(Site).Parent != null)
                 parent = sites.GetSiteByName(Site).Parent.GetBrokersUrl();
             string args = string.Join(" ",temp
                 , CommonUtil.MakeUrl("tcp", CommonUtil.GetLocalIPAddress()
                 , CommonUtil.PUPPET_MASTER_PORT.ToString(), 
-                CommonUtil.PUPPET_MASTER_NAME), parent, children);
+                CommonUtil.PUPPET_MASTER_NAME), parent, url, children);
             LaunchProcess(this.GetType().Name.Substring(6), args);
         }
     }

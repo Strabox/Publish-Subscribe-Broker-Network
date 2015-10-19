@@ -37,7 +37,7 @@ namespace Broker
             TcpChannel channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(channel, false);
             BrokerServer broker = new BrokerServer(args[1],args[2], args[3], args[4], args[5],
-                args[6], args.Skip(7).ToArray());
+                args[6], args[8], args.Skip(8).ToArray());
             RemotingServices.Marshal(broker, args[1], typeof(BrokerServer));
             Console.WriteLine("Broker up and running...");
             Console.ReadLine();

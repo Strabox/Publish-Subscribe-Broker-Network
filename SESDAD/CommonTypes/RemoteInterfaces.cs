@@ -11,18 +11,22 @@ namespace CommonTypes
 
     public interface IBroker
     {
-        void Diffuse(Message message);
-        void Subscribe(ISubscriber subscriber, string topic);
-        void Unsubscribe(ISubscriber subscriber, string topic);
+        void Diffuse(Event e);
+        void Subscribe(Subscription subscription);
+        void Unsubscribe(Subscription subscription);
+        string GetName();
+        void HeyDaddy(string url);
     }
 
     public interface ISubscriber
     {
-        void Receive(Message message);
+        void Receive(Event e);
+        string GetName();
     }
 
     public interface IPublisher
     {
+        string GetName();
         //TODO
     }
 
