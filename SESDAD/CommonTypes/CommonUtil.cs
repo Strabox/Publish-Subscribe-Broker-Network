@@ -19,6 +19,8 @@ namespace CommonTypes
                             "bin" + Path.DirectorySeparatorChar +
                             "Debug" + Path.DirectorySeparatorChar;
 
+        public static string ROOT = "Root";
+
         public static int PUPPET_MASTER_PORT = 6969;
 
         public static string PUPPET_MASTER_NAME = "PuppetMasterURL";

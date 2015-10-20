@@ -74,11 +74,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExecuteScriptForm.cs">
+    <Compile Include="ExecuteBackgroundTask.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ExecuteScriptForm.Designer.cs">
-      <DependentUpon>ExecuteScriptForm.cs</DependentUpon>
+    <Compile Include="ExecuteBackgroundTask.Designer.cs">
+      <DependentUpon>ExecuteBackgroundTask.cs</DependentUpon>
     </Compile>
     <Compile Include="ProcessLaunch.cs" />
     <Compile Include="ParseUtil.cs" />
@@ -93,8 +93,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LogServer.cs" />
     <Compile Include="SitesTree.cs" />
-    <EmbeddedResource Include="ExecuteScriptForm.resx">
-      <DependentUpon>ExecuteScriptForm.cs</DependentUpon>
+    <EmbeddedResource Include="ExecuteBackgroundTask.resx">
+      <DependentUpon>ExecuteBackgroundTask.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormPuppetMaster.resx">
       <DependentUpon>FormPuppetMaster.cs</DependentUpon>

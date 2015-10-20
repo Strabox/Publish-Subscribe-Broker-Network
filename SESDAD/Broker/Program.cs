@@ -17,17 +17,17 @@ namespace Broker
         
         static void Main(string[] args)
         {
-            if (args.Length < 5) {
+            if (args.Length < 6) {
                 Console.Error.WriteLine("Wrong usage.");
                 return;                                
             }
             string nl = Environment.NewLine;
             Console.WriteLine("Port: {0}" + nl + "Name: {1}" + nl + "OrderingPolicy: {2}"
-                + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}"+ nl
-                + "PuppetMasterLogService: {5}" + nl + "Parent: {6}" + nl + "My Url: {7}",
-                args[0], args[1], args[2], args[3], args[4],args[5],args[6],args[7]);
-            Console.WriteLine("Brokers Children:");
-            for (int i = 8; i < args.Length; i++)
+                + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}" + nl
+                + "PuppetMasterLogService: {5}" + nl + "Parent: {6}",
+                args[0], args[1], args[2], args[3], args[4],args[5],args[6]);
+            Console.WriteLine("Broker's Children:");
+            for (int i = 7; i < args.Length; i++)
                 Console.WriteLine(args[i]);
 
             BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
@@ -37,7 +37,7 @@ namespace Broker
             TcpChannel channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(channel, false);
             BrokerServer broker = new BrokerServer(args[1],args[2], args[3], args[4], args[5],
-                args[7], args[6], args.Skip(8).ToArray());
+                 args[6], args.Skip(7).ToArray());
             RemotingServices.Marshal(broker, args[1], typeof(BrokerServer));
             Console.WriteLine("Broker up and running...");
             Console.ReadLine();

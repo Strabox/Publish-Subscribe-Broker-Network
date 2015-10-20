@@ -13,12 +13,12 @@ using System.Windows.Forms;
 namespace PuppetMaster
 {
 
-    public partial class ExecuteScriptForm : Form
+    public partial class ExecuteBackgroundTask : Form
     {
 
         private ProcessesManager manager;
 
-        public ExecuteScriptForm(string scriptFile,ProcessesManager form)
+        public ExecuteBackgroundTask(string scriptFile,ProcessesManager form)
         {
             InitializeComponent();
             manager = form;

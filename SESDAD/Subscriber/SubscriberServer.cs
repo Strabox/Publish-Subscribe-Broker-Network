@@ -39,8 +39,8 @@ namespace Subscriber
         public void Receive(Event e)
         {
             //TODO if we need save messages or something like that.
-            logServer.LogAction("SubEvent " + name+", " + "MissingPublisherName" 
-                + ", " + e.Topic + ", " + "MissingEventNumber");
+            logServer.LogAction("SubEvent " + name + ", " + e.Publisher
+                + ", " + e.Topic + ", " + e.EventNumber);
         }
 
         // General test and control methods.
@@ -50,7 +50,6 @@ namespace Subscriber
             IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
             broker.Subscribe(new Subscription(this.name, topicName, this as ISubscriber));
             logServer.LogAction("SubSubscribe " + name + " Subscribe " + topicName);
-            Console.WriteLine("SubSubscribe " + name + " Subscribe " + topicName);
         }
 
         public void Unsubscribe(string topicName)
@@ -89,5 +88,9 @@ namespace Subscriber
             return this.name;
         }
 
+        public void Init()
+        {
+            //Do nothing
+        }
     }
 }

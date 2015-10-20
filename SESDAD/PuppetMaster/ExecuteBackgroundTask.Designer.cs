@@ -1,6 +1,6 @@
 ﻿namespace PuppetMaster
 {
-    partial class ExecuteScriptForm
+    partial class ExecuteBackgroundTask
     {
         /// <summary>
         /// Required designer variable.

@@ -40,9 +40,9 @@ namespace Publisher
             for(int i = 0; i < numberOfEvents; i++)
             {
                 broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-                broker.Diffuse(new Event(this.name, topicName, "content"));
-                logServer.LogAction("PubEvent " + name + ", " + "???????" + ", " +
+                logServer.LogAction("PubEvent " + name + ", " + name + ", " +
                     topicName + ", " + i);
+                broker.Diffuse(new Event(this.name,this.name, topicName, "content",i));
                 Thread.Sleep(interval);
             }
         }
@@ -72,9 +72,9 @@ namespace Publisher
             return null;
         }
 
-        string GetName()
+        public void Init()
         {
-            return this.name;
+            //DO Nothing
         }
     }
 }

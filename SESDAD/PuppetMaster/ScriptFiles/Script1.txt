@@ -1,5 +1,5 @@
-﻿Subscriber subscriber0 Subscribe /Ist/DaD
-Wait 4000
-Publisher publisher0 Publish 9 Ontopic /Ist/DaD Interval 300 
-Wait 400
+﻿Subscriber subscriber0 Subscribe /Ist
+Wait 1000
+Publisher publisher0 Publish 9 Ontopic /Ist Interval 100
+Wait 600
 

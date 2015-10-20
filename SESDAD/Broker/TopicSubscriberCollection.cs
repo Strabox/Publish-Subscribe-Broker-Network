@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Broker
 {
-    class TopicSubscriberCollection 
+    public class TopicSubscriberCollection 
 	{
 		class Struct 
 		{

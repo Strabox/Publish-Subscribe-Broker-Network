@@ -11,8 +11,6 @@ namespace Broker
     {
         private string name;
 
-        private string url;
-
         private string orderingPolicy;
 
         private string routingPolicy;
@@ -23,9 +21,7 @@ namespace Broker
 
         private string parentUrl;
 
-        private string parentName = "";
-
-        private IBroker parentBroker;
+        private string parentName;
         
         private string[] childUrls;
 
@@ -33,10 +29,12 @@ namespace Broker
 
         private TopicSubscriberCollection topicSubscribers;
 
+        private IBroker parentBroker;
+
         private Dictionary<string, IBroker> childBrokers = new Dictionary<string, IBroker>();
 
         public BrokerServer(string name,string orderingPolicy,string routingPolicy,
-            string loggingLevel,string pmLogServerUrl, string url, string parent, string[] children)
+            string loggingLevel,string pmLogServerUrl, string parent, string[] children)
         {
             this.name = name;
             this.pmLogServerUrl = pmLogServerUrl;
@@ -45,36 +43,26 @@ namespace Broker
             this.loggingLevel = loggingLevel;
             this.parentUrl = parent;
             this.childUrls = children;
-            this.url = url;
             this.topicSubscribers = new TopicSubscriberCollection();
         }
 
-        //Init is called after launch all processes.
+        //Init is called after launch all processes and before the system start working.
         public void Init()
         {
-            
-            if (!parentUrl.Equals("NoParent"))
+            if (!parentUrl.Equals(CommonUtil.ROOT))
             {
-                Console.WriteLine(parentUrl);
                 parentBroker = Activator.GetObject(typeof(IBroker), parentUrl)
                     as IBroker;
-
                 parentName = CommonUtil.ExtractPath(parentUrl);
-
-                //parentBroker.HeyDaddy(this.url);
             }
-
             foreach (string childUrl in childUrls)
             {
-                Console.WriteLine(childUrl);
                 IBroker childBroker = Activator.GetObject(typeof(IBroker), childUrl)
                     as IBroker;
-
                 childBrokers.Add(CommonUtil.ExtractPath(childUrl), childBroker);
             }
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
                 as IPuppetMasterLog;
-                
         }
 
         // Broker specific methods.
@@ -83,99 +71,70 @@ namespace Broker
         {
             // TODO - On Progress
             // Enviar aos Brokers vizinhos.
-            Event newEvent = new Event(this.name, e.Topic, e.Content);
+            Event newEvent = new Event(e.Publisher,this.name, e.Topic, e.Content,e.EventNumber);
 
-            if (!e.Sender.Equals(parentName))
-            {
+            if (!parentUrl.Equals(CommonUtil.ROOT) && !e.Sender.Equals(parentName))
                 parentBroker.Diffuse(newEvent);
-            }
 
-            foreach(KeyValuePair<string, IBroker> child in childBrokers)
+            if (loggingLevel.Equals("full"))
+                logServer.LogAction("BroEvent " + name + ", " + e.Publisher + ", "
+                    + newEvent.Topic + ", " + e.EventNumber);
+
+            foreach (KeyValuePair<string, IBroker> child in childBrokers)
             {
                 if (!e.Sender.Equals(child.Key))
-                {
                     child.Value.Diffuse(newEvent);
-                }
             }
-
-            // Enviar aos Subscribers que querem a messagem.
-
+            // Send to subscribers that want the message.
             ICollection<ISubscriber> subscribersToSend = topicSubscribers.SubscribersForTopic(e.Topic);
-
             foreach (ISubscriber subscriber in subscribersToSend)
             {
                 subscriber.Receive(newEvent);
             }
-
-            if (loggingLevel.Equals("full"))
-                logServer.LogAction("BroEvent "+ name +", "+"MissingPublisherName"+", "
-                    + newEvent.Topic+", " + "MissingEventNumber");
         }
 
         public void Subscribe(Subscription subscription)
         {
-            this.topicSubscribers.Add(subscription.Topic, subscription.Subscriber);
-            // Enviar aos brokers vizinhos
-
+            lock (this)
+            {
+                this.topicSubscribers.Add(subscription.Topic, subscription.Subscriber);
+            }
             string sender = subscription.Sender;
             subscription.Sender = this.name;
 
-            if (!parentUrl.Equals("NoParent") && !parentName.Equals(sender))
-            {
+            if (!parentUrl.Equals(CommonUtil.ROOT) && !parentName.Equals(sender))
                 parentBroker.Subscribe(subscription);
-            }
 
             foreach (KeyValuePair<string, IBroker> childPair in childBrokers)
             {
                 IBroker child = childPair.Value;
                 if (!childPair.Key.Equals(sender))
-                {
                     child.Subscribe(subscription);
-                }
             }
-            // TODO: LOG
-            if (loggingLevel.Equals("full"))
-                logServer.LogAction("BroSubscribe " + name + ", " + subscription.Subscriber.GetName() + ", "
-                    + subscription.Topic + ", " + "MissingEventNumber");
         }
 
         public void Unsubscribe(Subscription subscription)
         {
-            this.topicSubscribers.Remove(subscription.Topic, subscription.Subscriber);
-            // Enviar aos brokers vizinhos
-
+            lock (this)
+            {
+                this.topicSubscribers.Remove(subscription.Topic, subscription.Subscriber);
+            }
             string sender = subscription.Sender;
-
             subscription.Sender = this.name;
 
-            if (!parentUrl.Equals("NoParent") && !parentName.Equals(sender))
-            {
+            if (!parentUrl.Equals(CommonUtil.ROOT) && !parentName.Equals(sender))
                 parentBroker.Unsubscribe(subscription);
-            }
 
             foreach (KeyValuePair<string, IBroker> childPair in childBrokers)
             {
                 IBroker child = childPair.Value;
-                if (!child.GetName().Equals(sender))
-                {
-                    child.Unsubscribe(subscription);
-                }
+                if (!CommonUtil.ExtractPath(childPair.Key).Equals(sender))
+                    lock (this)
+                    {
+                        child.Unsubscribe(subscription);
+                    }
             }
 
-            // TODO: LOG
-
-            if (loggingLevel.Equals("full"))
-                logServer.LogAction("BroUnsubscribe " + name + ", " + subscription.Subscriber.GetName() + ", "
-                    + subscription.Topic + ", " + "MissingEventNumber");
-
-        }
-
-        public void HeyDaddy(string url)
-        {
-            IBroker childBroker = Activator.GetObject(typeof(IBroker), url)
-                    as IBroker;
-
-            childBrokers.Add(childBroker.GetName(), childBroker);
         }
 
         // General test and control methods.
@@ -203,11 +162,6 @@ namespace Broker
         public override object InitializeLifetimeService()
         {
             return null;
-        }
-
-        public string GetName()
-        {
-            return this.name;
         }
 
       

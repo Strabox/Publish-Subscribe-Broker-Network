@@ -109,7 +109,7 @@ namespace PuppetMaster
         private void treeViewScriptFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             TreeView tree = sender as TreeView;
-            ExecuteScriptForm form = new ExecuteScriptForm(
+            ExecuteBackgroundTask form = new ExecuteBackgroundTask(
                 ProcessesManager.SCRIPT_FILES_DIRECTORY + tree.SelectedNode.Text,manager);
             form.ShowDialog();
         }

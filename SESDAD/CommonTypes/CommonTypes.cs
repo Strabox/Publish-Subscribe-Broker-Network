@@ -6,6 +6,13 @@ namespace CommonTypes {
     [Serializable]
     public class Event : ISerializable
     {
+        private string publisher;
+        public string Publisher
+        {
+            get { return publisher; }
+            private set { publisher = value; }
+        }
+
 		private string topic;
 		public string Topic 
 		{
@@ -27,24 +34,38 @@ namespace CommonTypes {
             set { sender = value; }
         }
 
-        public Event(string sender, string topic, string content)
+        private int eventNumber;
+        public int EventNumber
         {
+            get { return eventNumber; }
+            set { eventNumber = value; }
+        }
+
+        public Event(string publisher,string sender, string topic, string content,int eventNumber)
+        {
+            Publisher = publisher;
             Topic = topic;
             Sender = sender;
             Content = content;
+            EventNumber = eventNumber;
         }
 
 		public Event(SerializationInfo info, StreamingContext context) 
 		{
-			topic = info.GetValue("topic", typeof(string)) as string;
-			content = info.GetValue("content", typeof(string)) as string;
-            sender = info.GetValue("sender", typeof(string)) as string;
+            Publisher = info.GetValue("publisher", typeof(string)) as string;
+            EventNumber = (int)info.GetValue("eventNumber",typeof(int));
+			Topic = info.GetValue("topic", typeof(string)) as string;
+			Content = info.GetValue("content", typeof(string)) as string;
+            Sender = info.GetValue("sender", typeof(string)) as string;
         }
+
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-			info.AddValue("topic", topic);
-			info.AddValue("content", content);
-            info.AddValue("sender", sender);
+            info.AddValue("eventNumber", EventNumber);
+            info.AddValue("publisher", Publisher);
+			info.AddValue("topic", Topic);
+			info.AddValue("content", Content);
+            info.AddValue("sender", Sender);
         }
     }
 
@@ -81,9 +102,9 @@ namespace CommonTypes {
 
         public Subscription(SerializationInfo info, StreamingContext context)
         {
-            topic = info.GetValue("topic", typeof(string)) as string;
-            subscriber = info.GetValue("subscriber", typeof(ISubscriber)) as ISubscriber;
-            sender = info.GetValue("sender", typeof(string)) as string;
+            Topic = info.GetValue("topic", typeof(string)) as string;
+            Subscriber = info.GetValue("subscriber", typeof(ISubscriber)) as ISubscriber;
+            Sender = info.GetValue("sender", typeof(string)) as string;
         }
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {

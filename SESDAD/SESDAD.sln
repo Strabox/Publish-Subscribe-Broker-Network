@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTypes", "CommonTypes\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PuppetMasterProcessLauncher", "PuppetMasterProcessLauncher\PuppetMasterProcessLauncher.csproj", "{233CF99A-64C5-4053-A26E-20D19F2F3F86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{D9324191-2F0E-4FD4-AA2A-6315BFC7668C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{233CF99A-64C5-4053-A26E-20D19F2F3F86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{233CF99A-64C5-4053-A26E-20D19F2F3F86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{233CF99A-64C5-4053-A26E-20D19F2F3F86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9324191-2F0E-4FD4-AA2A-6315BFC7668C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9324191-2F0E-4FD4-AA2A-6315BFC7668C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9324191-2F0E-4FD4-AA2A-6315BFC7668C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9324191-2F0E-4FD4-AA2A-6315BFC7668C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

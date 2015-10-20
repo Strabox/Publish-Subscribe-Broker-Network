@@ -15,22 +15,19 @@ namespace CommonTypes
         void Diffuse(Event e);
         [OneWay]
         void Subscribe(Subscription subscription);
+        [OneWay]
         void Unsubscribe(Subscription subscription);
-        void Init();
-        string GetName();
-        void HeyDaddy(string url);
     }
 
     public interface ISubscriber
     {
+        [OneWay]
         void Receive(Event e);
-        string GetName();
     }
 
     public interface IPublisher
     {
-        string GetName();
-        //TODO
+        // Nothing here for now
     }
 
     // Interfaces to test and control of system processes.
@@ -39,9 +36,15 @@ namespace CommonTypes
     {
         [OneWay]
         void Crash();
+        [OneWay]
         void Freeze();
+        [OneWay]
         void Unfreeze();
+        [OneWay]
         void Status();
+        /* It isn't one way(async) because I want wait for all Init returns
+        to start the system. */
+        void Init();
     }
 
     public interface IPublisherControlServices
@@ -54,6 +57,7 @@ namespace CommonTypes
     {
         [OneWay]
         void Subscribe(string topicName);
+        [OneWay]
         void Unsubscribe(string topicName);
     }  
 
@@ -65,7 +69,6 @@ namespace CommonTypes
 
     public interface IPuppetMasterLauncher
     {
-        [OneWay]
         void LaunchProcess(string name,string args);
     }
 
