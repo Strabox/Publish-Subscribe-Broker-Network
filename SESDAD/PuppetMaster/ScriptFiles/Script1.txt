@@ -1,12 +1,5 @@
-﻿Wait 1000
-Freeze broker1
-Crash broker1
-Crash broker2
-Wait 2000
-Crash broker3
-Publisher publisher0 Publish 5 Ontopic /Ist/Meic/ Interval 100
-Subscriber subscriber0 Subscribe /Ist/
-Subscriber subscriber0 Unsubscribe /Ist/Meic/*
-Wait 1000
-Wait 1
-Wait 2
+﻿Subscriber subscriber0 Subscribe /Ist/DaD
+Wait 4000
+Publisher publisher0 Publish 9 Ontopic /Ist/DaD Interval 300 
+Wait 400
+

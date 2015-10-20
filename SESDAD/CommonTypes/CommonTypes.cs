@@ -82,7 +82,7 @@ namespace CommonTypes {
         public Subscription(SerializationInfo info, StreamingContext context)
         {
             topic = info.GetValue("topic", typeof(string)) as string;
-            subscriber = info.GetValue("content", typeof(ISubscriber)) as ISubscriber;
+            subscriber = info.GetValue("subscriber", typeof(ISubscriber)) as ISubscriber;
             sender = info.GetValue("sender", typeof(string)) as string;
         }
         public void GetObjectData(SerializationInfo info, StreamingContext context)

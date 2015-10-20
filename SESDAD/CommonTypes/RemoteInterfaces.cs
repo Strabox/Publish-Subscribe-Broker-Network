@@ -11,7 +11,9 @@ namespace CommonTypes
 
     public interface IBroker
     {
+        [OneWay]
         void Diffuse(Event e);
+        [OneWay]
         void Subscribe(Subscription subscription);
         void Unsubscribe(Subscription subscription);
         void Init();
@@ -50,6 +52,7 @@ namespace CommonTypes
 
     public interface ISubscriberControlServices
     {
+        [OneWay]
         void Subscribe(string topicName);
         void Unsubscribe(string topicName);
     }  
@@ -62,6 +65,7 @@ namespace CommonTypes
 
     public interface IPuppetMasterLauncher
     {
+        [OneWay]
         void LaunchProcess(string name,string args);
     }
 

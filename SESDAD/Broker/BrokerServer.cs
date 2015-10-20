@@ -23,7 +23,7 @@ namespace Broker
 
         private string parentUrl;
 
-        private string parentName;
+        private string parentName = "";
 
         private IBroker parentBroker;
         
@@ -118,25 +118,22 @@ namespace Broker
             // Enviar aos brokers vizinhos
 
             string sender = subscription.Sender;
-
             subscription.Sender = this.name;
 
-            if (!parentName.Equals(sender))
+            if (!parentUrl.Equals("NoParent") && !parentName.Equals(sender))
             {
                 parentBroker.Subscribe(subscription);
             }
-            
+
             foreach (KeyValuePair<string, IBroker> childPair in childBrokers)
             {
                 IBroker child = childPair.Value;
-                if (!child.GetName().Equals(sender))
+                if (!childPair.Key.Equals(sender))
                 {
                     child.Subscribe(subscription);
                 }
             }
-
             // TODO: LOG
-
             if (loggingLevel.Equals("full"))
                 logServer.LogAction("BroSubscribe " + name + ", " + subscription.Subscriber.GetName() + ", "
                     + subscription.Topic + ", " + "MissingEventNumber");
@@ -151,7 +148,7 @@ namespace Broker
 
             subscription.Sender = this.name;
 
-            if (!parentName.Equals(sender))
+            if (!parentUrl.Equals("NoParent") && !parentName.Equals(sender))
             {
                 parentBroker.Unsubscribe(subscription);
             }

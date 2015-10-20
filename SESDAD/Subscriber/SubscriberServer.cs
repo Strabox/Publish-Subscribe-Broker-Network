@@ -48,8 +48,7 @@ namespace Subscriber
         public void Subscribe(string topicName)
         {
             IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Subscribe(new Subscription(this.name, topicName, this));
-
+            broker.Subscribe(new Subscription(this.name, topicName, this as ISubscriber));
             logServer.LogAction("SubSubscribe " + name + " Subscribe " + topicName);
             Console.WriteLine("SubSubscribe " + name + " Subscribe " + topicName);
         }
