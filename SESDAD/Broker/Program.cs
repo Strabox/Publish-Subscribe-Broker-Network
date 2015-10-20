@@ -24,10 +24,10 @@ namespace Broker
             string nl = Environment.NewLine;
             Console.WriteLine("Port: {0}" + nl + "Name: {1}" + nl + "OrderingPolicy: {2}"
                 + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}"+ nl
-                + "PuppetMasterLogService: {5}",
-                args[0], args[1], args[2], args[3], args[4],args[5]);
-            Console.WriteLine("Brokers parents and children:");
-            for (int i = 6; i < args.Length; i++)
+                + "PuppetMasterLogService: {5}" + nl + "Parent: {6}" + nl + "My Url: {7}",
+                args[0], args[1], args[2], args[3], args[4],args[5],args[6],args[7]);
+            Console.WriteLine("Brokers Children:");
+            for (int i = 8; i < args.Length; i++)
                 Console.WriteLine(args[i]);
 
             BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
@@ -37,7 +37,7 @@ namespace Broker
             TcpChannel channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(channel, false);
             BrokerServer broker = new BrokerServer(args[1],args[2], args[3], args[4], args[5],
-                args[6], args[8], args.Skip(8).ToArray());
+                args[7], args[6], args.Skip(8).ToArray());
             RemotingServices.Marshal(broker, args[1], typeof(BrokerServer));
             Console.WriteLine("Broker up and running...");
             Console.ReadLine();

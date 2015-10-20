@@ -22,7 +22,7 @@ namespace PuppetMaster
 
         private string orderingPolicy = DEFAULT_ORDERING_POLICY;
 
-        private List<LaunchNode> launchNodes;
+        private LinkedList<LaunchNode> launchNodes;
 
         public string RoutingPolicy
         {
@@ -44,20 +44,20 @@ namespace PuppetMaster
 
         public ProcessLauncher()
         {
-            launchNodes = new List<LaunchNode>();
+            launchNodes = new LinkedList<LaunchNode>();
         }
 
         public void AddNode(LaunchNode node)
         {
-            launchNodes.Add(node);
+            launchNodes.AddFirst(node);
         }
 
         public void LaunchAllProcesses(ManageSites sites)
         {
             foreach(LaunchNode node in launchNodes)
-            {
                 node.Launch(sites,OrderingPolicy,RoutingPolicy,LogLevel);
-            }
+            foreach (LaunchNode node in launchNodes)
+                node.InitializeProcess();
         }
     }
 
@@ -121,6 +121,8 @@ namespace PuppetMaster
             }
         }
 
+        public abstract void InitializeProcess();
+
         public abstract void Launch(ManageSites sites,string orderingPolicy
             ,string routingPolicy,string logPolicy);
 
@@ -135,14 +137,20 @@ namespace PuppetMaster
         public override void Launch(ManageSites sites, string orderingPolicy,
             string routingPolicy, string logPolicy)
         {
+            string processType = this.GetType().Name.Substring(6);
             string args = string.Join(" ", Port, Name,
                 orderingPolicy,routingPolicy,logPolicy,
                 CommonUtil.MakeUrl("tcp",CommonUtil.GetLocalIPAddress()
                 , CommonUtil.PUPPET_MASTER_PORT.ToString(), CommonUtil.PUPPET_MASTER_NAME),
-                sites.GetSiteByName(Site).GetBrokersUrl());
-            string processType = this.GetType().Name.Substring(6);
+                sites.GetSiteBrokersUrl(Site));
             LaunchProcess(processType, args);
         }
+
+        public override void InitializeProcess()
+        {
+            //DO NOTHING
+        }
+
     }
 
     public class LaunchBroker : LaunchNode
@@ -154,19 +162,24 @@ namespace PuppetMaster
         public override void Launch(ManageSites sites, string orderingPolicy
             , string routingPolicy, string logPolicy)
         {
-            string temp = string.Join(" ", Port, Name,
-                orderingPolicy,routingPolicy,logPolicy);
             string parent = "NoParent";
-            string url = CommonUtil.MakeUrl("tcp", Ip, Port, Name);
-            string children = sites.GetSiteByName(Site).GetChildUrl();
-            if (sites.GetSiteByName(Site).Parent != null)
-                parent = sites.GetSiteByName(Site).Parent.GetBrokersUrl();
-            string args = string.Join(" ",temp
-                , CommonUtil.MakeUrl("tcp", CommonUtil.GetLocalIPAddress()
-                , CommonUtil.PUPPET_MASTER_PORT.ToString(), 
-                CommonUtil.PUPPET_MASTER_NAME), parent, url, children);
+            if (!sites.IsSiteRoot(Site))
+                parent = sites.GetParentBrokersUrl(Site);
+            string args = string.Join(" ", Port, Name,
+                orderingPolicy,routingPolicy,logPolicy,
+                CommonUtil.MakeUrl("tcp", CommonUtil.GetLocalIPAddress()
+                , CommonUtil.PUPPET_MASTER_PORT.ToString(),
+                CommonUtil.PUPPET_MASTER_NAME),parent, CommonUtil.MakeUrl("tcp", Ip, Port, Name),
+                sites.GetChildrenUrl(Site));
             LaunchProcess(this.GetType().Name.Substring(6), args);
         }
+
+        public override void InitializeProcess()
+        {
+            (Activator.GetObject(typeof(IBroker), CommonUtil.MakeUrl("tcp", Ip, Port, Name))
+                as IBroker).Init(); ;
+        }
+
     }
 
     public class LaunchPublisher : LaunchEndNode

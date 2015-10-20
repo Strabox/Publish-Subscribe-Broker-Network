@@ -81,6 +81,7 @@ namespace PuppetMaster
 
         private void FormPuppetMaster_Load(object sender, EventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine(CommonUtil.ExtractPath("tcp://12.123.133.1:3333/Nomedejeito"));
             TcpChannel channel = new TcpChannel(CommonUtil.PUPPET_MASTER_PORT);
             ChannelServices.RegisterChannel(channel, false);
             manager = new ProcessesManager(this);

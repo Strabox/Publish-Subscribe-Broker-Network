@@ -14,6 +14,7 @@ namespace CommonTypes
         void Diffuse(Event e);
         void Subscribe(Subscription subscription);
         void Unsubscribe(Subscription subscription);
+        void Init();
         string GetName();
         void HeyDaddy(string url);
     }

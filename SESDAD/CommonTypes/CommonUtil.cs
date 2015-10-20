@@ -32,6 +32,11 @@ namespace CommonTypes
             }
         }
 
+        public static string ExtractPath(string uri)
+        {
+            return new Uri(uri).LocalPath.Substring(1);
+        }
+
         public static string MakeUrl(string protocol,string ip, string port,
             string path)
         {

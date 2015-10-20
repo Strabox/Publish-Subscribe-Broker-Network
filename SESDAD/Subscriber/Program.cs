@@ -22,7 +22,7 @@ namespace Subscriber
             string nl = Environment.NewLine;
             Console.WriteLine("Port: {0}" + nl + "Name: {1}" + nl + "OrderingPolicy: {2}"
                 + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}" + nl
-                + "PuppetMasterLogService: {5} Brokers:",
+                + "PuppetMasterLogService: {5}"+ nl + "Brokers:",
                 args[0], args[1], args[2], args[3], args[4], args[5]);
             for (int i = 6; i < args.Length; i++)
                 Console.WriteLine(args[i]);

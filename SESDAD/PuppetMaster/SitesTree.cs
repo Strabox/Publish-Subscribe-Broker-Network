@@ -6,9 +6,75 @@ using System.Threading.Tasks;
 
 namespace PuppetMaster
 {
-  
+
     public class ManageSites
     {
+
+        class Site
+        {
+            private string name;
+
+            private Site parent = null;
+
+            private List<Site> child;
+
+            //List of broker's URL from this site.
+            private List<string> brokersUrls;
+
+            public bool IsRoot
+            {
+                get
+                { return parent == null; }
+            }
+
+            public string Name
+            {
+                get { return name; }
+                set { name = value; }
+            }
+
+            public Site Parent
+            {
+                get { return parent; }
+                set { parent = value; }
+            }
+
+            public Site(string name)
+            {
+                this.Name = name;
+                child = new List<Site>();
+                brokersUrls = new List<string>();
+            }
+
+            public void AddChildrenSite(Site site)
+            {
+                child.Add(site);
+            }
+
+            public void AddBrokerUrlToSite(string url)
+            {
+                brokersUrls.Add(url);
+            }
+
+            public string GetChildUrl()
+            {
+                string res = string.Empty;
+                foreach (Site site in child)
+                {
+                    res = string.Join(" ", res, site.GetBrokersUrl());
+                }
+                return res;
+            }
+
+            public string GetBrokersUrl()
+            {
+                string[] res = new string[brokersUrls.Count];
+                brokersUrls.CopyTo(res);
+                return string.Join(" ", res);
+            }
+
+        }
+
         //pair <site's name, site object>
         private Dictionary<string, Site> sites;
 
@@ -17,77 +83,52 @@ namespace PuppetMaster
             sites = new Dictionary<string, Site>();
         }
 
-        public Site CreateSite(string name)
+        public void CreateSite(string siteName)
         {
-            if (!sites.ContainsKey(name))
-                sites.Add(name, new Site(name));
-            return sites[name];
+            if (!sites.ContainsKey(siteName))
+                sites.Add(siteName, new Site(siteName));
         }
 
-        public Site GetSiteByName(string name)
+        public void CreateSiteWithParent(string childSiteName,
+            string parentSiteName)
         {
-            return sites[name];
+            CreateSite(childSiteName);
+            CreateSite(parentSiteName);
+            sites[parentSiteName].AddChildrenSite(sites[childSiteName]);
+            sites[childSiteName].Parent = sites[parentSiteName];
         }
 
-    }
-
-    public class Site
-    {
-        private string name;
-
-        private Site parent = null;
-
-        private List<Site> child;
-
-        //List of broker's URL from this site.
-        private List<string> brokersUrls;
-
-        public string Name
+        public string GetSiteBrokersUrl(string siteName)
         {
-            get { return name; }
-            set { name = value; }
+            return sites[siteName].GetBrokersUrl();
         }
 
-        public Site Parent
+        public string GetParentBrokersUrl(string siteName)
         {
-            get { return parent; }
-            set { parent = value; }
+            return sites[siteName].Parent.GetBrokersUrl();
         }
 
-        public Site(string name)
+        public string GetChildrenUrl(string siteName)
         {
-            this.Name = name;
-            child = new List<Site>();
-            brokersUrls = new List<string>();
+            return sites[siteName].GetChildUrl();
         }
 
-        public void AddChildrenSite(Site site)
+        public void AddBrokerUrlToSite(string siteName, string brokerUrl)
         {
-            child.Add(site);
+            if (sites.ContainsKey(siteName))
+                sites[siteName].AddBrokerUrlToSite(brokerUrl);
         }
 
-        public void AddBrokerUrlToSite(string url)
+        public bool IsSiteRoot(string siteName)
         {
-            brokersUrls.Add(url);
-        }
-
-        public string GetChildUrl()
-        {
-            string res = string.Empty;
-            foreach (Site site in child)
-            {
-                res = string.Join(" ", res, site.GetBrokersUrl());
-            }
-            return res;
-        }
-
-        public string GetBrokersUrl()
-        {
-            string[] res = new string[brokersUrls.Count];
-            brokersUrls.CopyTo(res);
-            return string.Join(" ", res);
+            if (sites.ContainsKey(siteName))
+                return sites[siteName].IsRoot;
+            return false;
         }
 
     }
- 
+
+
+
 }
+

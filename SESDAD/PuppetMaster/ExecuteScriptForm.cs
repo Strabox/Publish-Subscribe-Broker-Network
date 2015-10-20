@@ -41,8 +41,7 @@ namespace PuppetMaster
         {
             Debug.WriteLineIf(FormPuppetMaster.Debug,e.ProgressPercentage,"[Script File]");
             progressBarScript.Value = e.ProgressPercentage;
-            if (progressBarScript.Value == progressBarScript.Maximum)
-                labelScript.Text = "Execution Completed";
+            labelScriptLine.Text = e.UserState as string;
         }
 
         private void backgroundWorkerScript_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -52,6 +51,7 @@ namespace PuppetMaster
                 MessageBox.Show(e.Error.ToString());
                 return;
             }
+            labelScript.Text = "Execution Completed";
         }
     }
 }

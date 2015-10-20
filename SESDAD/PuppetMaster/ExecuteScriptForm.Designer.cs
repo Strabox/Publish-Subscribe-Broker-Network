@@ -31,11 +31,12 @@
             this.progressBarScript = new System.Windows.Forms.ProgressBar();
             this.labelScript = new System.Windows.Forms.Label();
             this.backgroundWorkerScript = new System.ComponentModel.BackgroundWorker();
+            this.labelScriptLine = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // progressBarScript
             // 
-            this.progressBarScript.Location = new System.Drawing.Point(40, 83);
+            this.progressBarScript.Location = new System.Drawing.Point(40, 95);
             this.progressBarScript.Name = "progressBarScript";
             this.progressBarScript.Size = new System.Drawing.Size(324, 23);
             this.progressBarScript.TabIndex = 0;
@@ -57,11 +58,21 @@
             this.backgroundWorkerScript.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorkerScript_ProgressChanged);
             this.backgroundWorkerScript.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerScript_RunWorkerCompleted);
             // 
+            // labelScriptLine
+            // 
+            this.labelScriptLine.AutoSize = true;
+            this.labelScriptLine.Location = new System.Drawing.Point(37, 79);
+            this.labelScriptLine.Name = "labelScriptLine";
+            this.labelScriptLine.Size = new System.Drawing.Size(76, 13);
+            this.labelScriptLine.TabIndex = 2;
+            this.labelScriptLine.Text = "labelScriptLine";
+            // 
             // ExecuteScriptForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(418, 174);
+            this.Controls.Add(this.labelScriptLine);
             this.Controls.Add(this.labelScript);
             this.Controls.Add(this.progressBarScript);
             this.Name = "ExecuteScriptForm";
@@ -78,5 +89,6 @@
         private System.Windows.Forms.ProgressBar progressBarScript;
         private System.Windows.Forms.Label labelScript;
         private System.ComponentModel.BackgroundWorker backgroundWorkerScript;
+        private System.Windows.Forms.Label labelScriptLine;
     }
 }

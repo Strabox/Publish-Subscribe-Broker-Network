@@ -46,34 +46,35 @@ namespace Broker
             this.parentUrl = parent;
             this.childUrls = children;
             this.url = url;
+            this.topicSubscribers = new TopicSubscriberCollection();
+        }
 
-            //PROBLEMS
-            if (parentName != "NoParent")
+        //Init is called after launch all processes.
+        public void Init()
+        {
+            
+            if (!parentUrl.Equals("NoParent"))
             {
+                Console.WriteLine(parentUrl);
                 parentBroker = Activator.GetObject(typeof(IBroker), parentUrl)
                     as IBroker;
 
-                parentName = parentBroker.GetName();
+                parentName = CommonUtil.ExtractPath(parentUrl);
 
-                parentBroker.HeyDaddy(this.url);
+                //parentBroker.HeyDaddy(this.url);
             }
-            //PROBLEMS
 
-            /*
-            //if(childUrls)
-            foreach (string childUrl in children)
+            foreach (string childUrl in childUrls)
             {
+                Console.WriteLine(childUrl);
                 IBroker childBroker = Activator.GetObject(typeof(IBroker), childUrl)
                     as IBroker;
 
-                childBrokers.Add(childBroker.GetName(), childBroker);
-            }*/
-            
-            this.topicSubscribers = new TopicSubscriberCollection();
+                childBrokers.Add(CommonUtil.ExtractPath(childUrl), childBroker);
+            }
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
                 as IPuppetMasterLog;
-
-
+                
         }
 
         // Broker specific methods.
@@ -84,14 +85,14 @@ namespace Broker
             // Enviar aos Brokers vizinhos.
             Event newEvent = new Event(this.name, e.Topic, e.Content);
 
-            if (e.Sender != parentName)
+            if (!e.Sender.Equals(parentName))
             {
                 parentBroker.Diffuse(newEvent);
             }
 
             foreach(KeyValuePair<string, IBroker> child in childBrokers)
             {
-                if (e.Sender != child.Key)
+                if (!e.Sender.Equals(child.Key))
                 {
                     child.Value.Diffuse(newEvent);
                 }
@@ -105,7 +106,6 @@ namespace Broker
             {
                 subscriber.Receive(newEvent);
             }
-             
 
             if (loggingLevel.Equals("full"))
                 logServer.LogAction("BroEvent "+ name +", "+"MissingPublisherName"+", "
@@ -121,7 +121,7 @@ namespace Broker
 
             subscription.Sender = this.name;
 
-            if (parentName != sender)
+            if (!parentName.Equals(sender))
             {
                 parentBroker.Subscribe(subscription);
             }
@@ -129,7 +129,7 @@ namespace Broker
             foreach (KeyValuePair<string, IBroker> childPair in childBrokers)
             {
                 IBroker child = childPair.Value;
-                if (child.GetName() != sender)
+                if (!child.GetName().Equals(sender))
                 {
                     child.Subscribe(subscription);
                 }
@@ -151,7 +151,7 @@ namespace Broker
 
             subscription.Sender = this.name;
 
-            if (parentName != sender)
+            if (!parentName.Equals(sender))
             {
                 parentBroker.Unsubscribe(subscription);
             }
@@ -159,7 +159,7 @@ namespace Broker
             foreach (KeyValuePair<string, IBroker> childPair in childBrokers)
             {
                 IBroker child = childPair.Value;
-                if (child.GetName() != sender)
+                if (!child.GetName().Equals(sender))
                 {
                     child.Unsubscribe(subscription);
                 }
@@ -213,5 +213,6 @@ namespace Broker
             return this.name;
         }
 
+      
     }
 }

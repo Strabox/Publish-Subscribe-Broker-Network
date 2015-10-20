@@ -61,15 +61,9 @@ namespace PuppetMaster
                 if (Regex.IsMatch(line, ParseUtil.SITE))
                 {
                     tokens = Regex.Split(line, ParseUtil.SPACE);
-                    Site children = sites.CreateSite(tokens[1]);
                     if (!tokens[3].Equals("none"))
-                    {
-                        Site parent = sites.CreateSite(tokens[3]);
-                        children.Parent = parent;
-                        parent.AddChildrenSite(children);
-                    }
-                    else
-                        children.Parent = null;
+                        sites.CreateSiteWithParent(tokens[1], tokens[3]);
+                    sites.CreateSite(tokens[1]);
                 }
                 else if (Regex.IsMatch(line, ParseUtil.PROCESS))
                 {
@@ -95,7 +89,7 @@ namespace PuppetMaster
                     }
                     else if (processType.Equals("broker"))
                     {
-                        sites.GetSiteByName(tokens[5]).AddBrokerUrlToSite(tokens[7]);
+                        sites.AddBrokerUrlToSite(tokens[5], tokens[7]);
                         launcher.AddNode(new LaunchBroker(tokens[1],
                            ParseUtil.ExtractIPFromURL(tokens[7]), port, tokens[5]));
                     }
@@ -125,6 +119,7 @@ namespace PuppetMaster
             int scriptLines = lines.Length,percentageCompleted = 0;
             foreach (string line in lines)
             {
+                worker.ReportProgress(percentageCompleted, line);
                 if (Regex.IsMatch(line, ParseUtil.PUBLISH))
                 {
                     string[] tokens = line.Split(' ');
@@ -165,8 +160,8 @@ namespace PuppetMaster
                 }
                 percentageCompleted += (int)Math.Ceiling(((double)1 / (double)scriptLines) * 100);
                 percentageCompleted = (percentageCompleted > 100) ? 100 : percentageCompleted;
-                worker.ReportProgress(percentageCompleted);
             }
+            worker.ReportProgress(percentageCompleted, string.Empty);
         }
         /* ########################## Remote Calls ########################## */
 
@@ -262,6 +257,7 @@ namespace PuppetMaster
                + " Ontopic " + topic + " Interval " + interval);
             node.Publish(topic, numberOfEvents, interval);
         }
+
 
     }
 }
