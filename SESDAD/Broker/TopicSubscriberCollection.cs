@@ -105,7 +105,9 @@ namespace Broker
 				}
 				
 				current = current.children[part];
-			}	
+			}
+			
+			subscribers.UnionWith(current.subscribers);
 
 			return subscribers;
 		}
