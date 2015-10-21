@@ -6,19 +6,35 @@ namespace Broker
 {
     public class TopicSubscriberCollection 
 	{
+		/**
+		*	This static class contains helper methods for handling string topics
+		*/
+		static class Topic
+		{
+			public static string[] Split(string topic)
+			{
+				return topic.Split('/').Skip(1).ToArray();
+			}
+			
+			public static bool IsWildcard(string subtopic)
+			{
+				return subtopic == "*";
+			}
+		}
+		
 		class Router<T>
 		{
 			public string topic;
-			public ICollection<T> subscribers;
-			public ICollection<T> subscribersAll;
-			public IDictionary<string, Router<T>> children;
+			public ICollection<T> nodes;
+			public ICollection<T> nodesAsterisk;
+			public IDictionary<string, Router<T>> subtopics;
 			
-			public Router(string topic, ICollection<T> subscribers, ICollection<T> subscribersAll, IDictionary<string, Router<T>> children)
+			public Router(string topic, ICollection<T> nodes, ICollection<T> nodesAsterisk, IDictionary<string, Router<T>> subtopics)
 			{
 				this.topic = topic;
-				this.subscribers = subscribers;
-				this.subscribersAll = subscribersAll;
-				this.children = children;
+				this.nodes = nodes;
+				this.nodesAsterisk = nodesAsterisk;
+				this.subtopics = subtopics;
 			}
 			
 			public static Router<T> ForTopic(string topic)
@@ -26,101 +42,126 @@ namespace Broker
 				return new Router<T>(topic, new HashSet<T>(), new HashSet<T>(), new Dictionary<string, Router<T>>());
 			}
 			
-			public bool hasChild(string part)
+			public bool HasSubtopic(string subtopic)
 			{
-				return this.children.ContainsKey(part);
+				return this.subtopics.ContainsKey(subtopic);
+			}
+			
+			public void Add(string topic, T node)
+			{
+				string[] parts = Topic.Split(topic);
+				var current = this;
+				
+				string currentTopic = "";
+				
+				foreach (var part in parts)
+				{
+					currentTopic += "/" + part;
+	
+					if (Topic.IsWildcard(part))
+					{
+						current.nodesAsterisk.Add(node);
+						return;
+					}
+	
+					if ( ! current.HasSubtopic(part))
+					{
+						current.subtopics.Add(part, Router<T>.ForTopic(currentTopic));
+					}
+					
+					current = current.subtopics[part];				
+				}
+				
+				current.nodes.Add(node);
+			}
+			
+			public void Remove(string topic, T node)
+			{
+				string[] parts = Topic.Split(topic);
+				var current = this;
+				
+				foreach (var part in parts)
+				{
+					if (Topic.IsWildcard(part))
+					{
+						current.nodesAsterisk.Remove(node);
+					}
+					
+					if ( ! current.HasSubtopic(part))
+					{
+						// No subscriber has subscribed the topic
+						// Still, that's weird.
+						return;
+					}
+					
+					current = current.subtopics[part];				
+				}
+				
+				current.nodes.Remove(node);
+			}
+			
+			public ICollection<T> NodesFor(string topic)
+			{
+				string[] parts = Topic.Split(topic);
+				var current = this;
+				HashSet<T> nodes = new HashSet<T>();
+				
+				foreach (var part in parts)
+				{
+					nodes.UnionWith(current.nodesAsterisk);
+					
+					if ( ! current.HasSubtopic(part))
+					{
+						return nodes;
+					}
+					
+					current = current.subtopics[part];
+				}
+				
+				nodes.UnionWith(current.nodes);
+	
+				return nodes;
 			}
 		}
 		
-		private Router<ISubscriber> data;
+		private Router<ISubscriber> subscribers;
+		private Router<IBroker> brokers;
 		
 		public TopicSubscriberCollection()
 		{
-			this.data = Router<ISubscriber>.ForTopic("/");
+			this.subscribers = Router<ISubscriber>.ForTopic("/");
+			this.brokers = Router<IBroker>.ForTopic("/");
 		}
 		
-		public void Add(string topic, ISubscriber subscriber)
+		public void AddSubscriber(string topic, ISubscriber subscriber)
 		{
-			string[] parts = this.splitTopic(topic);
-			var current = this.data;
-			string currentTopic = "";
-			
-			foreach (var part in parts)
-			{
-				currentTopic += "/" + part;
-
-				if (isWildcard(part))
-				{
-					current.subscribersAll.Add(subscriber);
-					return;
-				}
-
-				if ( ! current.hasChild(part))
-				{
-					current.children.Add(part, Router<ISubscriber>.ForTopic(currentTopic));
-				}
-				
-				current = current.children[part];				
-			}
-			
-			current.subscribers.Add(subscriber);
+			this.subscribers.Add(topic, subscriber);
 		}
 		
-		public void Remove(string topic, ISubscriber subscriber)
+		public void RemoveSubscriber(string topic, ISubscriber subscriber)
 		{
-			string[] parts = this.splitTopic(topic);
-			var current = this.data;
-			
-			foreach (var part in parts)
-			{
-				if (isWildcard(part))
-				{
-					current.subscribersAll.Remove(subscriber);
-				}
-				
-				if ( ! current.hasChild(part))
-				{
-					// No subscriber has subscribed the topic
-					return;
-				}
-				
-				current = current.children[part];				
-			}
-			
-			current.subscribers.Remove(subscriber);
+			this.subscribers.Remove(topic, subscriber);
 		}
 		
-		public ICollection<ISubscriber> SubscribersForTopic(string topic)
+		public ICollection<ISubscriber> SubscribersFor(string topic)
 		{
-			string[] parts = this.splitTopic(topic);
-			var current = this.data;
-			HashSet<ISubscriber> subscribers = new HashSet<ISubscriber>();
-			
-			foreach (var part in parts)
-			{
-				subscribers.UnionWith(current.subscribersAll);
-				
-				if ( ! current.hasChild(part))
-				{
-					return subscribers;
-				}
-				
-				current = current.children[part];
-			}
-			
-			subscribers.UnionWith(current.subscribers);
-
-			return subscribers;
+			return this.subscribers.NodesFor(topic);
 		}
 		
-		private string[] splitTopic(string topic)
+		public void AddRoute(string topic, IBroker broker)
 		{
-			return topic.Split('/').Skip(1).ToArray();
+			this.brokers.Add(topic, broker);
 		}
 		
-		private bool isWildcard(string part)
+		public void RemoveRoute(string topic, IBroker broker)
 		{
-			return part == "*";
+			this.brokers.Remove(topic, broker);
 		}
+		
+		public ICollection<IBroker> RoutingFor(string topic)
+		{
+			return this.brokers.NodesFor(topic);
+		}
+		
 	}
 }

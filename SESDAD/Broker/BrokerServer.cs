@@ -104,7 +104,7 @@ namespace Broker
                     child.Value.Diffuse(newEvent);
             }
             // Send to subscribers that want the message.
-            ICollection<ISubscriber> subscribersToSend = topicSubscribers.SubscribersForTopic(e.Topic);
+            ICollection<ISubscriber> subscribersToSend = topicSubscribers.SubscribersFor(e.Topic);
             foreach (ISubscriber subscriber in subscribersToSend)
             {
                 Console.WriteLine(subscribersToSend.Count);
@@ -121,7 +121,7 @@ namespace Broker
         {
             lock (this)
             {
-                this.topicSubscribers.Add(subscription.Topic, subscription.Subscriber);
+                this.topicSubscribers.AddSubscriber(subscription.Topic, subscription.Subscriber);
             }
         }
 
@@ -129,7 +129,7 @@ namespace Broker
         {
             lock (this)
             {
-                this.topicSubscribers.Remove(subscription.Topic, subscription.Subscriber);
+                this.topicSubscribers.RemoveSubscriber(subscription.Topic, subscription.Subscriber);
             }
             string sender = subscription.Sender;
             subscription.Sender = this.name;
