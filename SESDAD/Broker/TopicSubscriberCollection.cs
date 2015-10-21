@@ -122,6 +122,30 @@ namespace Broker
 	
 				return nodes;
 			}
+			
+			public bool HasNodesFor(string topic)
+			{
+				string[] parts = Topic.Split(topic);
+				var current = this;
+				
+				foreach (var part in parts)
+				{
+					if (current.nodesAsterisk.Count > 0)
+					{
+						return true;
+					}
+					
+					if ( ! current.HasSubtopic(part))
+					{
+						return false;
+					}
+					
+					current = current.subtopics[part];
+				}
+				
+				return current.nodes.Count > 0;
+			}
+			
 		}
 		
 		private Router<ISubscriber> subscribers;
@@ -133,14 +157,23 @@ namespace Broker
 			this.brokers = Router<IBroker>.ForTopic("/");
 		}
 		
-		public void AddSubscriber(string topic, ISubscriber subscriber)
+		/**
+		 * Returns true if this node gains interest in the topic. Returns false otherwise.
+		 */
+		public bool AddSubscriber(string topic, ISubscriber subscriber)
 		{
+			bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
 			this.subscribers.Add(topic, subscriber);
+			return result;
 		}
 		
-		public void RemoveSubscriber(string topic, ISubscriber subscriber)
+		/**
+		 * Returns true if this node loses all interest in the topic. Returns false otherwise.
+		 */
+		public bool RemoveSubscriber(string topic, ISubscriber subscriber)
 		{
 			this.subscribers.Remove(topic, subscriber);
+			return ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));			
 		}
 		
 		public ICollection<ISubscriber> SubscribersFor(string topic)
@@ -148,14 +181,23 @@ namespace Broker
 			return this.subscribers.NodesFor(topic);
 		}
 		
-		public void AddRoute(string topic, IBroker broker)
+		/**
+		 * Returns true if this node gains interest in the topic. Returns false otherwise.
+		 */
+		public bool AddRoute(string topic, IBroker broker)
 		{
+			bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
 			this.brokers.Add(topic, broker);
+			return result;
 		}
 		
-		public void RemoveRoute(string topic, IBroker broker)
+		/**
+		 * Returns true if this node loses all interest in the topic. Returns false otherwise.
+		 */
+		public bool RemoveRoute(string topic, IBroker broker)
 		{
 			this.brokers.Remove(topic, broker);
+			return ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));			
 		}
 		
 		public ICollection<IBroker> RoutingFor(string topic)
