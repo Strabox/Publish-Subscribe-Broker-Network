@@ -81,7 +81,6 @@ namespace PuppetMaster
 
         private void FormPuppetMaster_Load(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine(CommonUtil.ExtractPath("tcp://12.123.133.1:3333/Nomedejeito"));
             TcpChannel channel = new TcpChannel(CommonUtil.PUPPET_MASTER_PORT);
             ChannelServices.RegisterChannel(channel, false);
             manager = new ProcessesManager(this);
@@ -109,7 +108,7 @@ namespace PuppetMaster
         private void treeViewScriptFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             TreeView tree = sender as TreeView;
-            ExecuteBackgroundTask form = new ExecuteBackgroundTask(
+            ExecuteBackgroundTask form = new ExecuteBackgroundTask("Script Execution","ExecuteScriptFile",
                 ProcessesManager.SCRIPT_FILES_DIRECTORY + tree.SelectedNode.Text,manager);
             form.ShowDialog();
         }
@@ -126,7 +125,7 @@ namespace PuppetMaster
         private void treeViewLogFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             TreeView tree = sender as TreeView;
-            Process.Start(LogServer.LOG_FILES_DIRECTORY+tree.SelectedNode.Text);
+            Process.Start(LogServer.LOG_FILES_DIRECTORY + tree.SelectedNode.Text);
         }
 
 

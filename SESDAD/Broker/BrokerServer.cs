@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Broker
@@ -25,9 +26,16 @@ namespace Broker
         
         private string[] childUrls;
 
-        private IPuppetMasterLog logServer;
+        private bool isFreeze;
+        private bool IsFreeze
+        {
+            get { return isFreeze; }
+            set { isFreeze = value; }
+        }
 
         private TopicSubscriberCollection topicSubscribers;
+
+        private IPuppetMasterLog logServer;
 
         private IBroker parentBroker;
 
@@ -43,6 +51,7 @@ namespace Broker
             this.loggingLevel = loggingLevel;
             this.parentUrl = parent;
             this.childUrls = children;
+            this.isFreeze = false;
             this.topicSubscribers = new TopicSubscriberCollection();
         }
 
@@ -67,14 +76,23 @@ namespace Broker
 
         // Broker specific methods.
 
-        public void Diffuse(Event e)
+        private void ProcessDiffuse(Object eve)
         {
+            lock (this)
+            {
+                while (IsFreeze)
+                    Monitor.Wait(this);
+            }
+
+            Event e = eve as Event;
             // TODO - On Progress
             // Enviar aos Brokers vizinhos.
-            Event newEvent = new Event(e.Publisher,this.name, e.Topic, e.Content,e.EventNumber);
+            Event newEvent = new Event(e.Publisher, this.name, e.Topic, e.Content, e.EventNumber);
 
             if (!parentUrl.Equals(CommonUtil.ROOT) && !e.Sender.Equals(parentName))
+            {
                 parentBroker.Diffuse(newEvent);
+            }
 
             if (loggingLevel.Equals("full"))
                 logServer.LogAction("BroEvent " + name + ", " + e.Publisher + ", "
@@ -89,8 +107,14 @@ namespace Broker
             ICollection<ISubscriber> subscribersToSend = topicSubscribers.SubscribersForTopic(e.Topic);
             foreach (ISubscriber subscriber in subscribersToSend)
             {
+                Console.WriteLine(subscribersToSend.Count);
                 subscriber.Receive(newEvent);
             }
+        }
+
+        public void Diffuse(Event e)
+        {
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessDiffuse),e);
         }
 
         public void Subscribe(Subscription subscription)
@@ -98,18 +122,6 @@ namespace Broker
             lock (this)
             {
                 this.topicSubscribers.Add(subscription.Topic, subscription.Subscriber);
-            }
-            string sender = subscription.Sender;
-            subscription.Sender = this.name;
-
-            if (!parentUrl.Equals(CommonUtil.ROOT) && !parentName.Equals(sender))
-                parentBroker.Subscribe(subscription);
-
-            foreach (KeyValuePair<string, IBroker> childPair in childBrokers)
-            {
-                IBroker child = childPair.Value;
-                if (!childPair.Key.Equals(sender))
-                    child.Subscribe(subscription);
             }
         }
 
@@ -129,10 +141,7 @@ namespace Broker
             {
                 IBroker child = childPair.Value;
                 if (!CommonUtil.ExtractPath(childPair.Key).Equals(sender))
-                    lock (this)
-                    {
                         child.Unsubscribe(subscription);
-                    }
             }
 
         }
@@ -146,15 +155,22 @@ namespace Broker
 
         public void Freeze()
         {
-            //TODO
-        }
-
-        public void Status()
-        {
-            //TODO
+            lock (this)
+            {
+                IsFreeze = true;
+            }
         }
 
         public void Unfreeze()
+        {
+            lock (this)
+            {
+                IsFreeze = false;
+                Monitor.PulseAll(this);
+            }
+        }
+
+        public void Status()
         {
             //TODO
         }

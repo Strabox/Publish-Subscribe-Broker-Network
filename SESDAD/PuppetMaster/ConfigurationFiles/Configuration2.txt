@@ -14,4 +14,4 @@ Process subscriber2 Is subscriber On site0 URL tcp://localhost:3337/subscriber2
 Process subscriber3 Is subscriber On site3 URL tcp://localhost:3555/subscriber3
 RoutingPolicy flooding
 Ordering NO
-LoggingLevel light
+LoggingLevel full

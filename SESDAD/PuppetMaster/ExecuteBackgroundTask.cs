@@ -18,9 +18,14 @@ namespace PuppetMaster
 
         private ProcessesManager manager;
 
-        public ExecuteBackgroundTask(string scriptFile,ProcessesManager form)
+        private string executeFunction;
+
+        public ExecuteBackgroundTask(string textForm,
+            string executeFunction,string scriptFile,ProcessesManager form)
         {
             InitializeComponent();
+            this.Text = textForm;
+            this.executeFunction = executeFunction;
             manager = form;
             backgroundWorkerScript.RunWorkerAsync(scriptFile);
         }
@@ -34,7 +39,10 @@ namespace PuppetMaster
 
         private void backgroundWorkerScript_DoWork(object sender, DoWorkEventArgs e)
         {
-            manager.ExecuteScriptFile((string) e.Argument,sender as BackgroundWorker);
+            object[] param = new object[2];
+            param[0] = e.Argument as string;
+            param[1] = sender as BackgroundWorker;
+            manager.GetType().GetMethod(executeFunction).Invoke(manager,param);
         }
 
         private void backgroundWorkerScript_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -51,7 +59,8 @@ namespace PuppetMaster
                 MessageBox.Show(e.Error.ToString());
                 return;
             }
-            labelScript.Text = "Execution Completed";
+            else
+                labelScript.Text = "Execution Completed";
         }
     }
 }
