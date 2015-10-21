@@ -6,14 +6,14 @@ namespace Broker
 {
     public class TopicSubscriberCollection 
 	{
-		class Struct 
+		class Router<T>
 		{
 			public string topic;
-			public ICollection<ISubscriber> subscribers;
-			public ICollection<ISubscriber> subscribersAll;
-			public IDictionary<string, Struct> children;
+			public ICollection<T> subscribers;
+			public ICollection<T> subscribersAll;
+			public IDictionary<string, Router<T>> children;
 			
-			public Struct(string topic, ICollection<ISubscriber> subscribers, ICollection<ISubscriber> subscribersAll, IDictionary<string, Struct> children)
+			public Router(string topic, ICollection<T> subscribers, ICollection<T> subscribersAll, IDictionary<string, Router<T>> children)
 			{
 				this.topic = topic;
 				this.subscribers = subscribers;
@@ -21,9 +21,9 @@ namespace Broker
 				this.children = children;
 			}
 			
-			public static Struct ForTopic(string topic)
+			public static Router<T> ForTopic(string topic)
 			{
-				return new Struct(topic, new HashSet<ISubscriber>(), new HashSet<ISubscriber>(), new Dictionary<string, Struct>());
+				return new Router<T>(topic, new HashSet<T>(), new HashSet<T>(), new Dictionary<string, Router<T>>());
 			}
 			
 			public bool hasChild(string part)
@@ -31,11 +31,12 @@ namespace Broker
 				return this.children.ContainsKey(part);
 			}
 		}
-		private Struct data;
+		
+		private Router<ISubscriber> data;
 		
 		public TopicSubscriberCollection()
 		{
-			this.data = Struct.ForTopic("/");
+			this.data = Router<ISubscriber>.ForTopic("/");
 		}
 		
 		public void Add(string topic, ISubscriber subscriber)
@@ -56,7 +57,7 @@ namespace Broker
 
 				if ( ! current.hasChild(part))
 				{
-					current.children.Add(part, Struct.ForTopic(currentTopic));
+					current.children.Add(part, Router<ISubscriber>.ForTopic(currentTopic));
 				}
 				
 				current = current.children[part];				
