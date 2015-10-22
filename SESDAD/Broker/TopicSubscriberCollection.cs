@@ -162,9 +162,12 @@ namespace Broker
 		 */
 		public bool AddSubscriber(string topic, ISubscriber subscriber)
 		{
-			bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
-			this.subscribers.Add(topic, subscriber);
-			return result;
+			lock (this)
+			{
+				bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
+				this.subscribers.Add(topic, subscriber);
+				return result;
+			}			
 		}
 		
 		/**
@@ -172,13 +175,19 @@ namespace Broker
 		 */
 		public bool RemoveSubscriber(string topic, ISubscriber subscriber)
 		{
-			this.subscribers.Remove(topic, subscriber);
-			return ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));			
+			lock (this)
+			{
+				this.subscribers.Remove(topic, subscriber);
+				return ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));	
+			}		
 		}
 		
 		public ICollection<ISubscriber> SubscribersFor(string topic)
 		{
-			return this.subscribers.NodesFor(topic);
+			lock (this)
+			{
+				return this.subscribers.NodesFor(topic);
+			}
 		}
 		
 		/**
@@ -186,9 +195,12 @@ namespace Broker
 		 */
 		public bool AddRoute(string topic, IBroker broker)
 		{
-			bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
-			this.brokers.Add(topic, broker);
-			return result;
+			lock (this)
+			{
+				bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
+				this.brokers.Add(topic, broker);
+				return result;
+			}
 		}
 		
 		/**
@@ -196,13 +208,19 @@ namespace Broker
 		 */
 		public bool RemoveRoute(string topic, IBroker broker)
 		{
-			this.brokers.Remove(topic, broker);
-			return ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));			
+			lock (this)
+			{
+				this.brokers.Remove(topic, broker);
+				return ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
+			}			
 		}
 		
 		public ICollection<IBroker> RoutingFor(string topic)
 		{
-			return this.brokers.NodesFor(topic);
+			lock (this)
+			{
+				return this.brokers.NodesFor(topic);
+			}
 		}
 		
 	}
