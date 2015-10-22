@@ -113,4 +113,39 @@ namespace CommonTypes {
             info.AddValue("sender", sender);
         }
     }
+    
+    [Serializable]
+    public class Route : ISerializable
+    {
+        private string topic;
+        public string Topic
+        {
+            get { return topic; }
+            set { topic = value; }
+        }
+
+        private IBroker broker;
+        public IBroker Broker
+        {
+            get { return broker; }
+            set { broker = value; }
+        }
+
+        public Route(string topic, IBroker broker)
+        {
+            Topic = topic;
+            Broker = broker;
+        }
+
+        public Route(SerializationInfo info, StreamingContext context)
+        {
+            Topic = info.GetValue("topic", typeof(string)) as string;
+            Broker = info.GetValue("broker", typeof(IBroker)) as IBroker;
+        }
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("topic", topic);
+            info.AddValue("broker", broker);
+        }
+    }
 }

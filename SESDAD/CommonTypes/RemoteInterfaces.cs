@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.Remoting.Messaging;
 
 namespace CommonTypes
 {
@@ -17,6 +12,10 @@ namespace CommonTypes
         void Subscribe(Subscription subscription);
         [OneWay]
         void Unsubscribe(Subscription subscription);
+        [OneWay]
+        void AddRoute(Route route);
+        [OneWay]
+        void RemoveRoute(Route route);
     }
 
     public interface ISubscriber

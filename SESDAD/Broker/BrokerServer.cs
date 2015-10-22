@@ -178,5 +178,15 @@ namespace Broker
                     Monitor.Wait(this);
             }
         }
+
+        public void AddRoute(Route route)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveRoute(Route route)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
