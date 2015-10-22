@@ -196,4 +196,5 @@ FakesAssemblies/
 *.opt
 
 #Application Log Files
-
+SESDAD/PuppetMaster/LogFiles
+!SESDAD/PuppetMaster/LogFiles/.gitkeep
