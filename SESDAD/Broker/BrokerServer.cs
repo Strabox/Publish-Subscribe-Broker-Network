@@ -100,11 +100,11 @@ namespace Broker
             Event newEvent = this.router.Diffuse(e);
             
             // Send the event to Subscribers who want it
-            ICollection<ISubscriber> subscribersToSend = Data.SubscribersFor(e.Topic);
+            ICollection<NodePair<ISubscriber>> subscribersToSend = Data.SubscribersFor(e.Topic);
 
-            foreach (ISubscriber subscriber in subscribersToSend)
+            foreach (var subscriberPair in subscribersToSend)
             {
-                subscriber.Receive(newEvent);
+                subscriberPair.Node.Receive(newEvent);
             }
             
         }

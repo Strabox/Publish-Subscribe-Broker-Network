@@ -1,9 +1,46 @@
 using CommonTypes;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Broker
 {
+	using SubscriberPair = NodePair<ISubscriber>;
+	using BrokerPair = NodePair<IBroker>;
+	
+    public class NodePair<T> : IEquatable<NodePair<T>>
+    {
+		private T node;
+		public T Node
+		{
+			get { return node; }
+			set { node = value; }
+		}
+		
+		private string name;
+		public string Name
+		{
+			get { return name; }
+			set { name = value; }
+		}
+		
+		public NodePair(string name, T node)
+		{
+			this.name = name;
+			this.node = node;
+		}
+		
+		public bool Is(string name)
+		{
+			return this.name.Equals(name);
+		}
+
+        public bool Equals(NodePair<T> other)
+        {
+            return name.Equals(other.Name);
+        }
+    }
+
     public class TopicSubscriberCollection 
 	{
 		/**
@@ -148,24 +185,24 @@ namespace Broker
 			
 		}
 		
-		private Router<ISubscriber> subscribers;
-		private Router<IBroker> brokers;
+		private Router<SubscriberPair> subscribers;
+		private Router<BrokerPair> brokers;
 		
 		public TopicSubscriberCollection()
 		{
-			this.subscribers = Router<ISubscriber>.ForTopic("/");
-			this.brokers = Router<IBroker>.ForTopic("/");
+			this.subscribers = Router<SubscriberPair>.ForTopic("/");
+			this.brokers = Router<BrokerPair>.ForTopic("/");
 		}
 		
 		/**
 		 * Returns true if this node gains interest in the topic. Returns false otherwise.
 		 */
-		public bool AddSubscriber(string topic, ISubscriber subscriber)
+		public bool AddSubscriber(string topic, string name, ISubscriber subscriber)
 		{
 			lock (this)
 			{
 				bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
-				this.subscribers.Add(topic, subscriber);
+				this.subscribers.Add(topic, new SubscriberPair(name, subscriber));
 				return result;
 			}			
 		}
@@ -173,16 +210,16 @@ namespace Broker
 		/**
 		 * Returns true if this node loses all interest in the topic. Returns false otherwise.
 		 */
-		public bool RemoveSubscriber(string topic, ISubscriber subscriber)
+		public bool RemoveSubscriber(string topic, string name, ISubscriber subscriber)
 		{
 			lock (this)
 			{
-				this.subscribers.Remove(topic, subscriber);
+				this.subscribers.Remove(topic, new SubscriberPair(name, subscriber));
 				return ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));	
 			}		
 		}
 		
-		public ICollection<ISubscriber> SubscribersFor(string topic)
+		public ICollection<SubscriberPair> SubscribersFor(string topic)
 		{
 			lock (this)
 			{
@@ -193,12 +230,12 @@ namespace Broker
 		/**
 		 * Returns true if this node gains interest in the topic. Returns false otherwise.
 		 */
-		public bool AddRoute(string topic, IBroker broker)
+		public bool AddRoute(string topic, string name, IBroker broker)
 		{
 			lock (this)
 			{
 				bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
-				this.brokers.Add(topic, broker);
+				this.brokers.Add(topic, new BrokerPair(name, broker));
 				return result;
 			}
 		}
@@ -206,16 +243,16 @@ namespace Broker
 		/**
 		 * Returns true if this node loses all interest in the topic. Returns false otherwise.
 		 */
-		public bool RemoveRoute(string topic, IBroker broker)
+		public bool RemoveRoute(string topic, string name, IBroker broker)
 		{
 			lock (this)
 			{
-				this.brokers.Remove(topic, broker);
+				this.brokers.Remove(topic, new BrokerPair(name, broker));
 				return ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
 			}			
 		}
 		
-		public ICollection<IBroker> RoutingFor(string topic)
+		public ICollection<BrokerPair> RoutingFor(string topic)
 		{
 			lock (this)
 			{

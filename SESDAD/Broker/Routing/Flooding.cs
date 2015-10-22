@@ -15,7 +15,7 @@ namespace Broker
         
         public void Subscribe(Subscription subscription)
         {
-            broker.Data.AddSubscriber(subscription.Topic, subscription.Subscriber);
+            broker.Data.AddSubscriber(subscription.Topic, subscription.SubscriberName, subscription.Subscriber);
         }
 
         public Event Diffuse(Event e)
@@ -44,7 +44,7 @@ namespace Broker
 
         public void Unsubscribe(Subscription subscription)
         {
-            broker.Data.RemoveSubscriber(subscription.Topic, subscription.Subscriber);
+            broker.Data.RemoveSubscriber(subscription.Topic, subscription.SubscriberName, subscription.Subscriber);
         }
     }
 }

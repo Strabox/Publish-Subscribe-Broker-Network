@@ -85,6 +85,13 @@ namespace CommonTypes {
             get { return subscriber; }
             set { subscriber = value; }
         }
+        
+        private string subscriberName;
+        public string SubscriberName
+        {
+            get { return subscriberName; }
+            set { subscriberName = value; }
+        }
 
         private string sender;
         public string Sender
@@ -93,10 +100,11 @@ namespace CommonTypes {
             set { sender = value; }
         }
 
-        public Subscription(string sender, string topic, ISubscriber subscriber)
+        public Subscription(string sender, string topic, string name, ISubscriber subscriber)
         {
             Topic = topic;
             Sender = sender;
+            SubscriberName = name;
             Subscriber = subscriber;
         }
 
@@ -104,12 +112,14 @@ namespace CommonTypes {
         {
             Topic = info.GetValue("topic", typeof(string)) as string;
             Subscriber = info.GetValue("subscriber", typeof(ISubscriber)) as ISubscriber;
+            SubscriberName = info.GetValue("subscriberName", typeof(string)) as string;
             Sender = info.GetValue("sender", typeof(string)) as string;
         }
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("topic", topic);
             info.AddValue("subscriber", subscriber);
+            info.AddValue("subscriberName", subscriberName);
             info.AddValue("sender", sender);
         }
     }
@@ -130,21 +140,31 @@ namespace CommonTypes {
             get { return broker; }
             set { broker = value; }
         }
+        
+        private string brokerName;
+        public string BrokerName
+        {
+            get { return brokerName; }
+            set { brokerName = value; }
+        }
 
-        public Route(string topic, IBroker broker)
+        public Route(string topic, string name, IBroker broker)
         {
             Topic = topic;
             Broker = broker;
+            BrokerName = name;
         }
 
         public Route(SerializationInfo info, StreamingContext context)
         {
             Topic = info.GetValue("topic", typeof(string)) as string;
+            BrokerName = info.GetValue("brokerName", typeof(string)) as string;            
             Broker = info.GetValue("broker", typeof(IBroker)) as IBroker;
         }
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("topic", topic);
+            info.AddValue("brokerName", brokerName);
             info.AddValue("broker", broker);
         }
     }

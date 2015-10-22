@@ -60,7 +60,7 @@ namespace Subscriber
         public void Unsubscribe(string topicName)
         {
             IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Unsubscribe(new Subscription(this.name, topicName, this));
+            broker.Unsubscribe(new Subscription(this.name, topicName, this.name, this));
         }
 
         private void ProcessSubscribe(Object o)
@@ -72,7 +72,7 @@ namespace Subscriber
             }
             string topicName = o as string;
             IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Subscribe(new Subscription(this.name, topicName, this as ISubscriber));
+            broker.Subscribe(new Subscription(this.name, topicName, this.name, this as ISubscriber));
             logServer.LogAction("SubSubscribe " + name + " Subscribe " + topicName);
         }
 
