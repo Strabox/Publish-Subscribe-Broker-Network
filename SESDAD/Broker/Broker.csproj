@@ -46,7 +46,7 @@
   <ItemGroup>
     <Compile Include="BrokerServer.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Routing\Filtering.cs" />
+    <Compile Include="Routing\Filtered.cs" />
     <Compile Include="Routing\IRouter.cs" />
     <Compile Include="Routing\Flooding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

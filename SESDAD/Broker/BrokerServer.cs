@@ -73,10 +73,15 @@ namespace Broker
          */
         public void Init()
         {
-            if (!parentUrl.Equals(CommonUtil.ROOT))
+            if ( ! parentUrl.Equals(CommonUtil.ROOT))
             {
                 parentBroker = Activator.GetObject(typeof(IBroker), parentUrl) as IBroker;
                 parentName = CommonUtil.ExtractPath(parentUrl);
+            }
+            else
+            {
+                parentBroker = null;
+                parentName = null;
             }
             
             foreach (string childUrl in childUrls)
@@ -86,6 +91,20 @@ namespace Broker
             }
             
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl) as IPuppetMasterLog;
+        }
+        
+        public ICollection<NodePair<IBroker>> GetNeighbours()
+        {
+            HashSet<NodePair<IBroker>> brokers = new HashSet<NodePair<IBroker>>();
+            if (this.parentBroker != null)
+            {
+                brokers.Add(new NodePair<IBroker>(ParentName, ParentBroker));
+            }
+            foreach (var pair in childBrokers)
+            {
+                brokers.Add(new NodePair<IBroker>(pair.Key, pair.Value));
+            }
+            return brokers;
         }
 
         // Broker specific methods.
@@ -138,6 +157,30 @@ namespace Broker
             
             this.router.Subscribe(subscription as Subscription);
         }
+        
+        public void AddRoute(Route route)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveRoute(Route route)
+        {
+            throw new NotImplementedException();
+        }
+        
+        private void ProcessAddRoute(Object route)
+        {
+            this.BlockWhileFrozen();
+            
+            this.router.AddRoute(route as Route);
+        }
+        
+        private void ProcessRemoveRoute(Object route)
+        {
+            this.BlockWhileFrozen();
+            
+            this.router.RemoveRoute(route as Route);
+        }
 
         public void Crash()
         {
@@ -178,16 +221,6 @@ namespace Broker
                 while (IsFreeze)
                     Monitor.Wait(this);
             }
-        }
-
-        public void AddRoute(Route route)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveRoute(Route route)
-        {
-            throw new NotImplementedException();
         }
     }
 }
