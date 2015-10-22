@@ -1,1 +1,5 @@
-Freeze broker0
+Freeze subscriber0
+Subscriber subscriber0 Subscribe /Dad
+Freeze subscriber0
+Unfreeze subscriber0
+SubSubscribe subscriber0 Subscribe /Dad

@@ -1,6 +1,7 @@
 ﻿using CommonTypes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -119,10 +120,7 @@ namespace Broker
 
         public void Subscribe(Subscription subscription)
         {
-            lock (this)
-            {
-                this.topicSubscribers.AddSubscriber(subscription.Topic, subscription.Subscriber);
-            }
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessSubscribe), subscription);
         }
 
         public void Unsubscribe(Subscription subscription)
@@ -145,6 +143,21 @@ namespace Broker
             }
 
         }
+
+        private void ProcessSubscribe(Object o)
+        {
+            lock (this)
+            {
+                while (IsFreeze)
+                    Monitor.Wait(this);
+            }
+            Subscription subscription = o as Subscription;
+            lock (this)
+            {
+                this.topicSubscribers.AddSubscriber(subscription.Topic, subscription.Subscriber);
+            }
+        }
+
 
         // General test and control methods.
 
