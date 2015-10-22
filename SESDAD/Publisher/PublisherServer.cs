@@ -1,16 +1,30 @@
 ﻿using CommonTypes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Publisher
 {
-    public class PublisherServer : MarshalByRefObject, IGeneralControlServices,
-        IPublisherControlServices
+    public class PublisherServer : GenericRemoteNode, IPublisherControlServices
     {
+        class PublishDTO
+        {
+            private string topic;
+            public string Topic { get { return topic; } }
+
+            private int numEvents;
+            public int NumEvents {  get { return numEvents; } }
+
+            private int interval;
+            public int Interval { get { return interval; } }
+
+            public PublishDTO(string topic,int numEvents,int interval)
+            {
+                this.topic = topic;
+                this.numEvents = numEvents;
+                this.interval = Interval;
+            }
+        }
+
         private string name;
 
         private string pmLogServerUrl;
@@ -32,47 +46,38 @@ namespace Publisher
                 as IPuppetMasterLog;
         }
 
-        // General test and control methods.
+        // Publisher remote interface methods
 
         public void Publish(string topicName, int numberOfEvents, int interval)
         {
+            PublishDTO dto = new PublishDTO(topicName, numberOfEvents, interval);
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessPublish), dto);
+        }
+
+        // Publisher specific methods
+
+        public void ProcessPublish(Object o)
+        {
+            this.BlockWhileFrozen();
+
+            PublishDTO dto = o as PublishDTO;
             IBroker broker;
-            for(int i = 0; i < numberOfEvents; i++)
+            for(int i = 0; i < dto.NumEvents; i++)
             {
                 broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
+                broker.Diffuse(new Event(this.name,this.name, dto.Topic, "content",i));
                 logServer.LogAction("PubEvent " + name + ", " + name + ", " +
-                    topicName + ", " + i);
-                broker.Diffuse(new Event(this.name,this.name, topicName, "content",i));
-                Thread.Sleep(interval);
+                    dto.Topic + ", " + i);
+                Thread.Sleep(dto.Interval);
             }
         }
 
-        public void Crash()
-        {
-            System.Environment.Exit(-1);
-        }
-
-        public void Freeze()
+        public override void Status()
         {
             //TODO
         }
 
-        public void Status()
-        {
-            //TODO
-        }
-
-        public void Unfreeze()
-        {
-            //TODO
-        }
-
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
-
-        public void Init()
+        public override void Init()
         {
             //DO Nothing
         }

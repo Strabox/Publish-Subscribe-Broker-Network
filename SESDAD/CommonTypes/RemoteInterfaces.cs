@@ -68,6 +68,7 @@ namespace CommonTypes
 
     public interface IPuppetMasterLauncher
     {
+        [OneWay]
         void LaunchProcess(string name,string args);
     }
 

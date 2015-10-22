@@ -1,30 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace CommonTypes
 {
     /// <summary>
     ///     Remote Object 
     /// </summary>
-    public abstract class GeneralRemoteNode : MarshalByRefObject, IGeneralControlServices
+    public abstract class GenericRemoteNode : MarshalByRefObject, IGeneralControlServices
     {
 
         private bool freeze;
-        public bool IsFreeze
+        protected bool IsFreeze
         {
             get { return freeze; }
             set { freeze = value; }
         }
 
-        public GeneralRemoteNode()
+        public GenericRemoteNode()
         {
             IsFreeze = false;
         }
+
+        protected void BlockWhileFrozen()
+        {
+            lock (this)
+            {
+                while (IsFreeze)
+                    Monitor.Wait(this);
+            }
+        }
+
+        // Control Services Interface method's
 
         public void Crash()
         {
@@ -52,5 +58,9 @@ namespace CommonTypes
 
         public abstract void Status();
 
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
     }
 }

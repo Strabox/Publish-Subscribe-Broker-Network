@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Broker
 {
-    public class BrokerServer : MarshalByRefObject, IGeneralControlServices, IBroker
+    public class BrokerServer : GenericRemoteNode, IBroker
     {
         private string name;
         public string Name { get { return name; } }        
@@ -25,13 +25,6 @@ namespace Broker
         public string ParentName { get { return parentName; } }
         
         private string[] childUrls;
-
-        private bool isFreeze;
-        private bool IsFreeze
-        {
-            get { return isFreeze; }
-            set { isFreeze = value; }
-        }
 
         private TopicSubscriberCollection topicSubscribers;
         public TopicSubscriberCollection Data { get { return topicSubscribers; } }
@@ -64,14 +57,13 @@ namespace Broker
             this.loggingLevel = loggingLevel;
             this.parentUrl = parent;
             this.childUrls = children;
-            this.isFreeze = false;
             this.topicSubscribers = new TopicSubscriberCollection();
         }
 
         /**
          * Init is called after launch all processes and before the system start working.
          */
-        public void Init()
+        public override void Init()
         {
             if ( ! parentUrl.Equals(CommonUtil.ROOT))
             {
@@ -107,25 +99,11 @@ namespace Broker
             return brokers;
         }
 
-        // Broker specific methods.
+        // Broker remote interface methods
 
-        private void ProcessDiffuse(Object eve)
+        public override void Status()
         {
-            this.BlockWhileFrozen();
-
-            Event e = eve as Event;
-
-            // Send the event to interested Brokers
-            Event newEvent = this.router.Diffuse(e);
-            
-            // Send the event to Subscribers who want it
-            ICollection<NodePair<ISubscriber>> subscribersToSend = Data.SubscribersFor(e.Topic);
-
-            foreach (var subscriberPair in subscribersToSend)
-            {
-                subscriberPair.Node.Receive(newEvent);
-            }
-            
+            //TODO
         }
 
         public void Diffuse(Event e)
@@ -142,13 +120,34 @@ namespace Broker
         {
             ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessUnsubscribe), subscription);
         }
-        
+
+        // Broker specific Methods
+
+        private void ProcessDiffuse(Object eve)
+        {
+            this.BlockWhileFrozen();
+
+            Event e = eve as Event;
+
+            // Send the event to interested Brokers
+            Event newEvent = this.router.Diffuse(e);
+
+            // Send the event to Subscribers who want it
+            ICollection<NodePair<ISubscriber>> subscribersToSend = Data.SubscribersFor(e.Topic);
+
+            foreach (var subscriberPair in subscribersToSend)
+            {
+                subscriberPair.Node.Receive(newEvent);
+            }
+            logServer.LogAction("BroEvent " + name + ", " + e.Publisher
+                + ", " + e.Topic + ", " + e.EventNumber);
+        }
+
         public void ProcessUnsubscribe(Object subscription)
         {
             this.BlockWhileFrozen();
             
             this.router.Unsubscribe(subscription as Subscription);
-
         }
 
         private void ProcessSubscribe(Object subscription)
@@ -182,45 +181,5 @@ namespace Broker
             this.router.RemoveRoute(route as Route);
         }
 
-        public void Crash()
-        {
-            System.Environment.Exit(-1);
-        }
-
-        public void Freeze()
-        {
-            lock (this)
-            {
-                IsFreeze = true;
-            }
-        }
-
-        public void Unfreeze()
-        {
-            lock (this)
-            {
-                IsFreeze = false;
-                Monitor.PulseAll(this);
-            }
-        }
-
-        public void Status()
-        {
-            //TODO
-        }
-
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
-
-        private void BlockWhileFrozen()
-        {
-            lock (this)
-            {
-                while (IsFreeze)
-                    Monitor.Wait(this);
-            }
-        }
     }
 }
