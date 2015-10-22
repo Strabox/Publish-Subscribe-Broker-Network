@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommonTypes
 {
+    /// <summary>
+    ///     Remote Object 
+    /// </summary>
     public abstract class GeneralRemoteNode : MarshalByRefObject, IGeneralControlServices
     {
 
@@ -17,12 +21,9 @@ namespace CommonTypes
             set { freeze = value; }
         }
 
-        private Queue<Event> events;
-
         public GeneralRemoteNode()
         {
             IsFreeze = false;
-            events = new Queue<Event>();
         }
 
         public void Crash()
@@ -32,23 +33,24 @@ namespace CommonTypes
 
         public void Freeze()
         {
-            //TODO
+            lock (this)
+            {
+                IsFreeze = true;
+            }
         }
 
         public void Unfreeze()
         {
-            //TODO
+            lock(this)
+            {
+                IsFreeze = false;
+                Monitor.PulseAll(this);
+            }
         }
 
-        public void Init()
-        {
-            //TODO
-        }
+        public abstract void Init();
 
-        public void Status()
-        {
-            //TODO
-        }
+        public abstract void Status();
 
     }
 }
