@@ -53,9 +53,9 @@ namespace Broker
             this.pmLogServerUrl = pmLogServerUrl;
             this.orderingPolicy = orderingPolicy;
             this.routingPolicy = routingPolicy;
-            if (routingPolicy == "flooding")
+            if (routingPolicy == "filtered")
             {
-                this.router = new Flooding(this);
+                this.router = new Filtered(this);
             }
             else
             {
@@ -129,6 +129,7 @@ namespace Broker
             this.BlockWhileFrozen();
             
             this.router.Unsubscribe(subscription as Subscription);
+
         }
 
         private void ProcessSubscribe(Object subscription)
