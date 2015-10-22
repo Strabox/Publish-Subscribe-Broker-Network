@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using CommonTypes;
 
 namespace Broker
@@ -17,34 +16,35 @@ namespace Broker
         {
             broker.Data.AddSubscriber(subscription.Topic, subscription.SubscriberName, subscription.Subscriber);
         }
-
-        public Event Diffuse(Event e)
+        
+        public void Unsubscribe(Subscription subscription)
         {
-            Event newEvent = new Event(e.Publisher, broker.Name, e.Topic, e.Content, e.EventNumber);
-                        
-            if (!broker.ParentUrl.Equals(CommonUtil.ROOT) && !e.Sender.Equals(broker.ParentName))
-            {
-                broker.ParentBroker.Diffuse(newEvent);
-            }
+            broker.Data.RemoveSubscriber(subscription.Topic, subscription.SubscriberName, subscription.Subscriber);
+        }
 
-            /*
-            if (loggingLevel.Equals("full"))
-                logServer.LogAction("BroEvent " + name + ", " + e.Publisher + ", "
-                    + newEvent.Topic + ", " + e.EventNumber);
-            */
-
-            foreach (KeyValuePair<string, IBroker> child in broker.ChildBrokers)
+        public Event Diffuse(Event evt)
+        {
+            Event newEvent = new Event(evt.Publisher, broker.Name, evt.Topic, evt.Content, evt.EventNumber);
+                    
+            foreach (var broker in this.broker.GetNeighbours())
             {
-                if (!e.Sender.Equals(child.Key))
-                    child.Value.Diffuse(newEvent);
+                if ( ! evt.Sender.Equals(broker.Name))
+                {
+                    broker.Node.Diffuse(newEvent);
+                }
             }
             
             return newEvent;
         }
 
-        public void Unsubscribe(Subscription subscription)
+        public void AddRoute(Route route)
         {
-            broker.Data.RemoveSubscriber(subscription.Topic, subscription.SubscriberName, subscription.Subscriber);
+            throw new NotImplementedException();
+        }
+
+        public void RemoveRoute(Route route)
+        {
+            throw new NotImplementedException();
         }
     }
 }

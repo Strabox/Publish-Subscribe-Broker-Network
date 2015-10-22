@@ -19,20 +19,12 @@ namespace Broker
 
             if (inform)
             {
-               
                 Route route = new Route(subscription.Topic, broker.Name, broker);
 
-                if (broker.ParentUrl.Equals(CommonUtil.ROOT))
+                foreach (var broker in broker.GetNeighbours())
                 {
-                    broker.ParentBroker.AddRoute(route);
+                        broker.Node.AddRoute(route);
                 }
-
-                foreach (KeyValuePair<string, IBroker> child in broker.ChildBrokers)
-                {
-                        child.Value.AddRoute(route);
-                
-                }
-
             }
            
         }
@@ -51,12 +43,6 @@ namespace Broker
                 }
             }
 
-            /*
-            if (loggingLevel.Equals("full"))
-                logServer.LogAction("BroEvent " + name + ", " + e.Publisher + ", "
-                    + newEvent.Topic + ", " + e.EventNumber);
-            */
-
             return newEvent;
         }
 
@@ -66,21 +52,23 @@ namespace Broker
 
             if (inform)
             {
-
                 Route route = new Route(subscription.Topic, broker.Name, broker);
 
-                if (broker.ParentUrl.Equals(CommonUtil.ROOT))
+                foreach (var broker in broker.GetNeighbours())
                 {
-                    broker.ParentBroker.RemoveRoute(route);
+                        broker.Node.AddRoute(route);
                 }
-
-                foreach (KeyValuePair<string, IBroker> child in broker.ChildBrokers)
-                {
-                    child.Value.RemoveRoute(route);
-
-                }
-
             }
+        }
+
+        public void AddRoute(Route route)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveRoute(Route route)
+        {
+            throw new NotImplementedException();
         }
     }
 }
