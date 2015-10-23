@@ -10,3 +10,4 @@ Process subscriber1 Is subscriber On site0 URL tcp://localhost:3336/subscriber1
 RoutingPolicy flooding
 Ordering NO
 LoggingLevel full
+

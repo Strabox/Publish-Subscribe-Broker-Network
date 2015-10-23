@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace PuppetMaster
 {
@@ -52,10 +53,11 @@ namespace PuppetMaster
         {
             ManageSites sites = new ManageSites();
             ProcessLauncher launcher = new ProcessLauncher();
-            string[] tokens = null, lines = File.ReadAllLines(filePath);
+            string[] tokens = null, lines = File.ReadAllLines(filePath);int l = 1;
             logServer.LogFile = "Log" + Path.GetFileName(filePath);
             File.CreateText(LOG_FILES_DIRECTORY + logServer.LogFile).Close(); 
             parentForm.ReloadLogFiles();
+
             foreach (string line in lines)
             {
                 if (Regex.IsMatch(line, ParseUtil.SITE))
@@ -73,6 +75,7 @@ namespace PuppetMaster
                     processes.Add(tokens[1], tokens[7]);
                     parentForm.Invoke(new AddProcess(parentForm.AddToGenericProcesses),
                         tokens[1]);
+
                     if (processType.Equals("publisher"))
                     {
                         parentForm.Invoke(new AddProcess(parentForm.AddToPublishersProcesses),
@@ -109,6 +112,16 @@ namespace PuppetMaster
                     tokens = Regex.Split(line, ParseUtil.SPACE);
                     launcher.LogLevel = tokens[1];
                 }
+                else if(line != string.Empty) //Syntax error in a script instruction. Abort.
+                {
+                    processes.Clear();
+                    File.Delete(LOG_FILES_DIRECTORY + logServer.LogFile);
+                    parentForm.ReloadLogFiles();
+                    MessageBox.Show("Syntax Error at line " + l + " :" + Environment.NewLine + 
+                        Environment.NewLine + line , "Script Abort", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                l++;
             }
             launcher.LaunchAllProcesses(sites); 
         }
@@ -116,7 +129,7 @@ namespace PuppetMaster
         public void ExecuteScriptFile(string scriptFilePath,BackgroundWorker worker)
         {
             string[] lines = File.ReadAllLines(scriptFilePath);
-            int scriptLines = lines.Length,percentageCompleted = 0;
+            int scriptLines = lines.Length,percentageCompleted = 0,l = 1;
             foreach (string line in lines)
             {
                 worker.ReportProgress(percentageCompleted, line);
@@ -158,11 +171,20 @@ namespace PuppetMaster
                     string[] tokens = line.Split(' ');
                     Unsubscribe(tokens[1], tokens[3]);
                 }
+                else if(line != string.Empty) //Syntax error in script line. Abort.
+                {
+                    MessageBox.Show("Syntax Error at line " + l + " :" + Environment.NewLine +
+                        Environment.NewLine + line, "Script Abort", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    worker.CancelAsync();
+                    return;
+                }
                 percentageCompleted += (int)Math.Ceiling(((double)1 / (double)scriptLines) * 100);
                 percentageCompleted = (percentageCompleted > 100) ? 100 : percentageCompleted;
+                l++;
             }
             worker.ReportProgress(percentageCompleted, string.Empty);
         }
+
         /* ########################## Remote Calls ########################## */
 
         public void Status()

@@ -54,6 +54,7 @@
             // backgroundWorkerScript
             // 
             this.backgroundWorkerScript.WorkerReportsProgress = true;
+            this.backgroundWorkerScript.WorkerSupportsCancellation = true;
             this.backgroundWorkerScript.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerScript_DoWork);
             this.backgroundWorkerScript.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorkerScript_ProgressChanged);
             this.backgroundWorkerScript.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerScript_RunWorkerCompleted);
@@ -67,7 +68,7 @@
             this.labelScriptLine.TabIndex = 2;
             this.labelScriptLine.Text = "labelScriptLine";
             // 
-            // ExecuteScriptForm
+            // ExecuteBackgroundTask
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -75,7 +76,7 @@
             this.Controls.Add(this.labelScriptLine);
             this.Controls.Add(this.labelScript);
             this.Controls.Add(this.progressBarScript);
-            this.Name = "ExecuteScriptForm";
+            this.Name = "ExecuteBackgroundTask";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Execute Script";
             this.Load += new System.EventHandler(this.ExecuteScriptForm_Load);

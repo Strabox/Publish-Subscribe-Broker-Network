@@ -59,6 +59,10 @@ namespace PuppetMaster
                 MessageBox.Show(e.Error.ToString());
                 return;
             }
+            else if (e.Cancelled)
+            {
+                labelScript.Text = "Error in Execution";
+            }
             else
                 labelScript.Text = "Execution Completed";
         }

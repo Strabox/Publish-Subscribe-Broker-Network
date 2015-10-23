@@ -1,0 +1,1 @@
+﻿{ "url" : "tcp://localhost:4242/PuppetMasterURL" }
