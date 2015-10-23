@@ -198,3 +198,7 @@ FakesAssemblies/
 #Application Log Files
 SESDAD/PuppetMaster/LogFiles
 !SESDAD/PuppetMaster/LogFiles/.gitkeep
+
+# Visual Studio Code
+.vscode
+SESDAD/.vscode

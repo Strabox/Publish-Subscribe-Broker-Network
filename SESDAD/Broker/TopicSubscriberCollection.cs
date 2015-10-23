@@ -183,6 +183,31 @@ namespace Broker
 				return current.nodes.Count > 0;
 			}
 			
+			public Dictionary<string, ICollection<T>> List()
+			{
+				return ListRecursive(new Dictionary<string, ICollection<T>>(), this);
+			}
+			
+			private Dictionary<string, ICollection<T>> ListRecursive(Dictionary<string, ICollection<T>> result, Router<T> current)
+			{
+				if (current.nodes.Count > 0)
+				{
+					result.Add(current.topic, current.nodes);
+				}
+				
+				if (current.nodesAsterisk.Count > 0)
+				{
+					string asterisk = current.topic.Equals("/") ? "*" : "/*";
+					result.Add(current.topic + asterisk, current.nodesAsterisk);
+				}
+				
+				foreach (var subtopic in current.subtopics)
+				{
+					ListRecursive(result, subtopic.Value);
+				}
+				
+				return result;
+			}
 		}
 		
 		private Router<SubscriberPair> subscribers;
@@ -227,6 +252,11 @@ namespace Broker
 			}
 		}
 		
+		public Dictionary<string, ICollection<SubscriberPair>> SubscribersByTopic()
+		{
+			return this.subscribers.List();
+		}
+		
 		/**
 		 * Returns true if this node gains interest in the topic. Returns false otherwise.
 		 */
@@ -258,6 +288,11 @@ namespace Broker
 			{
 				return this.brokers.NodesFor(topic);
 			}
+		}
+		
+		public Dictionary<string, ICollection<BrokerPair>> RoutesByTopic()
+		{
+			return this.brokers.List();
 		}
 		
 	}
