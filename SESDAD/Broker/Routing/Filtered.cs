@@ -31,7 +31,7 @@ namespace Broker
 
         public Event Diffuse(Event e)
         {
-            Event newEvent = new Event(e.Publisher, broker.Name, e.Topic, e.Content, e.EventNumber);
+            Event newEvent = new Event(e.Publisher, broker.Name, e.Topic, e.Content, e.EventNumber,e.SequenceNumber);
 
             ICollection<NodePair<IBroker>> brokersToSend = broker.Data.RoutingFor(e.Topic);
 

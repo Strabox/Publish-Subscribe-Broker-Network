@@ -65,7 +65,7 @@ namespace Publisher
             for(int i = 0; i < dto.NumEvents; i++)
             {
                 broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-                broker.Diffuse(new Event(this.name,this.name, dto.Topic, "content",i));
+                broker.Diffuse(new Event(this.name,this.name, dto.Topic, "content",i,0));
                 logServer.LogAction("PubEvent " + name + ", " + name + ", " +
                     dto.Topic + ", " + i);
                 Thread.Sleep(dto.Interval);

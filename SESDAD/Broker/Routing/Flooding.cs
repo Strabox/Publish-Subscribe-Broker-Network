@@ -24,7 +24,7 @@ namespace Broker
 
         public Event Diffuse(Event evt)
         {
-            Event newEvent = new Event(evt.Publisher, broker.Name, evt.Topic, evt.Content, evt.EventNumber);
+            Event newEvent = new Event(evt.Publisher, broker.Name, evt.Topic, evt.Content, evt.EventNumber,evt.SequenceNumber);
                     
             foreach (var broker in this.broker.GetNeighbours())
             {

@@ -41,13 +41,21 @@ namespace CommonTypes {
             set { eventNumber = value; }
         }
 
-        public Event(string publisher,string sender, string topic, string content,int eventNumber)
+        private int sequenceNumber;
+        public int SequenceNumber
+        {
+            get { return sequenceNumber; }
+            set { sequenceNumber = value; }
+        }
+
+        public Event(string publisher,string sender, string topic, string content,int eventNumber,int sequenceNumber)
         {
             Publisher = publisher;
             Topic = topic;
             Sender = sender;
             Content = content;
             EventNumber = eventNumber;
+            SequenceNumber = sequenceNumber;
         }
 
 		public Event(SerializationInfo info, StreamingContext context) 
