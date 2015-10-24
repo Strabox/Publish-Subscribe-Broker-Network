@@ -1,6 +1,10 @@
 ﻿Subscriber subscriber3 Subscribe /Ist
+Subscriber subscriber2 Subscribe /Ist/Juno
 Wait 2000
 Freeze broker0
 Wait 200
-Publisher publisher1 Publish 2 Ontopic /Ist Interval 100
-
+Unfreeze broker0
+Wait 800
+Publisher publisher1 Publish 9 Ontopic /Ist Interval 40
+Publisher publisher1 Publish 7 Ontopic /Ist/Juno Interval 99
+Wait 400

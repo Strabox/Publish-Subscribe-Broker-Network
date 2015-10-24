@@ -1,5 +1,6 @@
 ﻿using CommonTypes;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Subscriber
@@ -17,9 +18,23 @@ namespace Subscriber
 
         private IPuppetMasterLog logServer;
 
-        public SubscriberServer(string name, string pmLogServerUrl,string loggingLevel,
+        private OrderGuarantee orderGuarantee;
+
+        public SubscriberServer(string orderingPolicy, string name, string pmLogServerUrl,string loggingLevel,
             string[] brokers)
         {
+            if (orderingPolicy.Equals("NO"))
+            {
+                orderGuarantee = new NoOrder();
+            }
+            else if(orderingPolicy.Equals("FIFO"))
+            {
+                orderGuarantee = new FifoOrdering();
+            }
+            else
+            {
+                //TODO
+            }
             this.name = name;
             this.pmLogServerUrl = pmLogServerUrl;
             this.loggingLevel = loggingLevel;
@@ -50,8 +65,12 @@ namespace Subscriber
         private void ProcessReceive(Object o)
         {
             this.BlockWhileFrozen();
+            orderGuarantee.DeliverMessage(o as Event as IMessage, DeliverMessageToClient);
+        }
 
-            Event e = o as Event;
+        private void DeliverMessageToClient(Object o)
+        {
+            Event e = o as IMessage as Event;
             logServer.LogAction("SubEvent " + name + ", " + e.Publisher
                 + ", " + e.Topic + ", " + e.EventNumber);
         }

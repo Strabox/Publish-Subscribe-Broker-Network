@@ -3,8 +3,14 @@ using System.Runtime.Serialization;
 
 namespace CommonTypes {
 
+    public interface IMessage
+    {
+        int GetSequenceNumber();
+        string GetId();
+    }
+
     [Serializable]
-    public class Event : ISerializable
+    public class Event : ISerializable, IMessage
     {
         private string publisher;
         public string Publisher
@@ -65,6 +71,7 @@ namespace CommonTypes {
 			Topic = info.GetValue("topic", typeof(string)) as string;
 			Content = info.GetValue("content", typeof(string)) as string;
             Sender = info.GetValue("sender", typeof(string)) as string;
+            SequenceNumber = (int) info.GetValue("sn", typeof(int));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -74,6 +81,17 @@ namespace CommonTypes {
 			info.AddValue("topic", Topic);
 			info.AddValue("content", Content);
             info.AddValue("sender", Sender);
+            info.AddValue("sn", SequenceNumber);
+        }
+
+        public int GetSequenceNumber()
+        {
+            return SequenceNumber;
+        }
+
+        public string GetId()
+        {
+            return Publisher;
         }
     }
 

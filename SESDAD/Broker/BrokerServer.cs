@@ -139,8 +139,9 @@ namespace Broker
             {
                 subscriberPair.Node.Receive(newEvent);
             }
-            logServer.LogAction("BroEvent " + name + ", " + e.Publisher
-                + ", " + e.Topic + ", " + e.EventNumber);
+            if(loggingLevel.Equals("Full"))
+                logServer.LogAction("BroEvent " + name + ", " + e.Publisher
+                     + ", " + e.Topic + ", " + e.EventNumber);
         }
 
         public void ProcessUnsubscribe(Object subscription)

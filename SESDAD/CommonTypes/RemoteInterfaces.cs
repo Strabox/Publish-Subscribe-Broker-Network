@@ -62,7 +62,6 @@ namespace CommonTypes
 
     public interface IPuppetMasterLog
     {
-        [OneWay]
         void LogAction(string logMessage);
     }
 

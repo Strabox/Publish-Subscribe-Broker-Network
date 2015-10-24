@@ -33,7 +33,7 @@ namespace Subscriber
             props["port"] = int.Parse(args[0]);
             TcpChannel channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(channel, false);
-            SubscriberServer subscriber = new SubscriberServer(args[1],args[5], 
+            SubscriberServer subscriber = new SubscriberServer(args[2],args[1],args[5], 
                 args[4], args.Skip(6).ToArray());
             RemotingServices.Marshal(subscriber, args[1], typeof(SubscriberServer));
             Console.WriteLine("Subscriber up and running....");

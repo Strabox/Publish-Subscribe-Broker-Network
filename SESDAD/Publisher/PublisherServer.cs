@@ -33,11 +33,14 @@ namespace Publisher
 
         private string[] brokers;
 
+        private int sequenceNumber;
+
         private IPuppetMasterLog logServer;
 
         public PublisherServer(string name,string pmLogServerUrl,string loggingLevel,
             string[] brokers)
         {
+            this.sequenceNumber = 0;
             this.name = name;
             this.pmLogServerUrl = pmLogServerUrl;
             this.loggingLevel = loggingLevel;
@@ -59,15 +62,18 @@ namespace Publisher
         public void ProcessPublish(Object o)
         {
             this.BlockWhileFrozen();
-
+            int sn;
             PublishDTO dto = o as PublishDTO;
             IBroker broker;
             for(int i = 0; i < dto.NumEvents; i++)
             {
                 broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-                broker.Diffuse(new Event(this.name,this.name, dto.Topic, "content",i,0));
-                logServer.LogAction("PubEvent " + name + ", " + name + ", " +
-                    dto.Topic + ", " + i);
+                lock (this)
+                {
+                    sn = sequenceNumber++;
+                    broker.Diffuse(new Event(this.name, this.name, dto.Topic, "content", i, sn));
+                }
+                logServer.LogAction("PubEvent " + name + ", " + name + ", " + dto.Topic + ", " + i);
                 Thread.Sleep(dto.Interval);
             }
         }
