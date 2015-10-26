@@ -65,6 +65,7 @@ namespace Subscriber
         private void ProcessReceive(Object o)
         {
             this.BlockWhileFrozen();
+           
             orderGuarantee.DeliverMessage(o as Event as IMessage, DeliverMessageToClient);
         }
 

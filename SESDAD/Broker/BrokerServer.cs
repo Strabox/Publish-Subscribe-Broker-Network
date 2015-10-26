@@ -160,12 +160,12 @@ namespace Broker
         
         public void AddRoute(Route route)
         {
-            throw new NotImplementedException();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessAddRoute), route);
         }
 
         public void RemoveRoute(Route route)
         {
-            throw new NotImplementedException();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessAddRoute), route);
         }
         
         private void ProcessAddRoute(Object route)

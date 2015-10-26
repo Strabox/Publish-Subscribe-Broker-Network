@@ -23,7 +23,7 @@ namespace Broker
 
                 foreach (var broker in broker.GetNeighbours())
                 {
-                        broker.Node.AddRoute(route);
+                    broker.Node.AddRoute(route);
                 }
             }
            
@@ -57,18 +57,45 @@ namespace Broker
                 foreach (var broker in broker.GetNeighbours())
                 {
                         broker.Node.AddRoute(route);
+
                 }
             }
         }
 
         public void AddRoute(Route route)
         {
-            throw new NotImplementedException();
+            bool inform = broker.Data.AddRoute(route.Topic, route.BrokerName, route.Broker);
+
+            if (inform)
+            {
+                Route newRoute = new Route(route.Topic, broker.Name, broker);
+
+                foreach (var broker in broker.GetNeighbours())
+                {
+                    if (!broker.Name.Equals(route.BrokerName))
+                    {
+                        broker.Node.AddRoute(newRoute);
+                    }
+                }
+            }
         }
 
         public void RemoveRoute(Route route)
         {
-            throw new NotImplementedException();
+            bool inform = broker.Data.RemoveRoute(route.Topic, route.BrokerName, route.Broker);
+
+            if (inform)
+            {
+                Route newRoute = new Route(route.Topic, broker.Name, broker);
+
+                foreach (var broker in broker.GetNeighbours())
+                {
+                    if (!broker.Name.Equals(route.BrokerName))
+                    {
+                        broker.Node.RemoveRoute(newRoute);
+                    }
+                }
+            }
         }
     }
 }
