@@ -32,6 +32,7 @@ namespace PuppetMaster
                 StreamWriter writer = File.AppendText(
                 LOG_FILES_DIRECTORY + logFile);
                 writer.Write(logMessage + Environment.NewLine);
+                writer.Flush();
                 writer.Close();
             }
         }

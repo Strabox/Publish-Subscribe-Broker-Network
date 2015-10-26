@@ -81,6 +81,7 @@
     <Compile Include="ExecuteBackgroundTask.Designer.cs">
       <DependentUpon>ExecuteBackgroundTask.cs</DependentUpon>
     </Compile>
+    <Compile Include="Json.cs" />
     <Compile Include="ProcessLaunch.cs" />
     <Compile Include="ParseUtil.cs" />
     <Compile Include="ProcessesManager.cs" />
