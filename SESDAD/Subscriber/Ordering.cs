@@ -15,7 +15,9 @@ namespace Subscriber
 
     public delegate void DeliverMessage(Object o);
 
-    // Guarantee FIFO ordering in messages.
+    /* Guarantee FIFO ordering in messages, according with each
+       publisher.
+    */
     public class FifoOrdering : OrderGuarantee
     {
         class WaitingMessages

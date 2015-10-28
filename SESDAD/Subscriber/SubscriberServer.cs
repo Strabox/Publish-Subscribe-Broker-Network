@@ -72,6 +72,8 @@ namespace Subscriber
         private void DeliverMessageToClient(Object o)
         {
             Event e = o as IMessage as Event;
+            Console.WriteLine("Publisher: {0} Topic: {1} EventNumber: {2}", e.Publisher,
+                e.Topic,e.EventNumber);
             logServer.LogAction("SubEvent " + name + ", " + e.Publisher
                 + ", " + e.Topic + ", " + e.EventNumber);
         }
