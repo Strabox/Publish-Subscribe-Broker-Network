@@ -6,9 +6,9 @@ namespace Broker
 {
     public class Filtered : IRouter
     {
-        private BrokerServer broker;
+        private BrokerLogic broker;
 
-        public Filtered(BrokerServer broker)
+        public Filtered(BrokerLogic broker)
         {
             this.broker = broker;
         }
@@ -19,7 +19,7 @@ namespace Broker
 
             if (inform)
             {
-                Route route = new Route(subscription.Topic, broker.Name, broker);
+                Route route = new Route(subscription.Topic, broker.Name, broker.RemoteProxy);
 
                 foreach (var broker in broker.GetNeighbours())
                 {
@@ -31,7 +31,7 @@ namespace Broker
 
         public Event Diffuse(Event e)
         {
-            Event newEvent = new Event(e.Publisher, broker.Name, e.Topic, e.Content, e.EventNumber,e.SequenceNumber);
+            Event newEvent = new Event(e.Publisher, broker.Name, e.Topic, e.Content,e.SequenceNumber);
 
             ICollection<NodePair<IBroker>> brokersToSend = broker.Data.RoutingFor(e.Topic);
 
@@ -52,7 +52,7 @@ namespace Broker
 
             if (inform)
             {
-                Route route = new Route(subscription.Topic, broker.Name, broker);
+                Route route = new Route(subscription.Topic, broker.Name, broker.RemoteProxy);
 
                 foreach (var broker in broker.GetNeighbours())
                 {
@@ -68,7 +68,7 @@ namespace Broker
 
             if (inform)
             {
-                Route newRoute = new Route(route.Topic, broker.Name, broker);
+                Route newRoute = new Route(route.Topic, broker.Name, broker.RemoteProxy);
 
                 foreach (var broker in broker.GetNeighbours())
                 {
@@ -86,7 +86,7 @@ namespace Broker
 
             if (inform)
             {
-                Route newRoute = new Route(route.Topic, broker.Name, broker);
+                Route newRoute = new Route(route.Topic, broker.Name, broker.RemoteProxy);
 
                 foreach (var broker in broker.GetNeighbours())
                 {

@@ -5,9 +5,9 @@ namespace Broker
 {
     public class Flooding : IRouter
     {
-        private BrokerServer broker;
+        private BrokerLogic broker;
         
-        public Flooding(BrokerServer broker)
+        public Flooding(BrokerLogic broker)
         {
             this.broker = broker;
         }
@@ -24,7 +24,7 @@ namespace Broker
 
         public Event Diffuse(Event evt)
         {
-            Event newEvent = new Event(evt.Publisher, broker.Name, evt.Topic, evt.Content, evt.EventNumber,evt.SequenceNumber);
+            Event newEvent = new Event(evt.Publisher, broker.Name, evt.Topic, evt.Content,evt.SequenceNumber);
                     
             foreach (var broker in this.broker.GetNeighbours())
             {

@@ -84,7 +84,6 @@
     <Compile Include="ExecuteBackgroundTask.Designer.cs">
       <DependentUpon>ExecuteBackgroundTask.cs</DependentUpon>
     </Compile>
-    <Compile Include="Json.cs" />
     <Compile Include="ProcessLaunch.cs" />
     <Compile Include="ParseUtil.cs" />
     <Compile Include="ProcessesManager.cs" />
@@ -140,7 +139,6 @@
     <Content Include="ConfigurationFiles\Configuration3.txt" />
     <Content Include="ConfigurationFiles\Configuration2.txt" />
     <Content Include="ConfigurationFiles\Configuration1.txt" />
-    <Content Include="ConfigurationFiles\PuppetMasters\PuppetMastersJson.txt" />
     <Content Include="ScriptFiles\Script1.txt" />
   </ItemGroup>
   <ItemGroup>

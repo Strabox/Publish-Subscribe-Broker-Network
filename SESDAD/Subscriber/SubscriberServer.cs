@@ -3,108 +3,61 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
+
 namespace Subscriber
 {
     public class SubscriberServer : GenericRemoteNode, ISubscriberControlServices,
-        ISubscriber
+        IGeneralControlServices ,ISubscriber
     {
-        private string name;
 
-        private string pmLogServerUrl;
-
-        private string loggingLevel;
-
-        private string[] brokers;
-
-        private IPuppetMasterLog logServer;
-
-        private OrderGuarantee orderGuarantee;
+        private SubscriberLogic subscriber;
 
         public SubscriberServer(string orderingPolicy, string name, string pmLogServerUrl,string loggingLevel,
             string[] brokers)
         {
-            if (orderingPolicy.Equals("NO"))
-            {
-                orderGuarantee = new NoOrder();
-            }
-            else if(orderingPolicy.Equals("FIFO"))
-            {
-                orderGuarantee = new FifoOrdering();
-            }
-            else
-            {
-                //TODO
-            }
-            this.name = name;
-            this.pmLogServerUrl = pmLogServerUrl;
-            this.loggingLevel = loggingLevel;
-            this.brokers = brokers;
-            logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
-                as IPuppetMasterLog;
+            subscriber = new SubscriberLogic(this, orderingPolicy, name, pmLogServerUrl, loggingLevel, brokers);
         }
 
         // Subscriber remote interfaces methods.
 
         public void Receive(Event e)
         {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessReceive), e);
+            subscriber.Receive(e);
         }
         
         public void Subscribe(string topicName)
         {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessSubscribe),topicName);
+            subscriber.Subscribe(topicName);
         }
 
         public void Unsubscribe(string topicName)
         {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessUnsubscribe), topicName);
+            subscriber.Unsubscribe(topicName);
         }
 
-        // Subscriber specific methods
-        
-        private void ProcessReceive(Object o)
+        public void Status()
         {
-            this.BlockWhileFrozen();
-           
-            orderGuarantee.DeliverMessage(o as Event as IMessage, DeliverMessageToClient);
+            subscriber.Status();
         }
 
-        private void DeliverMessageToClient(Object o)
+        public void Init()
         {
-            Event e = o as IMessage as Event;
-            Console.WriteLine("Publisher: {0} Topic: {1} EventNumber: {2}", e.Publisher,
-                e.Topic,e.EventNumber);
-            logServer.LogAction("SubEvent " + name + ", " + e.Publisher
-                + ", " + e.Topic + ", " + e.EventNumber);
+            subscriber.Init();
         }
 
-        private void ProcessUnsubscribe(Object o)
+        public void Crash()
         {
-            this.BlockWhileFrozen();
-
-            string topicName = o as string;
-            IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Unsubscribe(new Subscription(this.name, topicName, this.name, this));
+            subscriber.Crash();
         }
 
-        private void ProcessSubscribe(Object o)
+        public void Freeze()
         {
-            this.BlockWhileFrozen();
-
-            string topicName = o as string;
-            IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Subscribe(new Subscription(this.name, topicName, this.name, this as ISubscriber));
-            logServer.LogAction("SubSubscribe " + name + " Subscribe " + topicName);
+            subscriber.Freeze();
         }
 
-        public override void Status()
+        public void Unfreeze()
         {
-            //TODO
-        }
-
-        public override void Init()
-        {
-            //Do nothing for now.
+            subscriber.Unfreeze();
         }
     }
 }

@@ -6,7 +6,6 @@ namespace CommonTypes
 
     public interface IBroker
     {
-        [OneWay]
         void Diffuse(Event e);
         [OneWay]
         void Subscribe(Subscription subscription);
@@ -20,7 +19,6 @@ namespace CommonTypes
 
     public interface ISubscriber
     {
-        [OneWay]
         void Receive(Event e);
     }
 

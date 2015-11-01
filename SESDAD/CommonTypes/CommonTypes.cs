@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace CommonTypes {
 
@@ -40,13 +41,6 @@ namespace CommonTypes {
             set { sender = value; }
         }
 
-        private int eventNumber;
-        public int EventNumber
-        {
-            get { return eventNumber; }
-            set { eventNumber = value; }
-        }
-
         private int sequenceNumber;
         public int SequenceNumber
         {
@@ -54,20 +48,18 @@ namespace CommonTypes {
             set { sequenceNumber = value; }
         }
 
-        public Event(string publisher,string sender, string topic, string content,int eventNumber,int sequenceNumber)
+        public Event(string publisher,string sender, string topic, string content,int sequenceNumber)
         {
             Publisher = publisher;
             Topic = topic;
             Sender = sender;
             Content = content;
-            EventNumber = eventNumber;
             SequenceNumber = sequenceNumber;
         }
 
 		public Event(SerializationInfo info, StreamingContext context) 
 		{
             Publisher = info.GetValue("publisher", typeof(string)) as string;
-            EventNumber = (int)info.GetValue("eventNumber",typeof(int));
 			Topic = info.GetValue("topic", typeof(string)) as string;
 			Content = info.GetValue("content", typeof(string)) as string;
             Sender = info.GetValue("sender", typeof(string)) as string;
@@ -76,7 +68,6 @@ namespace CommonTypes {
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("eventNumber", EventNumber);
             info.AddValue("publisher", Publisher);
 			info.AddValue("topic", Topic);
 			info.AddValue("content", Content);
@@ -193,5 +184,57 @@ namespace CommonTypes {
             info.AddValue("brokerName", brokerName);
             info.AddValue("broker", broker);
         }
+    }
+
+    public abstract class GenericNode : IGeneralControlServices
+    {
+        private bool freeze;
+        protected bool IsFreeze
+        {
+            get { return freeze; }
+            set { freeze = value; }
+        }
+
+        public GenericNode()
+        {
+            IsFreeze = false;
+        }
+
+        protected void BlockWhileFrozen()
+        {
+            lock (this)
+            {
+                while (IsFreeze)
+                    Monitor.Wait(this);
+            }
+        }
+
+        // Control Services Interface method's
+
+        public void Crash()
+        {
+            System.Environment.Exit(-1);
+        }
+
+        public void Freeze()
+        {
+            lock (this)
+            {
+                IsFreeze = true;
+            }
+        }
+
+        public void Unfreeze()
+        {
+            lock (this)
+            {
+                IsFreeze = false;
+                Monitor.PulseAll(this);
+            }
+        }
+
+        public abstract void Init();
+
+        public abstract void Status();
     }
 }

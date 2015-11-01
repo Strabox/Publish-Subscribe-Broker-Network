@@ -4,88 +4,47 @@ using System.Threading;
 
 namespace Publisher
 {
-    public class PublisherServer : GenericRemoteNode, IPublisherControlServices
+    public class PublisherServer : GenericRemoteNode, IPublisherControlServices, IGeneralControlServices
     {
-        class PublishDTO
+    
+        private PublisherLogic publisher;
+
+        public PublisherServer(string name,string pmLogServerUrl,string loggingLevel
+            ,string ordering, string[] brokers)
         {
-            private string topic;
-            public string Topic { get { return topic; } }
-
-            private int numEvents;
-            public int NumEvents {  get { return numEvents; } }
-
-            private int interval;
-            public int Interval { get { return interval; } }
-
-            public PublishDTO(string topic,int numEvents,int interval)
-            {
-                this.topic = topic;
-                this.numEvents = numEvents;
-                this.interval = Interval;
-            }
-        }
-
-        private string name;
-
-        private string pmLogServerUrl;
-
-        private string loggingLevel;
-
-        private string[] brokers;
-
-        private int sequenceNumber;
-
-        private IPuppetMasterLog logServer;
-
-        public PublisherServer(string name,string pmLogServerUrl,string loggingLevel,
-            string[] brokers)
-        {
-            this.sequenceNumber = 0;
-            this.name = name;
-            this.pmLogServerUrl = pmLogServerUrl;
-            this.loggingLevel = loggingLevel;
-            this.brokers = brokers;
-            logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
-                as IPuppetMasterLog;
+            publisher = new PublisherLogic(name, pmLogServerUrl, loggingLevel, ordering, brokers);
         }
 
         // Publisher remote interface methods
 
         public void Publish(string topicName, int numberOfEvents, int interval)
         {
-            PublishDTO dto = new PublishDTO(topicName, numberOfEvents, interval);
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessPublish), dto);
+            publisher.Publish(topicName, numberOfEvents, interval);
         }
 
-        // Publisher specific methods
-
-        public void ProcessPublish(Object o)
+        public void Status()
         {
-            this.BlockWhileFrozen();
-            int sn;
-            PublishDTO dto = o as PublishDTO;
-            IBroker broker;
-            for(int i = 0; i < dto.NumEvents; i++)
-            {
-                broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-                lock (this)
-                {
-                    sn = sequenceNumber++;
-                    broker.Diffuse(new Event(this.name, this.name, dto.Topic, "content", i, sn));
-                }
-                logServer.LogAction("PubEvent " + name + ", " + name + ", " + dto.Topic + ", " + i);
-                Thread.Sleep(dto.Interval);
-            }
+            publisher.Status();
         }
 
-        public override void Status()
+        public void Init()
         {
-            //TODO
+            publisher.Init();
         }
 
-        public override void Init()
+        public void Crash()
         {
-            //DO Nothing
+            publisher.Crash();
+        }
+
+        public void Freeze()
+        {
+            publisher.Freeze();
+        }
+
+        public void Unfreeze()
+        {
+            publisher.Unfreeze();
         }
     }
 }

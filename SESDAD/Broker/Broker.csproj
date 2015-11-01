@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrokerLogic.cs" />
     <Compile Include="BrokerServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Routing\Filtered.cs" />

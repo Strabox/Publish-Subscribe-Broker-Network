@@ -49,6 +49,7 @@
     <Compile Include="RemoteClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteInterfaces.cs" />
+    <Compile Include="ThreadPool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
