@@ -33,9 +33,7 @@ namespace CommonTypes
     {
         [OneWay]
         void Crash();
-        [OneWay]
         void Freeze();
-        [OneWay]
         void Unfreeze();
         [OneWay]
         void Status();
@@ -45,16 +43,13 @@ namespace CommonTypes
     }
 
     public interface IPublisherControlServices
-    {
-        [OneWay]
+    {   [OneWay]
         void Publish(string topicName,int numberOfEvents,int interval);
     }
 
     public interface ISubscriberControlServices
     {
-        [OneWay]
         void Subscribe(string topicName);
-        [OneWay]
         void Unsubscribe(string topicName);
     }  
 

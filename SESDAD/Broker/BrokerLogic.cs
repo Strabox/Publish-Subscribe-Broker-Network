@@ -1,4 +1,6 @@
-﻿using CommonTypes;
+﻿using Broker.Order;
+using Broker.Ordering;
+using CommonTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +52,7 @@ namespace Broker
         private IBroker remoteProxy;
         public IBroker RemoteProxy { get { return remoteProxy; } }
 
+        private IOrder order;
 
         public BrokerLogic(IBroker myProxy,string name, string orderingPolicy, string routingPolicy,
             string loggingLevel, string pmLogServerUrl, string parent, string[] children)
@@ -59,26 +62,30 @@ namespace Broker
             this.pmLogServerUrl = pmLogServerUrl;
             this.orderingPolicy = orderingPolicy;
             this.routingPolicy = routingPolicy;
-            if (routingPolicy == "filtered")
+            if (routingPolicy.Equals("filter"))
             {
                 this.router = new Filtered(this);
             }
-            else
+            else if (routingPolicy.Equals("flooding"))
             {
                 this.router = new Flooding(this);
             }
             if (orderingPolicy.Equals("FIFO"))
             {
-                this.pool = new CommonTypes.ThreadPool(1);
-
+                this.order = new FifoOrdering();
             }
-            else
+            else if(orderingPolicy.Equals("NO"))
             {
-                this.pool = new CommonTypes.ThreadPool(10);
+                this.order = new NoOrdering();
+            }
+            else if (orderingPolicy.Equals("TOTAL"))
+            {
+                //TODO
             }
             this.loggingLevel = loggingLevel;
             this.parentUrl = parent;
             this.childUrls = children;
+            this.pool = new CommonTypes.ThreadPool(10);
             this.topicSubscribers = new TopicSubscriberCollection();
         }
 
@@ -122,6 +129,7 @@ namespace Broker
 
         public void AddEventToDiffusion(Event e)
         {
+            order.AddNewMessage(e.Publisher, e.SequenceNumber);
             pool.AssyncInvoke(new WaitCallback(Diffuse), e);
         }
 
@@ -155,12 +163,10 @@ namespace Broker
         private void Diffuse(Object o)
         {
             this.BlockWhileFrozen();
-
             Event e = o as Event;
-
+            order.Deliver(e.Publisher, e.SequenceNumber);
             // Send the event to interested Brokers
             Event newEvent = this.router.Diffuse(e);
-
             // Send the event to Subscribers who want it
             ICollection<NodePair<ISubscriber>> subscribersToSend = Data.SubscribersFor(e.Topic);
 
@@ -168,6 +174,7 @@ namespace Broker
             {
                 subscriberPair.Node.Receive(newEvent);
             }
+            order.ConfirmDeliver(e.Publisher);
             if (loggingLevel.Equals("full"))
                 logServer.LogAction("BroEvent " + name + ", " + e.Publisher
                      + ", " + e.Topic + ", " + e.SequenceNumber);

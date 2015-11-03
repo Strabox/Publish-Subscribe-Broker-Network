@@ -21,9 +21,9 @@ namespace Broker
             {
                 Route route = new Route(subscription.Topic, broker.Name, broker.RemoteProxy);
 
-                foreach (var broker in broker.GetNeighbours())
+                foreach (var b in broker.GetNeighbours())
                 {
-                    broker.Node.AddRoute(route);
+                    b.Node.AddRoute(route);
                 }
             }
            
@@ -54,9 +54,9 @@ namespace Broker
             {
                 Route route = new Route(subscription.Topic, broker.Name, broker.RemoteProxy);
 
-                foreach (var broker in broker.GetNeighbours())
+                foreach (var b in broker.GetNeighbours())
                 {
-                        broker.Node.AddRoute(route);
+                        b.Node.AddRoute(route);
 
                 }
             }
@@ -70,11 +70,11 @@ namespace Broker
             {
                 Route newRoute = new Route(route.Topic, broker.Name, broker.RemoteProxy);
 
-                foreach (var broker in broker.GetNeighbours())
+                foreach (var b in broker.GetNeighbours())
                 {
-                    if (!broker.Name.Equals(route.BrokerName))
+                    if (!b.Name.Equals(route.BrokerName))
                     {
-                        broker.Node.AddRoute(newRoute);
+                        b.Node.AddRoute(newRoute);
                     }
                 }
             }
@@ -88,11 +88,11 @@ namespace Broker
             {
                 Route newRoute = new Route(route.Topic, broker.Name, broker.RemoteProxy);
 
-                foreach (var broker in broker.GetNeighbours())
+                foreach (var b in broker.GetNeighbours())
                 {
-                    if (!broker.Name.Equals(route.BrokerName))
+                    if (!b.Name.Equals(route.BrokerName))
                     {
-                        broker.Node.RemoveRoute(newRoute);
+                        b.Node.RemoveRoute(newRoute);
                     }
                 }
             }

@@ -55,14 +55,7 @@ namespace Publisher
             this.pmLogServerUrl = pmLogServerUrl;
             this.loggingLevel = loggingLevel;
             this.brokers = brokers;
-            if (ordering.Equals("FIFO"))
-            {
-                pool = new CommonTypes.ThreadPool(1);
-            }
-            else
-            {
-                pool = new CommonTypes.ThreadPool(10);
-            }
+            pool = new CommonTypes.ThreadPool(10);
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
                 as IPuppetMasterLog;
         }
@@ -77,7 +70,7 @@ namespace Publisher
 
         public override void Init()
         {
-            //TODO
+            //Do Nothing
         }
 
         public override void Status()

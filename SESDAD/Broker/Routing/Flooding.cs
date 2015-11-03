@@ -26,11 +26,11 @@ namespace Broker
         {
             Event newEvent = new Event(evt.Publisher, broker.Name, evt.Topic, evt.Content,evt.SequenceNumber);
                     
-            foreach (var broker in this.broker.GetNeighbours())
+            foreach (var b in this.broker.GetNeighbours())
             {
-                if ( ! evt.Sender.Equals(broker.Name))
+                if ( ! evt.Sender.Equals(b.Name))
                 {
-                    broker.Node.Diffuse(newEvent);
+                    b.Node.Diffuse(newEvent);
                 }
             }
             
