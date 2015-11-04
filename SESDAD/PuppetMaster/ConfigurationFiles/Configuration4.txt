@@ -6,12 +6,9 @@ Process broker0 Is broker On site0 URL tcp://localhost:3333/broker0
 Process broker1 Is broker On site1 URL tcp://localhost:3338/broker1
 Process broker2 Is broker On site2 URL tcp://localhost:3339/broker2
 Process broker3 Is broker On site3 URL tcp://localhost:3390/broker3
-Process publisher0 Is publisher On site0 URL tcp://localhost:3334/publisher0
 Process publisher1 Is publisher On site1 URL tcp://localhost:3909/publisher1
-Process subscriber0 Is subscriber On site0 URL tcp://localhost:3335/subscriber0
 Process subscriber1 Is subscriber On site0 URL tcp://localhost:3336/subscriber1
-Process subscriber2 Is subscriber On site0 URL tcp://localhost:3337/subscriber2
-Process subscriber3 Is subscriber On site3 URL tcp://localhost:3555/subscriber3
+Process subscriber2 Is subscriber On site2 URL tcp://localhost:3337/subscriber2
 RoutingPolicy filter
 Ordering NO
 LoggingLevel full

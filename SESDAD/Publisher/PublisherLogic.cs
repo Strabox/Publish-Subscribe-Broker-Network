@@ -88,13 +88,14 @@ namespace Publisher
             IBroker broker;
             for (int i = 0; i < dto.NumEvents; i++)
             {
+
                 broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
                 lock (this)
                 {
                     sn = sequenceNumber++;
+                    logServer.LogAction("[ " + name + " - Publish ] Broker: " + brokers[0] + " | Topic: " + dto.Topic + " | Seq. Number: " + sn);
                     broker.Diffuse(new Event(this.name, this.name, dto.Topic, "content", sn));
                 }
-                logServer.LogAction("PubEvent " + name + ", " + name + ", " + dto.Topic + ", " + sn);
                 Thread.Sleep(dto.Interval);
             }
         }

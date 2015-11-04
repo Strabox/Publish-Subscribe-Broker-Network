@@ -86,10 +86,9 @@ namespace Subscriber
             this.BlockWhileFrozen();
 
             Event e = o as IMessage as Event;
-            Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher,
-                e.Topic, e.GetSequenceNumber());
-            logServer.LogAction("SubEvent " + name + ", " + e.Publisher
-                + ", " + e.Topic + ", " + e.SequenceNumber);
+            Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher, e.Topic, e.GetSequenceNumber());
+            logServer.LogAction("[ " + name + " - Receive ] Sender: " + e.Sender + " | Publisher: " + e.Publisher + " | Topic: " + e.Topic + " | Seq. Number: " + e.SequenceNumber);
+
         }
 
 

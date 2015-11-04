@@ -8,7 +8,7 @@ namespace Broker
 	using SubscriberPair = NodePair<ISubscriber>;
 	using BrokerPair = NodePair<IBroker>;
 	
-    public class NodePair<T> : IEquatable<NodePair<T>>
+    public class NodePair<T>
     {
 		private T node;
 		public T Node
@@ -35,9 +35,15 @@ namespace Broker
 			return this.name.Equals(name);
 		}
 
-        public bool Equals(NodePair<T> other)
+        public override bool Equals(Object other)
         {
-            return name.Equals(other.Name);
+            NodePair<T> o = other as NodePair<T>;
+            return o != null && o.Name.Equals(this.name);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Name.GetHashCode() ^ this.Node.GetHashCode();
         }
     }
 
