@@ -1,0 +1,10 @@
+﻿Subscriber subscriber1 Subscribe /IST/a
+Subscriber subscriber2 Subscribe /*
+
+Wait 4000
+
+Publisher publisher1 Publish 1 Ontopic /IST Interval 40
+
+Wait 2000
+
+Publisher publisher1 Publish 1 Ontopic /IST/a Interval 99

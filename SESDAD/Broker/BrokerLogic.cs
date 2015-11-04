@@ -164,6 +164,10 @@ namespace Broker
         {
             this.BlockWhileFrozen();
             Event e = o as Event;
+
+            if (loggingLevel.Equals("full"))
+                logServer.LogAction("[ " + name + " - Diffuse ] Sender: " + e.Sender + " | Publisher: " + e.Publisher + " | Topic: " + e.Topic + " | Seq. Number: " + e.SequenceNumber);
+
             order.Deliver(e.Publisher, e.SequenceNumber);
             // Send the event to interested Brokers
             Event newEvent = this.router.Diffuse(e);
@@ -175,9 +179,6 @@ namespace Broker
                 subscriberPair.Node.Receive(newEvent);
             }
             order.ConfirmDeliver(e.Publisher);
-            if (loggingLevel.Equals("full"))
-                logServer.LogAction("BroEvent " + name + ", " + e.Publisher
-                     + ", " + e.Topic + ", " + e.SequenceNumber);
         }
 
         private void ProcessUnsubscribe(Object subscription)
