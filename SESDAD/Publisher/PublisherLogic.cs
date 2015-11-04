@@ -25,7 +25,7 @@ namespace Publisher
             {
                 this.topic = topic;
                 this.numEvents = numEvents;
-                this.interval = Interval;
+                this.interval = interval;
             }
         }
 
@@ -37,7 +37,7 @@ namespace Publisher
 
         private string ordering;
 
-        private string[] brokers;
+        private List<string> brokers;
 
         private int sequenceNumber;
 
@@ -47,7 +47,7 @@ namespace Publisher
 
 
         public PublisherLogic(string name, string pmLogServerUrl, string loggingLevel
-            , string ordering, string[] brokers)
+            , string ordering, List<string> brokers)
         {
             this.ordering = ordering;
             this.sequenceNumber = 0;
@@ -95,6 +95,7 @@ namespace Publisher
                     broker.Diffuse(new Event(this.name, this.name, dto.Topic, "content", sn));
                 }
                 logServer.LogAction("PubEvent " + name + ", " + name + ", " + dto.Topic + ", " + sn);
+                Console.WriteLine(dto.Interval);
                 Thread.Sleep(dto.Interval);
             }
         }

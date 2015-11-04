@@ -1,5 +1,6 @@
 ﻿using CommonTypes;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Publisher
@@ -10,7 +11,7 @@ namespace Publisher
         private PublisherLogic publisher;
 
         public PublisherServer(string name,string pmLogServerUrl,string loggingLevel
-            ,string ordering, string[] brokers)
+            ,string ordering, List<string> brokers)
         {
             publisher = new PublisherLogic(name, pmLogServerUrl, loggingLevel, ordering, brokers);
         }

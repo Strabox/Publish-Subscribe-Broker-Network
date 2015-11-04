@@ -35,7 +35,6 @@ namespace CommonTypes
         void Crash();
         void Freeze();
         void Unfreeze();
-        [OneWay]
         void Status();
         /* It isn't one way(async) because I want wait for all Init returns
         to start the system. */
@@ -43,7 +42,7 @@ namespace CommonTypes
     }
 
     public interface IPublisherControlServices
-    {   [OneWay]
+    {
         void Publish(string topicName,int numberOfEvents,int interval);
     }
 
@@ -60,7 +59,6 @@ namespace CommonTypes
 
     public interface IPuppetMasterLauncher
     {
-        [OneWay]
         void LaunchProcess(string name,string args);
     }
 

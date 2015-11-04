@@ -32,9 +32,11 @@ namespace PuppetMaster
                              ".." + Path.DirectorySeparatorChar +
                              "LogFiles" + Path.DirectorySeparatorChar;
 
+
         private FormPuppetMaster parentForm;
 
         private LogServer logServer;
+
 
         // Pair <ProcessName,URL>
         private Dictionary<string, string> processes;
@@ -92,7 +94,7 @@ namespace PuppetMaster
                     }
                     else if (processType.Equals("broker"))
                     {
-                        sites.AddBrokerUrlToSite(tokens[5], tokens[7]);
+                        sites.AddBrokerUrlToSite(tokens[5], tokens[7],tokens[1]);
                         launcher.AddNode(new LaunchBroker(tokens[1],
                            ParseUtil.ExtractIPFromURL(tokens[7]), port, tokens[5]));
                     }

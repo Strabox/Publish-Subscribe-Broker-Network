@@ -10,7 +10,22 @@ namespace PuppetMaster
     public class ManageSites
     {
 
-        class Site
+        private class Broker
+        {
+            private string url;
+            public string Url { get { return url; } }
+
+            private string logicName;
+            public string LogicName { get { return logicName; } }
+
+            public Broker(string url,string logicName)
+            {
+                this.url = url;
+                this.logicName = logicName;
+            }
+        }
+
+        private class Site
         {
             private string name;
 
@@ -19,12 +34,11 @@ namespace PuppetMaster
             private List<Site> child;
 
             //List of broker's URL from this site.
-            private List<string> brokersUrls;
+            private List<Broker> brokersUrls;
 
             public bool IsRoot
             {
-                get
-                { return parent == null; }
+                get{ return parent == null; }
             }
 
             public string Name
@@ -43,7 +57,7 @@ namespace PuppetMaster
             {
                 this.Name = name;
                 child = new List<Site>();
-                brokersUrls = new List<string>();
+                brokersUrls = new List<Broker>();
             }
 
             public void AddChildrenSite(Site site)
@@ -51,9 +65,9 @@ namespace PuppetMaster
                 child.Add(site);
             }
 
-            public void AddBrokerUrlToSite(string url)
+            public void AddBrokerUrlToSite(string url,string logicName)
             {
-                brokersUrls.Add(url);
+                brokersUrls.Add(new Broker(url,logicName));
             }
 
             public string GetChildUrl()
@@ -68,9 +82,12 @@ namespace PuppetMaster
 
             public string GetBrokersUrl()
             {
-                string[] res = new string[brokersUrls.Count];
-                brokersUrls.CopyTo(res);
-                return string.Join(" ", res);
+                string res2 = "";
+                foreach(Broker broker in brokersUrls)
+                {
+                    res2 += broker.LogicName + " " + broker.Url + " ";
+                }
+                return res2.Substring(0, res2.Length - 1);
             }
 
         }
@@ -113,10 +130,10 @@ namespace PuppetMaster
             return sites[siteName].GetChildUrl();
         }
 
-        public void AddBrokerUrlToSite(string siteName, string brokerUrl)
+        public void AddBrokerUrlToSite(string siteName, string brokerUrl,string brokerLogicName)
         {
             if (sites.ContainsKey(siteName))
-                sites[siteName].AddBrokerUrlToSite(brokerUrl);
+                sites[siteName].AddBrokerUrlToSite(brokerUrl,brokerLogicName);
         }
 
         public bool IsSiteRoot(string siteName)

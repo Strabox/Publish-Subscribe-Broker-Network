@@ -11,10 +11,10 @@ namespace Broker
         private BrokerLogic broker;
 
         public BrokerServer(string name,string orderingPolicy,string routingPolicy,
-            string loggingLevel,string pmLogServerUrl, string parent, string[] children)
+            string loggingLevel,string pmLogServerUrl,string parentName, string parentUrl, List<BrokerPairDTO> children)
         {
             broker = new BrokerLogic(this,name, orderingPolicy, routingPolicy, loggingLevel, pmLogServerUrl,
-                parent, children);
+                parentName,parentUrl, children);
         }
 
         /**

@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrokerLogic.cs" />
+    <Compile Include="BrokerPairDTO.cs" />
     <Compile Include="BrokerServer.cs" />
     <Compile Include="Order\FifoOrdering.cs" />
     <Compile Include="Order\IOrdering.cs" />

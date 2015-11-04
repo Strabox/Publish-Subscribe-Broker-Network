@@ -23,17 +23,17 @@ namespace Publisher
                 + "PuppetMasterLogService: {5}",
                 args[0], args[1], args[2], args[3], args[4], args[5]);
             Console.WriteLine("Brokers: ");
-            string[] brokers = new string[args.Length - 6];
-            for (int i = 6; i < args.Length; i++)
+            List<string> brokers = new List<string>();
+            for (int i = 6; i < args.Length; i = i +2)
             {
-                brokers[i - 6] = args[i];
-                Console.WriteLine(args[i]);
+                brokers.Add(args[i + 1]);
+                Console.WriteLine(args[i + 1]);
             }
 
             TcpChannel channel = new TcpChannel(int.Parse(args[0]));
             ChannelServices.RegisterChannel(channel, false);
             PublisherServer publisher = new PublisherServer(args[1],args[5],args[4],args[2],brokers);
-            RemotingServices.Marshal(publisher, args[1], typeof(PublisherServer));
+            RemotingServices.Marshal(publisher, "pub", typeof(PublisherServer));
             Console.WriteLine("Publisher up and running....");
             Console.ReadLine();
         }

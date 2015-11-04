@@ -16,7 +16,7 @@ namespace Subscriber
 
         private string loggingLevel;
 
-        private string[] brokers;
+        private List<string> brokers;
 
         private IPuppetMasterLog logServer;
 
@@ -27,7 +27,7 @@ namespace Subscriber
 
 
         public SubscriberLogic(ISubscriber myProxy,string orderingPolicy, string name,
-            string pmLogServerUrl, string loggingLevel, string[] brokers)
+            string pmLogServerUrl, string loggingLevel, List<string> brokers)
         {
             if (orderingPolicy.Equals("NO"))
             {
@@ -55,7 +55,6 @@ namespace Subscriber
 
         public void Receive(Event e)
         {
-            Console.WriteLine("Posto na queue {0}", e.SequenceNumber);
             pool.AssyncInvoke(new WaitCallback(ProcessReceive), e);
         }
 
@@ -96,7 +95,7 @@ namespace Subscriber
         private void ProcessUnsubscribe(Object o)
         {
             this.BlockWhileFrozen();
-
+            Console.WriteLine("Unsubscribe");
             string topicName = o as string;
             IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
             broker.Unsubscribe(new Subscription(this.name, topicName, this.name, MyProxy));

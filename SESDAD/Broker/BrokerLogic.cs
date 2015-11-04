@@ -32,7 +32,7 @@ namespace Broker
         private string parentName;
         public string ParentName { get { return parentName; } }
 
-        private string[] childUrls;
+        private List<BrokerPairDTO> childUrls;
 
         private TopicSubscriberCollection topicSubscribers;
         public TopicSubscriberCollection Data { get { return topicSubscribers; } }
@@ -55,7 +55,7 @@ namespace Broker
         private IOrder order;
 
         public BrokerLogic(IBroker myProxy,string name, string orderingPolicy, string routingPolicy,
-            string loggingLevel, string pmLogServerUrl, string parent, string[] children)
+            string loggingLevel, string pmLogServerUrl,string parentName ,string parentUrl, List<BrokerPairDTO> children)
         {
             this.remoteProxy = myProxy;
             this.name = name;
@@ -74,7 +74,7 @@ namespace Broker
             {
                 this.order = new FifoOrdering();
             }
-            else if(orderingPolicy.Equals("NO"))
+            else if (orderingPolicy.Equals("NO"))
             {
                 this.order = new NoOrdering();
             }
@@ -82,8 +82,9 @@ namespace Broker
             {
                 //TODO
             }
+            this.parentName = parentName;
             this.loggingLevel = loggingLevel;
-            this.parentUrl = parent;
+            this.parentUrl = parentUrl;
             this.childUrls = children;
             this.pool = new CommonTypes.ThreadPool(10);
             this.topicSubscribers = new TopicSubscriberCollection();
@@ -93,10 +94,9 @@ namespace Broker
 
         public override void Init()
         {
-            if (!parentUrl.Equals(CommonUtil.ROOT))
+            if (!parentName.Equals(CommonUtil.ROOT))
             {
                 parentBroker = Activator.GetObject(typeof(IBroker), parentUrl) as IBroker;
-                parentName = CommonUtil.ExtractPath(parentUrl);
             }
             else
             {
@@ -104,10 +104,10 @@ namespace Broker
                 parentName = null;
             }
 
-            foreach (string childUrl in childUrls)
+            foreach (BrokerPairDTO child in childUrls)
             {
-                IBroker childBroker = Activator.GetObject(typeof(IBroker), childUrl) as IBroker;
-                childBrokers.Add(CommonUtil.ExtractPath(childUrl), childBroker);
+                IBroker childBroker = Activator.GetObject(typeof(IBroker), child.Url) as IBroker;
+                childBrokers.Add(child.LogicName, childBroker);
             }
 
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl) as IPuppetMasterLog;

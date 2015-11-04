@@ -13,7 +13,7 @@ namespace Subscriber
         private SubscriberLogic subscriber;
 
         public SubscriberServer(string orderingPolicy, string name, string pmLogServerUrl,string loggingLevel,
-            string[] brokers)
+            List<string> brokers)
         {
             subscriber = new SubscriberLogic(this, orderingPolicy, name, pmLogServerUrl, loggingLevel, brokers);
         }

@@ -24,8 +24,12 @@ namespace Subscriber
                 + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}" + nl
                 + "PuppetMasterLogService: {5}"+ nl + "Brokers:",
                 args[0], args[1], args[2], args[3], args[4], args[5]);
-            for (int i = 6; i < args.Length; i++)
-                Console.WriteLine(args[i]);
+            List<string> brokers = new List<string>(); 
+            for (int i = 6; i < args.Length; i = i + 2)
+            {
+                Console.WriteLine(args[i + 1]);
+                brokers.Add(args[i + 1]);
+            }
 
             BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
             provider.TypeFilterLevel = TypeFilterLevel.Full;
@@ -34,8 +38,8 @@ namespace Subscriber
             TcpChannel channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(channel, false);
             SubscriberServer subscriber = new SubscriberServer(args[2],args[1],args[5], 
-                args[4], args.Skip(6).ToArray());
-            RemotingServices.Marshal(subscriber, args[1], typeof(SubscriberServer));
+                args[4], brokers);
+            RemotingServices.Marshal(subscriber, "sub", typeof(SubscriberServer));
             Console.WriteLine("Subscriber up and running....");
             Console.ReadLine();
         }

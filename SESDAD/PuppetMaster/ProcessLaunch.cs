@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PuppetMaster
@@ -64,32 +65,16 @@ namespace PuppetMaster
     public abstract class LaunchNode
     {
         private string name;
+        public string Name { get { return name; } }
 
         private string port;
+        public string Port { get { return port; } }
 
         private string ip;
+        public string Ip { get { return ip; } }
 
         private string site;
-
-        public string Name
-        {
-            get { return name; }
-        }
-
-        public string Ip
-        {
-            get { return ip; }
-        }
-
-        public string Port
-        {
-            get { return port; }
-        }
-
-        public string Site
-        {
-            get { return site; }
-        }
+        public string Site { get { return site; } }
 
         public LaunchNode(string name, string ip, string port, string site)
         {
@@ -121,11 +106,7 @@ namespace PuppetMaster
             }
         }
 
-        public void InitializeProcess()
-        {
-            (Activator.GetObject(typeof(IGeneralControlServices),
-                CommonUtil.MakeUrl("tcp", Ip, Port, Name)) as IGeneralControlServices).Init();
-        }
+        public abstract void InitializeProcess();
 
         public abstract void Launch(ManageSites sites,string orderingPolicy
             ,string routingPolicy,string logPolicy);
@@ -161,7 +142,7 @@ namespace PuppetMaster
         public override void Launch(ManageSites sites, string orderingPolicy
             , string routingPolicy, string logPolicy)
         {
-            string parent = CommonUtil.ROOT;
+            string parent = CommonUtil.ROOT + " " + "None";
             if (!sites.IsSiteRoot(Site))
                 parent = sites.GetParentBrokersUrl(Site);
             string args = string.Join(" ", Port, Name,
@@ -172,18 +153,39 @@ namespace PuppetMaster
                 sites.GetChildrenUrl(Site));
             LaunchProcess(this.GetType().Name.Substring(6), args);
         }
+
+        public override void InitializeProcess()
+        {
+            (Activator.GetObject(typeof(IGeneralControlServices),
+                CommonUtil.MakeUrl("tcp", Ip, Port, "broker")) as IGeneralControlServices).Init();
+        }
+
     }
 
     public class LaunchPublisher : LaunchEndNode
     {
-        public LaunchPublisher(string name,string ip, string port, string site) 
+        public LaunchPublisher(string name, string ip, string port, string site) 
             : base(name,ip,port,site){ }
+
+        public override void InitializeProcess()
+        {
+            (Activator.GetObject(typeof(IGeneralControlServices),
+                CommonUtil.MakeUrl("tcp", Ip, Port, "pub")) as IGeneralControlServices).Init();
+        }
+
     }
 
     public class LaunchSubscriber : LaunchEndNode
     {
         public LaunchSubscriber(string name,string ip, string port, string site) 
             : base(name,ip,port,site){ }
+
+        public override void InitializeProcess()
+        {
+            (Activator.GetObject(typeof(IGeneralControlServices),
+                CommonUtil.MakeUrl("tcp", Ip, Port, "sub")) as IGeneralControlServices).Init();
+        }
+
     }
    
 }

@@ -131,10 +131,15 @@
     <Folder Include="LogFiles\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ConfigurationFiles\Configuration3.txt" />
+    <Content Include="ConfigurationFiles\ConfigurationOP.txt" />
     <Content Include="ConfigurationFiles\Configuration2.txt" />
     <Content Include="ConfigurationFiles\Configuration1.txt" />
+    <Content Include="ConfigurationFiles\ProfessorConfig1.txt" />
+    <Content Include="ConfigurationFiles\ProfessorConfig2.txt" />
+    <Content Include="ScriptFiles\ProfessorScript2.txt" />
+    <Content Include="ScriptFiles\ProfessorScript1.txt" />
     <Content Include="ScriptFiles\Script1.txt" />
+    <Content Include="ScriptFiles\ScriptOP.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

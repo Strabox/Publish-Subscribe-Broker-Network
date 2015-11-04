@@ -48,6 +48,7 @@ namespace Broker
 
         public void Unsubscribe(Subscription subscription)
         {
+            Console.WriteLine("Here");
             bool inform = broker.Data.RemoveSubscriber(subscription.Topic, subscription.SubscriberName, subscription.Subscriber);
 
             if (inform)

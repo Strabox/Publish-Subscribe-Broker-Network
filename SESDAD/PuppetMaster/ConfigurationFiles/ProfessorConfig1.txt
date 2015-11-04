@@ -1,0 +1,9 @@
+﻿RoutingPolicy flooding
+Ordering NO
+LoggingLevel full
+Site site0 Parent none
+Site site1 Parent site0
+Process broker0 Is broker On site0 URL tcp://localhost:3333/broker
+Process publisher0 Is publisher On site0 URL tcp://localhost:3334/pub
+Process broker1 Is broker On site1 URL tcp://localhost:3335/broker
+Process subscriber1 Is subscriber On site1 URL tcp://localhost:3336/sub
