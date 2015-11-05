@@ -29,18 +29,7 @@ namespace Subscriber
         public SubscriberLogic(ISubscriber myProxy,string orderingPolicy, string name,
             string pmLogServerUrl, string loggingLevel, List<string> brokers)
         {
-            if (orderingPolicy.Equals("NO"))
-            {
-                pool = new CommonTypes.ThreadPool(10);
-            }
-            else if (orderingPolicy.Equals("FIFO"))
-            {
-                pool = new CommonTypes.ThreadPool(1);
-            }
-            else
-            {
-                //TODO
-            }
+            pool = new CommonTypes.ThreadPool(1);
             this.myProxy = myProxy;
             this.name = name;
             this.pmLogServerUrl = pmLogServerUrl;
@@ -70,7 +59,7 @@ namespace Subscriber
 
         public override void Init()
         {
-            //TODO
+            //Do nothing for now.
         }
 
         public override void Status()
@@ -86,15 +75,14 @@ namespace Subscriber
 
             Event e = o as IMessage as Event;
             Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher, e.Topic, e.GetSequenceNumber());
-            logServer.LogAction("[ " + name + " - Receive ] Sender: " + e.Sender + " | Publisher: " + e.Publisher + " | Topic: " + e.Topic + " | Seq. Number: " + e.SequenceNumber);
-
+            logServer.LogAction("SubEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
         }
 
 
         private void ProcessUnsubscribe(Object o)
         {
             this.BlockWhileFrozen();
-            Console.WriteLine("Unsubscribe");
+
             string topicName = o as string;
             IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
             broker.Unsubscribe(new Subscription(this.name, topicName, this.name, MyProxy));

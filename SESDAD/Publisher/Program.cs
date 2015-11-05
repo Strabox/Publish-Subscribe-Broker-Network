@@ -13,7 +13,7 @@ namespace Publisher
     {
         static void Main(string[] args)
         {
-            if (args.Length < 5) {
+            if (args.Length < 6) {
                 Console.Error.WriteLine("Wrong usage.");
                 return;                                
             }

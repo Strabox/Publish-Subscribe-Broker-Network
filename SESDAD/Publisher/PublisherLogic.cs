@@ -70,7 +70,7 @@ namespace Publisher
 
         public override void Init()
         {
-            //Do Nothing
+            //Do Nothing for now
         }
 
         public override void Status()
@@ -93,9 +93,8 @@ namespace Publisher
                 {
                     sn = sequenceNumber++;
                     broker.Diffuse(new Event(this.name, this.name, dto.Topic, "content", sn));
+                    logServer.LogAction("PubEvent " + name + ", " + name + ", " + dto.Topic + ", " + sn);
                 }
-                logServer.LogAction("PubEvent " + name + ", " + name + ", " + dto.Topic + ", " + sn);
-                Console.WriteLine(dto.Interval);
                 Thread.Sleep(dto.Interval);
             }
         }

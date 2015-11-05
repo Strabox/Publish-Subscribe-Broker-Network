@@ -166,8 +166,7 @@ namespace Broker
             Event e = o as Event;
 
             if (loggingLevel.Equals("full"))
-                logServer.LogAction("[ " + name + " - Diffuse ] Sender: " + e.Sender + " | Publisher: " + e.Publisher + " | Topic: " + e.Topic + " | Seq. Number: " + e.SequenceNumber);
-
+                logServer.LogAction("BroEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
             order.Deliver(e.Publisher, e.SequenceNumber);
             // Send the event to interested Brokers
             Event newEvent = this.router.Diffuse(e);

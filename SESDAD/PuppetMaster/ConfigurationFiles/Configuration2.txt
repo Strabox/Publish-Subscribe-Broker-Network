@@ -13,6 +13,6 @@ Process subscriber1 Is subscriber On site0 URL tcp://localhost:3336/sub
 Process subscriber2 Is subscriber On site0 URL tcp://localhost:3337/sub
 Process subscriber3 Is subscriber On site2 URL tcp://localhost:3555/sub
 Process subscriber4 Is subscriber On site2 URL tcp://localhost:3995/sub
-RoutingPolicy flooding
+RoutingPolicy filter
 Ordering FIFO
 LoggingLevel full

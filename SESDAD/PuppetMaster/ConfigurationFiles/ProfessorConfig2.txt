@@ -1,4 +1,4 @@
-﻿RoutingPolicy filter
+﻿RoutingPolicy flooding
 Ordering FIFO
 LoggingLevel full
 Site site0 Parent none

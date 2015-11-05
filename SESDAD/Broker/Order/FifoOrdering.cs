@@ -81,7 +81,6 @@ namespace Broker.Ordering
         {
             lock (controlOrder[publisherId])
             {
-                
                 while (messageSequenceNumber > controlOrder[publisherId].GetFirst())
                     Monitor.Wait(controlOrder[publisherId]);
             }
