@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting;
@@ -20,21 +21,12 @@ namespace Publisher
             string nl = Environment.NewLine;
             Console.WriteLine("Port: {0}" + nl + "Name: {1}" + nl + "OrderingPolicy: {2}"
                 + nl + "Routing policy: {3}" + nl + "LoggingPolicy: {4}" + nl
-                + "PuppetMasterLogService: {5}",
-                args[0], args[1], args[2], args[3], args[4], args[5]);
-            Console.WriteLine("Brokers: ");
-            List<string> brokers = new List<string>();
-            for (int i = 6; i < args.Length; i = i +2)
-            {
-                brokers.Add(args[i + 1]);
-                Console.WriteLine(args[i + 1]);
-            }
+                + "PuppetMasterLogService: {5}", args[0], args[1], args[2], args[3], args[4], args[5]);
 
             TcpChannel channel = new TcpChannel(int.Parse(args[0]));
             ChannelServices.RegisterChannel(channel, false);
-            PublisherServer publisher = new PublisherServer(args[1],args[5],args[4],args[2],brokers);
+            PublisherServer publisher = new PublisherServer(args[1],args[5]);
             RemotingServices.Marshal(publisher, "pub", typeof(PublisherServer));
-            Console.WriteLine("Publisher up and running....");
             Console.ReadLine();
         }
     }

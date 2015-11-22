@@ -1,97 +1,134 @@
-﻿using System;
+﻿using CommonTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace PuppetMaster
 {
 
+    public class Broker
+    {
+        public string Url { get; set; }
+
+        public string LogicName { get; set; }
+
+        public Broker() { }
+
+        public Broker(string url, string logicName)
+        {
+            Url = url;
+            LogicName = logicName;
+        }
+
+        public BrokerPairDTO GetBrokerDTO()
+        {
+            return new BrokerPairDTO(Url, LogicName);
+        }
+
+    }
+
+    /// <summary>
+    ///     A site represents an set of brokers that work as a single one.
+    /// </summary>
+    public class Site
+    {
+        public string Name { get; set; }
+
+        private Site parent = null;
+
+        // List of site child sites.
+        private List<Site> child;
+
+        //List of broker's URL from this site.
+        private List<Broker> brokers;
+
+        public bool IsRoot { get { return parent == null; } }
+
+        public Site() { }
+
+        public Site Parent
+        {
+            get { return parent; }
+            set { parent = value; }
+        }
+
+        public Site(string name)
+        {
+            this.Name = name;
+            child = new List<Site>();
+            brokers = new List<Broker>();
+        }
+
+        private List<BrokerPairDTO> GetSiteBrokersDTO()
+        {
+            List<BrokerPairDTO> brokersList = new List<BrokerPairDTO>();
+            foreach(Broker broker in brokers)
+            {
+                brokersList.Add(broker.GetBrokerDTO());
+            }
+            return brokersList;
+        }
+
+        private List<BrokerPairDTO> GetParentBrokersDTO()
+        {
+            if (!IsRoot)
+                return parent.GetSiteBrokersDTO();
+            return null;
+        }
+     
+        public SiteDTO GetSiteDTO()
+        {
+            SiteDTO.SiteBrokers parentSite = null;
+            if (!IsRoot)
+                parentSite = new SiteDTO.SiteBrokers(parent.Name, parent.GetSiteBrokersDTO());
+            SiteDTO dto = new SiteDTO(Name, IsRoot, parentSite,GetSiteBrokersDTO());
+            foreach(Site site in child)
+            {
+                dto.AddSiteChild(site.Name, site.GetSiteBrokersDTO());
+            }
+            return dto;
+        }
+
+        public void AddChildrenSite(Site site)
+        {
+            child.Add(site);
+        }
+
+        public void AddBrokerToSite(string url, string logicName)
+        {
+            brokers.Add(new Broker(url, logicName));
+        }
+
+        public string GetChildUrl()
+        {
+            string res = string.Empty;
+            foreach (Site site in child)
+            {
+                res = string.Join(" ", res, site.GetBrokersUrl());
+            }
+            return res;
+        }
+
+        public string GetBrokersUrl()
+        {
+            string res = "";
+            foreach (Broker broker in brokers)
+            {
+                res += broker.LogicName + " " + broker.Url + " ";
+            }
+            return res.Substring(0, res.Length - 1);
+        }
+    }
+
+    /// <summary>
+    ///     Manage network sites.
+    /// </summary>
     public class ManageSites
     {
-
-        private class Broker
-        {
-            private string url;
-            public string Url { get { return url; } }
-
-            private string logicName;
-            public string LogicName { get { return logicName; } }
-
-            public Broker(string url,string logicName)
-            {
-                this.url = url;
-                this.logicName = logicName;
-            }
-        }
-
-        private class Site
-        {
-            private string name;
-
-            private Site parent = null;
-
-            private List<Site> child;
-
-            //List of broker's URL from this site.
-            private List<Broker> brokersUrls;
-
-            public bool IsRoot
-            {
-                get{ return parent == null; }
-            }
-
-            public string Name
-            {
-                get { return name; }
-                set { name = value; }
-            }
-
-            public Site Parent
-            {
-                get { return parent; }
-                set { parent = value; }
-            }
-
-            public Site(string name)
-            {
-                this.Name = name;
-                child = new List<Site>();
-                brokersUrls = new List<Broker>();
-            }
-
-            public void AddChildrenSite(Site site)
-            {
-                child.Add(site);
-            }
-
-            public void AddBrokerUrlToSite(string url,string logicName)
-            {
-                brokersUrls.Add(new Broker(url,logicName));
-            }
-
-            public string GetChildUrl()
-            {
-                string res = string.Empty;
-                foreach (Site site in child)
-                {
-                    res = string.Join(" ", res, site.GetBrokersUrl());
-                }
-                return res;
-            }
-
-            public string GetBrokersUrl()
-            {
-                string res2 = "";
-                foreach(Broker broker in brokersUrls)
-                {
-                    res2 += broker.LogicName + " " + broker.Url + " ";
-                }
-                return res2.Substring(0, res2.Length - 1);
-            }
-
-        }
-
         //pair <site's name, site object>
         private Dictionary<string, Site> sites;
 
@@ -99,6 +136,7 @@ namespace PuppetMaster
         {
             sites = new Dictionary<string, Site>();
         }
+
 
         public void CreateSite(string siteName)
         {
@@ -133,7 +171,7 @@ namespace PuppetMaster
         public void AddBrokerUrlToSite(string siteName, string brokerUrl,string brokerLogicName)
         {
             if (sites.ContainsKey(siteName))
-                sites[siteName].AddBrokerUrlToSite(brokerUrl,brokerLogicName);
+                sites[siteName].AddBrokerToSite(brokerUrl,brokerLogicName);
         }
 
         public bool IsSiteRoot(string siteName)
@@ -143,9 +181,15 @@ namespace PuppetMaster
             return false;
         }
 
+        public Site GetSite(string siteName)
+        {
+            if (sites[siteName] != null)
+                return sites[siteName];
+            else
+                return null;
+        }
+
     }
-
-
 
 }
 

@@ -12,7 +12,7 @@ namespace PuppetMaster
     {
         public static string NAME = "([0-9]|[A-Z]|[a-z]|\\-)+";
         public static string SPACE = "[ \t]+";
-        public static string TOPIC_NAME = "([0-9]|[A-Z]|[a-z]|\\*|\\-|/)+"; //TODO correct it :)
+        public static string TOPIC_NAME = "([0-9]|[A-Z]|[a-z]|\\*|\\-|/)+";
 
         //Configuration File
         public static string SITE = "^Site" + SPACE + NAME + SPACE +  "Parent" + SPACE + NAME;

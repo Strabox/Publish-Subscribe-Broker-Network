@@ -10,10 +10,9 @@ namespace Publisher
     
         private PublisherLogic publisher;
 
-        public PublisherServer(string name,string pmLogServerUrl,string loggingLevel
-            ,string ordering, List<string> brokers)
+        public PublisherServer(string name,string pmLogServerUrl)
         {
-            publisher = new PublisherLogic(name, pmLogServerUrl, loggingLevel, ordering, brokers);
+            publisher = new PublisherLogic(name, pmLogServerUrl);
         }
 
         // Publisher remote interface methods
@@ -28,9 +27,9 @@ namespace Publisher
             publisher.Status();
         }
 
-        public void Init()
+        public void Init(Object o)
         {
-            publisher.Init();
+            publisher.Init(o);
         }
 
         public void Crash()

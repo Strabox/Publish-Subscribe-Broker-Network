@@ -11,18 +11,17 @@ namespace Broker
         private BrokerLogic broker;
 
         public BrokerServer(string name,string orderingPolicy,string routingPolicy,
-            string loggingLevel,string pmLogServerUrl,string parentName, string parentUrl, List<BrokerPairDTO> children)
+            string loggingLevel,string pmLogServerUrl)
         {
-            broker = new BrokerLogic(this,name, orderingPolicy, routingPolicy, loggingLevel, pmLogServerUrl,
-                parentName,parentUrl, children);
+            broker = new BrokerLogic(this,name, orderingPolicy, routingPolicy, loggingLevel, pmLogServerUrl);
         }
 
-        /**
+        /*
          * Init is called after launch all processes and before the system start working.
          */
-        public void Init()
+        public void Init(Object o)
         {
-            broker.Init();
+            broker.Init(o);
         }
         
         public ICollection<NodePair<IBroker>> GetNeighbours()

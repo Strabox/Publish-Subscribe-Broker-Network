@@ -46,7 +46,7 @@ namespace PuppetMaster
         {
             processes = new Dictionary<string, string>();
             logServer = new LogServer();
-            RemotingServices.Marshal(logServer, CommonUtil.PUPPET_MASTER_NAME,
+            RemotingServices.Marshal(logServer, Util.PUPPET_MASTER_NAME,
                 typeof(LogServer));
             this.parentForm = form;
         }
@@ -195,7 +195,6 @@ namespace PuppetMaster
             {
                 IGeneralControlServices node = Activator.GetObject(typeof(IGeneralControlServices), pair.Value)
                     as IGeneralControlServices;
-                logServer.LogAction("Status");
                 node.Status();
             }
         }

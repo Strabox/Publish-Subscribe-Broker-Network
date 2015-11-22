@@ -15,9 +15,9 @@ namespace PuppetMasterProcessLauncher
         static void Main(string[] args)
         {
             ProcessLauncherServer server = new ProcessLauncherServer();
-            TcpChannel channel = new TcpChannel(CommonUtil.PUPPET_MASTER_PORT);
+            TcpChannel channel = new TcpChannel(Util.PUPPET_MASTER_PORT);
             ChannelServices.RegisterChannel(channel, false);
-            RemotingServices.Marshal(server, CommonUtil.PUPPET_MASTER_NAME,
+            RemotingServices.Marshal(server, Util.PUPPET_MASTER_NAME,
                 typeof(ProcessLauncherServer));
             Console.WriteLine("Waiting to launch processes........");
             Console.ReadLine();

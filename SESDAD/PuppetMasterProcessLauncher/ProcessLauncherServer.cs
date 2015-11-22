@@ -15,13 +15,13 @@ namespace PuppetMasterProcessLauncher
         {
             if (args == null || name == null)
                 return;
-            if (CommonUtil.IsLinux)
+            if (Util.IsLinux)
                 Process.Start("mono",
-                string.Join(" ", CommonUtil.PROJECT_ROOT + name +
-                CommonUtil.EXE_PATH + name + ".exe", args));
+                string.Join(" ", Util.PROJECT_ROOT + name +
+                Util.EXE_PATH + name + ".exe", args));
             else
-                Process.Start(CommonUtil.PROJECT_ROOT + name +
-                CommonUtil.EXE_PATH + name, args);
+                Process.Start(Util.PROJECT_ROOT + name +
+                Util.EXE_PATH + name, args);
             string[] argv = args.Split(' ');
             Console.WriteLine("{0} {1} launched..", name, argv[1]);
         }

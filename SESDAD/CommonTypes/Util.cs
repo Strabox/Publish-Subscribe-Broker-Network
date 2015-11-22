@@ -2,10 +2,15 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 
 namespace CommonTypes
 {
-    public class CommonUtil
+    /// <summary>
+    /// Contains useful methods and constants to system nodes.
+    /// </summary>
+    public class Util
     {
         public static string PROJECT_ROOT = ".." +
                             Path.DirectorySeparatorChar + ".." +
@@ -17,9 +22,9 @@ namespace CommonTypes
 
         public static string ROOT = "Root";
 
-        public static int PUPPET_MASTER_PORT = 6969;
-
         public static string PUPPET_MASTER_NAME = "PuppetMasterURL";
+
+        public static int PUPPET_MASTER_PORT = 30000;
 
         public static bool IsLinux
         {

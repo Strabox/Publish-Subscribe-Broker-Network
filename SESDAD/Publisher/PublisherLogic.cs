@@ -10,7 +10,7 @@ namespace Publisher
 {
     public class PublisherLogic : GenericNode
     {
-        class PublishDTO
+        private class PublishDTO
         {
             private string topic;
             public string Topic { get { return topic; } }
@@ -31,30 +31,21 @@ namespace Publisher
 
         private string name;
 
-        private string pmLogServerUrl;
-
-        private string loggingLevel;
-
-        private string ordering;
-
-        private List<string> brokers;
+        private string siteName;
 
         private int sequenceNumber;
 
-        private IPuppetMasterLog logServer;
-
         private CommonTypes.ThreadPool pool;
 
+        private IBroker brokerSite;
 
-        public PublisherLogic(string name, string pmLogServerUrl, string loggingLevel
-            , string ordering, List<string> brokers)
+        private IPuppetMasterLog logServer;
+
+
+        public PublisherLogic(string name, string pmLogServerUrl)
         {
-            this.ordering = ordering;
             this.sequenceNumber = 0;
             this.name = name;
-            this.pmLogServerUrl = pmLogServerUrl;
-            this.loggingLevel = loggingLevel;
-            this.brokers = brokers;
             pool = new CommonTypes.ThreadPool(10);
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
                 as IPuppetMasterLog;
@@ -68,9 +59,13 @@ namespace Publisher
             pool.AssyncInvoke(new WaitCallback(ProcessPublish), dto);
         }
 
-        public override void Init()
+        public override void Init(Object o)
         {
-            //Do Nothing for now
+            SiteDTO dto = o as SiteDTO;
+            siteName = dto.Name;
+            brokerSite = new BrokerSiteFrontEnd(dto.Brokers, dto.Name);
+            Console.Write(brokerSite.ToString());
+            Console.WriteLine("Publisher Up and running........");
         }
 
         public override void Status()
@@ -85,15 +80,13 @@ namespace Publisher
             this.BlockWhileFrozen();
             int sn;
             PublishDTO dto = o as PublishDTO;
-            IBroker broker;
             for (int i = 0; i < dto.NumEvents; i++)
             {
-                broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
                 lock (this)
                 {
                     sn = sequenceNumber++;
-                    broker.Diffuse(new Event(this.name, this.name, dto.Topic, "content", sn));
                     logServer.LogAction("PubEvent " + name + ", " + name + ", " + dto.Topic + ", " + sn);
+                    brokerSite.Diffuse(new Event(this.name, this.siteName, dto.Topic, "content", sn));
                 }
                 Thread.Sleep(dto.Interval);
             }

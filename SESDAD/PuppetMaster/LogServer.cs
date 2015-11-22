@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PuppetMaster
 {
-    public class LogServer : MarshalByRefObject, IPuppetMasterLog
+    public class LogServer : GenericRemoteNode, IPuppetMasterLog
     {
         public static string LOG_FILES_DIRECTORY = ".."
                              + Path.DirectorySeparatorChar +
@@ -37,9 +37,5 @@ namespace PuppetMaster
             }
         }
 
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
     }
 }

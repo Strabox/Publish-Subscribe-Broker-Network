@@ -429,6 +429,7 @@
             this.Name = "FormPuppetMaster";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "PuppetMaster";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormPuppetMaster_FormClosing);
             this.Load += new System.EventHandler(this.FormPuppetMaster_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

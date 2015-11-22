@@ -12,10 +12,9 @@ namespace Subscriber
 
         private SubscriberLogic subscriber;
 
-        public SubscriberServer(string orderingPolicy, string name, string pmLogServerUrl,string loggingLevel,
-            List<string> brokers)
+        public SubscriberServer(string orderingPolicy, string name, string pmLogServerUrl,string loggingLevel)
         {
-            subscriber = new SubscriberLogic(this, orderingPolicy, name, pmLogServerUrl, loggingLevel, brokers);
+            subscriber = new SubscriberLogic(this, orderingPolicy, name, pmLogServerUrl, loggingLevel);
         }
 
         // Subscriber remote interfaces methods.
@@ -40,9 +39,9 @@ namespace Subscriber
             subscriber.Status();
         }
 
-        public void Init()
+        public void Init(Object o)
         {
-            subscriber.Init();
+            subscriber.Init(o);
         }
 
         public void Crash()

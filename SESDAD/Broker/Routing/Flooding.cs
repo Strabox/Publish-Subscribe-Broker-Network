@@ -1,4 +1,3 @@
-using System;
 using CommonTypes;
 
 namespace Broker
@@ -24,7 +23,7 @@ namespace Broker
 
         public Event Diffuse(Event evt)
         {
-            Event newEvent = new Event(evt.Publisher, broker.Name, evt.Topic, evt.Content,evt.SequenceNumber);
+            Event newEvent = new Event(evt.Publisher, broker.SiteName, evt.Topic, evt.Content,evt.SequenceNumber);
                     
             foreach (var b in this.broker.GetNeighbours())
             {
@@ -39,12 +38,12 @@ namespace Broker
 
         public void AddRoute(Route route)
         {
-            throw new NotImplementedException();
+            //Do Nothing
         }
 
         public void RemoveRoute(Route route)
         {
-            throw new NotImplementedException();
+            //Do Nothing
         }
     }
 }

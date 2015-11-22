@@ -15,8 +15,15 @@ namespace Broker
     /// </summary>
     public class BrokerLogic : GenericNode
     {
-        private string name;
-        public string Name { get { return name; } }
+        private string brokerName;
+        public string BrokerName { get { return brokerName; } }
+
+        public string SiteName { get; set; }
+
+        private string parentName;
+        public string ParentName { get { return parentName; } }
+
+        public bool IsRoot { get; set; }
 
         private string orderingPolicy;
 
@@ -26,41 +33,35 @@ namespace Broker
 
         private string pmLogServerUrl;
 
-        private string parentUrl;
-        public string ParentUrl { get { return parentUrl; } }
-
-        private string parentName;
-        public string ParentName { get { return parentName; } }
-
-        private List<BrokerPairDTO> childUrls;
+        private CommonTypes.ThreadPool pool;
 
         private TopicSubscriberCollection topicSubscribers;
         public TopicSubscriberCollection Data { get { return topicSubscribers; } }
 
         private IRouter router;
 
+        private IOrder order;
+
         private IPuppetMasterLog logServer;
-
-        private IBroker parentBroker;
-        public IBroker ParentBroker { get { return parentBroker; } }
-
-        private Dictionary<string, IBroker> childBrokers = new Dictionary<string, IBroker>();
-        public Dictionary<string, IBroker> ChildBrokers { get { return childBrokers; } }
-
-        private CommonTypes.ThreadPool pool;
 
         private IBroker remoteProxy;
         public IBroker RemoteProxy { get { return remoteProxy; } }
 
-        private IOrder order;
+        private IBroker parentSiteBroker;
+        public IBroker ParentSiteBroker { get { return parentSiteBroker; } }
+
+        private Dictionary<string, IBroker> childSites;
+
+        private List<IBroker> brothers = new List<IBroker>();
 
         public BrokerLogic(IBroker myProxy,string name, string orderingPolicy, string routingPolicy,
-            string loggingLevel, string pmLogServerUrl,string parentName ,string parentUrl, List<BrokerPairDTO> children)
+            string loggingLevel, string pmLogServerUrl)
         {
             this.remoteProxy = myProxy;
-            this.name = name;
+            this.brokerName = name;
             this.pmLogServerUrl = pmLogServerUrl;
             this.orderingPolicy = orderingPolicy;
+            this.loggingLevel = loggingLevel;
             this.routingPolicy = routingPolicy;
             if (routingPolicy.Equals("filter"))
             {
@@ -82,45 +83,53 @@ namespace Broker
             {
                 //TODO
             }
-            this.parentName = parentName;
-            this.loggingLevel = loggingLevel;
-            this.parentUrl = parentUrl;
-            this.childUrls = children;
             this.pool = new CommonTypes.ThreadPool(10);
             this.topicSubscribers = new TopicSubscriberCollection();
+            childSites = new Dictionary<string, IBroker>();
         }
 
         // Public methods
 
-        public override void Init()
+        /// <summary>
+        /// Basically the Site DTO passed as paramenter has all the information about the broker
+        /// site.
+        /// </summary>
+        /// <param name="o"> Site DTO </param>
+        public override void Init(Object o)
         {
-            if (!parentName.Equals(CommonUtil.ROOT))
+            SiteDTO site = o as SiteDTO;
+            Console.Write(site);
+            IsRoot = site.IsRoot;
+            SiteName = site.Name;
+            if (!IsRoot)
             {
-                parentBroker = Activator.GetObject(typeof(IBroker), parentUrl) as IBroker;
+                parentSiteBroker = new BrokerSiteFrontEnd(site.Parent.Brokers, site.Parent.Name);
+                parentName = site.Parent.Name;
             }
             else
             {
-                parentBroker = null;
                 parentName = null;
             }
-
-            foreach (BrokerPairDTO child in childUrls)
+            foreach(BrokerPairDTO dto in site.Brokers)
             {
-                IBroker childBroker = Activator.GetObject(typeof(IBroker), child.Url) as IBroker;
-                childBrokers.Add(child.LogicName, childBroker);
+                brothers.Add(Activator.GetObject(typeof(IBroker), dto.Url) as IBroker);
             }
-
+            foreach(SiteDTO.SiteBrokers dto in site.Childs)
+            {
+                childSites.Add(dto.Name, new BrokerSiteFrontEnd(dto.Brokers, dto.Name));
+            }
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl) as IPuppetMasterLog;
+            Console.WriteLine("Broker up and running.......");
         }
 
         public ICollection<NodePair<IBroker>> GetNeighbours()
         {
             HashSet<NodePair<IBroker>> brokers = new HashSet<NodePair<IBroker>>();
-            if (this.parentBroker != null)
+            if (!IsRoot)
             {
-                brokers.Add(new NodePair<IBroker>(ParentName, ParentBroker));
+                brokers.Add(new NodePair<IBroker>(ParentName, ParentSiteBroker));
             }
-            foreach (var pair in childBrokers)
+            foreach (var pair in childSites)
             {
                 brokers.Add(new NodePair<IBroker>(pair.Key, pair.Value));
             }
@@ -165,11 +174,12 @@ namespace Broker
             this.BlockWhileFrozen();
             Event e = o as Event;
 
-            if (loggingLevel.Equals("full"))
-                logServer.LogAction("BroEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
             order.Deliver(e.Publisher, e.SequenceNumber);
             // Send the event to interested Brokers
+            if (loggingLevel.Equals("full"))
+                logServer.LogAction("BroEvent " + brokerName + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
             Event newEvent = this.router.Diffuse(e);
+
             // Send the event to Subscribers who want it
             ICollection<NodePair<ISubscriber>> subscribersToSend = Data.SubscribersFor(e.Topic);
 

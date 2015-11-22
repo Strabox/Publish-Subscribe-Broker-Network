@@ -19,7 +19,7 @@ namespace Broker
 
             if (inform)
             {
-                Route route = new Route(subscription.Topic, broker.Name, broker.RemoteProxy);
+                Route route = new Route(subscription.Topic, broker.SiteName, broker.RemoteProxy);
 
                 foreach (var b in broker.GetNeighbours())
                 {
@@ -31,7 +31,7 @@ namespace Broker
 
         public Event Diffuse(Event e)
         {
-            Event newEvent = new Event(e.Publisher, broker.Name, e.Topic, e.Content,e.SequenceNumber);
+            Event newEvent = new Event(e.Publisher, broker.SiteName, e.Topic, e.Content,e.SequenceNumber);
 
             ICollection<NodePair<IBroker>> brokersToSend = broker.Data.RoutingFor(e.Topic);
 
@@ -48,12 +48,11 @@ namespace Broker
 
         public void Unsubscribe(Subscription subscription)
         {
-            Console.WriteLine("Here");
             bool inform = broker.Data.RemoveSubscriber(subscription.Topic, subscription.SubscriberName, subscription.Subscriber);
 
             if (inform)
             {
-                Route route = new Route(subscription.Topic, broker.Name, broker.RemoteProxy);
+                Route route = new Route(subscription.Topic, broker.SiteName, broker.RemoteProxy);
 
                 foreach (var b in broker.GetNeighbours())
                 {
@@ -65,15 +64,15 @@ namespace Broker
 
         public void AddRoute(Route route)
         {
-            bool inform = broker.Data.AddRoute(route.Topic, route.BrokerName, route.Broker);
+            bool inform = broker.Data.AddRoute(route.Topic, route.SiteName, route.Broker);
 
             if (inform)
             {
-                Route newRoute = new Route(route.Topic, broker.Name, broker.RemoteProxy);
+                Route newRoute = new Route(route.Topic, broker.SiteName, broker.RemoteProxy);
 
                 foreach (var b in broker.GetNeighbours())
                 {
-                    if (!b.Name.Equals(route.BrokerName))
+                    if (!b.Name.Equals(route.SiteName))
                     {
                         b.Node.AddRoute(newRoute);
                     }
@@ -83,15 +82,15 @@ namespace Broker
 
         public void RemoveRoute(Route route)
         {
-            bool inform = broker.Data.RemoveRoute(route.Topic, route.BrokerName, route.Broker);
+            bool inform = broker.Data.RemoveRoute(route.Topic, route.SiteName, route.Broker);
 
             if (inform)
             {
-                Route newRoute = new Route(route.Topic, broker.Name, broker.RemoteProxy);
+                Route newRoute = new Route(route.Topic, broker.SiteName, broker.RemoteProxy);
 
                 foreach (var b in broker.GetNeighbours())
                 {
-                    if (!b.Name.Equals(route.BrokerName))
+                    if (!b.Name.Equals(route.SiteName))
                     {
                         b.Node.RemoveRoute(newRoute);
                     }

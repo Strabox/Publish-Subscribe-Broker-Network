@@ -1,4 +1,5 @@
-﻿using System.Runtime.Remoting.Messaging;
+﻿using System;
+using System.Runtime.Remoting.Messaging;
 
 namespace CommonTypes
 {
@@ -38,7 +39,7 @@ namespace CommonTypes
         void Status();
         /* It isn't one way(async) because I want wait for all Init returns
         to start the system. */
-        void Init();
+        void Init(Object o);
     }
 
     public interface IPublisherControlServices

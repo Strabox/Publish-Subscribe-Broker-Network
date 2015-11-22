@@ -131,6 +131,7 @@
     <Folder Include="LogFiles\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ConfigurationFiles\ConfigReplics.txt" />
     <Content Include="ConfigurationFiles\ConfigurationOP.txt" />
     <Content Include="ConfigurationFiles\Configuration2.txt" />
     <Content Include="ConfigurationFiles\Configuration1.txt" />

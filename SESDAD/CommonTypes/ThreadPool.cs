@@ -20,20 +20,14 @@ namespace CommonTypes
 
             public WaitCallback CallbackFunction
             {
-                get
-                {
-                    return callbackFunction;
-                }
+                get { return callbackFunction; }
             }
 
             private Object callbackArgument;
 
             public Object CallbackArgument
             {
-                get
-                {
-                    return callbackArgument;
-                }
+                get { return callbackArgument; }
             }
 
             public WorkStruct(WaitCallback callback,Object argument)

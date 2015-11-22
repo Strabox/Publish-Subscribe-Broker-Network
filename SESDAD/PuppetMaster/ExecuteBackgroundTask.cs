@@ -47,7 +47,6 @@ namespace PuppetMaster
 
         private void backgroundWorkerScript_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Debug.WriteLineIf(FormPuppetMaster.Debug,e.ProgressPercentage,"[Script File]");
             progressBarScript.Value = e.ProgressPercentage;
             labelScriptLine.Text = e.UserState as string;
         }

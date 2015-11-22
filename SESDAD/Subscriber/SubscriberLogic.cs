@@ -12,35 +12,46 @@ namespace Subscriber
     {
         private string name;
 
-        private string pmLogServerUrl;
-
         private string loggingLevel;
 
-        private List<string> brokers;
+        private CommonTypes.ThreadPool pool;
+
+        private IBroker brokerSite;
 
         private IPuppetMasterLog logServer;
-
-        private CommonTypes.ThreadPool pool;
 
         private ISubscriber myProxy;
         public ISubscriber MyProxy { get { return myProxy; } }
 
 
         public SubscriberLogic(ISubscriber myProxy,string orderingPolicy, string name,
-            string pmLogServerUrl, string loggingLevel, List<string> brokers)
+            string pmLogServerUrl, string loggingLevel)
         {
             pool = new CommonTypes.ThreadPool(1);
             this.myProxy = myProxy;
             this.name = name;
-            this.pmLogServerUrl = pmLogServerUrl;
             this.loggingLevel = loggingLevel;
-            this.brokers = brokers;
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
                 as IPuppetMasterLog;
         }
 
 
         // Public specific methods
+
+        public override void Init(Object o)
+        {
+            SiteDTO siteDto = o as SiteDTO;
+
+            brokerSite = new BrokerSiteFrontEnd(siteDto.Brokers, siteDto.Name);
+            Console.Write(brokerSite.ToString());
+            Console.WriteLine("Subscriber up and running........");
+           
+        }
+
+        public override void Status()
+        {
+            //TODO
+        }
 
         public void Receive(Event e)
         {
@@ -57,23 +68,13 @@ namespace Subscriber
             pool.AssyncInvoke(new WaitCallback(ProcessUnsubscribe), topicName);
         }
 
-        public override void Init()
-        {
-            //Do nothing for now.
-        }
-
-        public override void Status()
-        {
-            //TODO
-        }
-
         // Private methods
 
         private void ProcessReceive(Object o)
         {
             this.BlockWhileFrozen();
 
-            Event e = o as IMessage as Event;
+            Event e = o as Event;
             Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher, e.Topic, e.GetSequenceNumber());
             logServer.LogAction("SubEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
         }
@@ -84,8 +85,8 @@ namespace Subscriber
             this.BlockWhileFrozen();
 
             string topicName = o as string;
-            IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Unsubscribe(new Subscription(this.name, topicName, this.name, MyProxy));
+            //TODO - I think its missing a log call here.
+            brokerSite.Unsubscribe(new Subscription(this.name, topicName, this.name, MyProxy));
         }
 
         private void ProcessSubscribe(Object o)
@@ -93,9 +94,8 @@ namespace Subscriber
             this.BlockWhileFrozen();
 
             string topicName = o as string;
-            IBroker broker = Activator.GetObject(typeof(IBroker), brokers[0]) as IBroker;
-            broker.Subscribe(new Subscription(this.name, topicName, this.name, MyProxy));
             logServer.LogAction("SubSubscribe " + name + " Subscribe " + topicName);
+            brokerSite.Subscribe(new Subscription(this.name, topicName, this.name, MyProxy));
         }
 
     }

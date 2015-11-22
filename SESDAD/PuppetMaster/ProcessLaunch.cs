@@ -14,8 +14,8 @@ namespace PuppetMaster
     public class ProcessLauncher
     {
         public static string DEFAULT_ROUTING_POLICY = "flooding";
-        public static string DEFAULT_LOG_LEVEL = "FIFO";
-        public static string DEFAULT_ORDERING_POLICY = "light";
+        public static string DEFAULT_LOG_LEVEL = "light";
+        public static string DEFAULT_ORDERING_POLICY = "FIFO";
 
         private string routingPolicy = DEFAULT_ROUTING_POLICY;
 
@@ -53,12 +53,16 @@ namespace PuppetMaster
             launchNodes.AddFirst(node);
         }
 
+        /// <summary>
+        /// Launch all the system processes in corresponding nodes.
+        /// </summary>
+        /// <param name="sites"> Tree topography and information </param>
         public void LaunchAllProcesses(ManageSites sites)
         {
             foreach(LaunchNode node in launchNodes)
                 node.Launch(sites,OrderingPolicy,RoutingPolicy,LogLevel);
             foreach (LaunchNode node in launchNodes)
-                node.InitializeProcess();
+                node.InitializeProcess(sites);
         }
     }
 
@@ -88,46 +92,35 @@ namespace PuppetMaster
         {
             if (Ip.Equals("localhost") || Ip.Equals("127.0.0.1"))
             {
-                if (CommonUtil.IsLinux)
+                if (Util.IsLinux)
                     Process.Start("mono",
-                        string.Join(" ", CommonUtil.PROJECT_ROOT + processType +
-                        CommonUtil.EXE_PATH + processType + ".exe", args));
+                        string.Join(" ", Util.PROJECT_ROOT + processType +
+                        Util.EXE_PATH + processType + ".exe", args));
                 else
-                    Process.Start(CommonUtil.PROJECT_ROOT + processType +
-                        CommonUtil.EXE_PATH + processType, args);
+                    Process.Start(Util.PROJECT_ROOT + processType +
+                        Util.EXE_PATH + processType, args);
             }
             else
             {
                 IPuppetMasterLauncher launcher = Activator.GetObject(
-                    typeof(IPuppetMasterLauncher), CommonUtil.MakeUrl("tcp",
-                    Ip, CommonUtil.PUPPET_MASTER_PORT.ToString(), CommonUtil.PUPPET_MASTER_NAME))
+                    typeof(IPuppetMasterLauncher), Util.MakeUrl("tcp",
+                    Ip, Util.PUPPET_MASTER_PORT.ToString(), Util.PUPPET_MASTER_NAME))
                     as IPuppetMasterLauncher;
                 launcher.LaunchProcess(processType, args);
             }
         }
 
-        public abstract void InitializeProcess();
+        public abstract void InitializeProcess(ManageSites sites);
 
-        public abstract void Launch(ManageSites sites,string orderingPolicy
-            ,string routingPolicy,string logPolicy);
-
-    }
-
-    public abstract class LaunchEndNode : LaunchNode
-    {
-        public LaunchEndNode(string name,string ip, string port, string site) 
-            : base(name,ip,port,site)
-        { }
-
-        public override void Launch(ManageSites sites, string orderingPolicy,
+        public void Launch(ManageSites sites, string orderingPolicy,
             string routingPolicy, string logPolicy)
         {
+            //Class name should be: Launch.....
             string processType = this.GetType().Name.Substring(6);
             string args = string.Join(" ", Port, Name,
-                orderingPolicy,routingPolicy,logPolicy,
-                CommonUtil.MakeUrl("tcp",CommonUtil.GetLocalIPAddress()
-                , CommonUtil.PUPPET_MASTER_PORT.ToString(), CommonUtil.PUPPET_MASTER_NAME),
-                sites.GetSiteBrokersUrl(Site));
+                orderingPolicy, routingPolicy, logPolicy,
+                Util.MakeUrl("tcp", Util.GetLocalIPAddress()
+                , Util.PUPPET_MASTER_PORT.ToString(), Util.PUPPET_MASTER_NAME));
             LaunchProcess(processType, args);
         }
 
@@ -139,51 +132,36 @@ namespace PuppetMaster
             : base(name,ip,port,site)
         {   }
 
-        public override void Launch(ManageSites sites, string orderingPolicy
-            , string routingPolicy, string logPolicy)
-        {
-            string parent = CommonUtil.ROOT + " " + "None";
-            if (!sites.IsSiteRoot(Site))
-                parent = sites.GetParentBrokersUrl(Site);
-            string args = string.Join(" ", Port, Name,
-                orderingPolicy,routingPolicy,logPolicy,
-                CommonUtil.MakeUrl("tcp", CommonUtil.GetLocalIPAddress()
-                , CommonUtil.PUPPET_MASTER_PORT.ToString(),
-                CommonUtil.PUPPET_MASTER_NAME),parent,
-                sites.GetChildrenUrl(Site));
-            LaunchProcess(this.GetType().Name.Substring(6), args);
-        }
-
-        public override void InitializeProcess()
+        public override void InitializeProcess(ManageSites sites)
         {
             (Activator.GetObject(typeof(IGeneralControlServices),
-                CommonUtil.MakeUrl("tcp", Ip, Port, "broker")) as IGeneralControlServices).Init();
+            Util.MakeUrl("tcp", Ip, Port, "broker")) as IGeneralControlServices).Init(sites.GetSite(Site).GetSiteDTO());
         }
 
     }
 
-    public class LaunchPublisher : LaunchEndNode
+    public class LaunchPublisher : LaunchNode
     {
         public LaunchPublisher(string name, string ip, string port, string site) 
             : base(name,ip,port,site){ }
 
-        public override void InitializeProcess()
+        public override void InitializeProcess(ManageSites sites)
         {
             (Activator.GetObject(typeof(IGeneralControlServices),
-                CommonUtil.MakeUrl("tcp", Ip, Port, "pub")) as IGeneralControlServices).Init();
+                Util.MakeUrl("tcp", Ip, Port, "pub")) as IGeneralControlServices).Init(sites.GetSite(Site).GetSiteDTO());
         }
 
     }
 
-    public class LaunchSubscriber : LaunchEndNode
+    public class LaunchSubscriber : LaunchNode
     {
         public LaunchSubscriber(string name,string ip, string port, string site) 
             : base(name,ip,port,site){ }
 
-        public override void InitializeProcess()
+        public override void InitializeProcess(ManageSites sites)
         {
             (Activator.GetObject(typeof(IGeneralControlServices),
-                CommonUtil.MakeUrl("tcp", Ip, Port, "sub")) as IGeneralControlServices).Init();
+                Util.MakeUrl("tcp", Ip, Port, "sub")) as IGeneralControlServices).Init(sites.GetSite(Site).GetSiteDTO());
         }
 
     }
