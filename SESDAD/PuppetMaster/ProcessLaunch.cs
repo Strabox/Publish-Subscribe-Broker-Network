@@ -1,6 +1,7 @@
 ﻿using CommonTypes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -57,12 +58,23 @@ namespace PuppetMaster
         /// Launch all the system processes in corresponding nodes.
         /// </summary>
         /// <param name="sites"> Tree topography and information </param>
-        public void LaunchAllProcesses(ManageSites sites)
+        /// <param name="worker"></param>
+        public void LaunchAllProcesses(ManageSites sites, BackgroundWorker worker)
         {
+            int l = 1, percentageCompleted = 0, totalNodes = launchNodes.Count;
             foreach(LaunchNode node in launchNodes)
-                node.Launch(sites,OrderingPolicy,RoutingPolicy,LogLevel);
+            {
+                node.Launch(sites, OrderingPolicy, RoutingPolicy, LogLevel);
+            }
             foreach (LaunchNode node in launchNodes)
+            {
+                worker.ReportProgress(percentageCompleted, "Initializing");
                 node.InitializeProcess(sites);
+                percentageCompleted += (int)Math.Ceiling(((double)1 / (double)totalNodes) * 100);
+                percentageCompleted = (percentageCompleted > 100) ? 100 : percentageCompleted;
+                l++;
+            }
+            worker.ReportProgress(percentageCompleted, string.Empty);
         }
     }
 

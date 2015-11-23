@@ -45,7 +45,6 @@ namespace Subscriber
             brokerSite = new BrokerSiteFrontEnd(siteDto.Brokers, siteDto.Name);
             Console.Write(brokerSite.ToString());
             Console.WriteLine("Subscriber up and running........");
-           
         }
 
         public override void Status()

@@ -79,6 +79,7 @@
             this.Name = "ExecuteBackgroundTask";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Execute Script";
+            this.TopMost = true;
             this.Load += new System.EventHandler(this.ExecuteScriptForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

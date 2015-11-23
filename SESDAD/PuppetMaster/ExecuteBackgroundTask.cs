@@ -16,18 +16,18 @@ namespace PuppetMaster
     public partial class ExecuteBackgroundTask : Form
     {
 
-        private ProcessesManager manager;
+        private Object callObject;
 
         private string executeFunction;
 
-        public ExecuteBackgroundTask(string textForm,
-            string executeFunction,string scriptFile,ProcessesManager form)
+        public ExecuteBackgroundTask(string textForm,string labelScript,string executeFunction,Object argument,Object callObject)
         {
             InitializeComponent();
             this.Text = textForm;
+            this.labelScript.Text = labelScript;
             this.executeFunction = executeFunction;
-            manager = form;
-            backgroundWorkerScript.RunWorkerAsync(scriptFile);
+            this.callObject = callObject;
+            backgroundWorkerScript.RunWorkerAsync(argument);
         }
 
         private void ExecuteScriptForm_Load(object sender, EventArgs e)
@@ -40,9 +40,9 @@ namespace PuppetMaster
         private void backgroundWorkerScript_DoWork(object sender, DoWorkEventArgs e)
         {
             object[] param = new object[2];
-            param[0] = e.Argument as string;
+            param[0] = e.Argument;
             param[1] = sender as BackgroundWorker;
-            manager.GetType().GetMethod(executeFunction).Invoke(manager,param);
+            callObject.GetType().GetMethod(executeFunction).Invoke(callObject,param);
         }
 
         private void backgroundWorkerScript_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -63,7 +63,10 @@ namespace PuppetMaster
                 labelScript.Text = "Error in Execution";
             }
             else
+            {
                 labelScript.Text = "Execution Completed";
+                this.Close();
+            }
         }
     }
 }

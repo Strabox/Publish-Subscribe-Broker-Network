@@ -91,8 +91,7 @@ namespace Broker
         // Public methods
 
         /// <summary>
-        /// Basically the Site DTO passed as paramenter has all the information about the broker
-        /// site.
+        /// Basically the Site DTO passed as paramenter has all the information about the broker site.
         /// </summary>
         /// <param name="o"> Site DTO </param>
         public override void Init(Object o)

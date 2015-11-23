@@ -37,8 +37,6 @@ namespace CommonTypes
         void Freeze();
         void Unfreeze();
         void Status();
-        /* It isn't one way(async) because I want wait for all Init returns
-        to start the system. */
         void Init(Object o);
     }
 

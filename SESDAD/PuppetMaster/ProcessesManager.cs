@@ -37,7 +37,6 @@ namespace PuppetMaster
 
         private LogServer logServer;
 
-
         // Pair <ProcessName,URL>
         private Dictionary<string, string> processes;
 
@@ -55,7 +54,7 @@ namespace PuppetMaster
         {
             ManageSites sites = new ManageSites();
             ProcessLauncher launcher = new ProcessLauncher();
-            string[] tokens = null, lines = File.ReadAllLines(filePath);int l = 1;
+            string[] tokens = null, lines = File.ReadAllLines(filePath); int l = 1;
             logServer.LogFile = "Log" + Path.GetFileName(filePath);
             File.CreateText(LOG_FILES_DIRECTORY + logServer.LogFile).Close(); 
             parentForm.ReloadLogFiles();
@@ -125,7 +124,10 @@ namespace PuppetMaster
                 }
                 l++;
             }
-            launcher.LaunchAllProcesses(sites); 
+            //Execute Asynchronous Launching...
+            ExecuteBackgroundTask task = new ExecuteBackgroundTask("Booting System"," Initializing", 
+                "LaunchAllProcesses", sites, launcher);
+            task.ShowDialog();
         }
 
         public void ExecuteScriptFile(string scriptFilePath,BackgroundWorker worker)
