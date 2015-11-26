@@ -29,6 +29,11 @@ namespace Broker
             return broker.GetNeighbours();
         }
 
+        public List<IBroker> GetChildren()
+        {
+            return broker.GetChildren();
+        } 
+
         // Broker remote interface methods
 
         public void Status()
@@ -38,27 +43,74 @@ namespace Broker
 
         public void Diffuse(Event e)
         {
-            broker.AddEventToDiffusion(e);
+            lock (this)
+            {
+                broker.AddEventToDiffusion(e);
+            }
         }
 
         public void Subscribe(Subscription subscription)
         {
-            broker.AddSubscription(subscription);
+            lock (this)
+            {
+                broker.AddSubscription(subscription);
+            }
         }
    
         public void Unsubscribe(Subscription subscription)
         {
-            broker.AddUnsubscription(subscription);
+            lock (this)
+            {
+                broker.AddUnsubscription(subscription);
+            }
         }
         
         public void AddRoute(Route route)
         {
-            broker.AddRoute(route);
+            lock (this)
+            {
+                broker.AddRoute(route);
+            }
         }
 
         public void RemoveRoute(Route route)
         {
-            broker.RemoveRoute(route);
+            lock (this)
+            {
+                broker.RemoveRoute(route);
+            }
+        }
+
+        public void Sequence(Bludger bludger)
+        {
+            lock (this)
+            {
+                broker.Sequence(bludger);
+            }
+        }
+
+        public void Bludger(Bludger bludger)
+        {
+            lock (this)
+            {
+                broker.Bludger(bludger);
+            }
+        }
+
+        public void DoSequence(Bludger bludger)
+        {
+            lock (this)
+            {
+                broker.DoSequence(bludger);
+            }
+        }
+
+        public void DoBludger(Bludger bludger)
+        {
+            lock (this)
+            {
+                broker.DoBludger(bludger);
+            }
         }
 
         public void Crash()

@@ -49,6 +49,7 @@
     <Compile Include="Order\FifoOrdering.cs" />
     <Compile Include="Order\IOrdering.cs" />
     <Compile Include="Order\NoOrdering.cs" />
+    <Compile Include="Order\TotalOrdering.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Routing\Filtered.cs" />
     <Compile Include="Routing\IRouter.cs" />

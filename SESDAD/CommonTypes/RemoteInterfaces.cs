@@ -8,6 +8,8 @@ namespace CommonTypes
     public interface IBroker
     {
         void Diffuse(Event e);
+        void Sequence(Bludger b);
+        void Bludger(Bludger b); 
         [OneWay]
         void Subscribe(Subscription subscription);
         [OneWay]
@@ -21,6 +23,7 @@ namespace CommonTypes
     public interface ISubscriber
     {
         void Receive(Event e);
+        void Bludger(Bludger bludger);
     }
 
     public interface IPublisher

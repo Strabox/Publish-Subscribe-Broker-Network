@@ -351,4 +351,19 @@ namespace CommonTypes
             return null;
         }
     }
+
+    [Serializable]
+    public class Bludger
+    {
+        public String Publisher { get; set;}
+        public String Topic { get; set; }
+        public int Sequence { get; set; }
+
+        public Bludger (string publisher, string topic, int sequence)
+        {
+            this.Publisher = publisher;
+            this.Topic = topic;
+            this.Sequence = sequence;
+        }
+    }
 }

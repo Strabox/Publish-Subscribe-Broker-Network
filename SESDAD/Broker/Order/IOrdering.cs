@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,8 +11,15 @@ namespace Broker.Order
     {
         void AddNewMessage(string publisherId, int msgSequenceNumber);
 
-        void ConfirmDeliver(string publisherId);
+        void ConfirmDeliver(Event e);
 
         void Deliver(string publisherId, int msgSequenceNumber);
+
+        bool HasMessage(String id, int seq);
+
+        bool FreezeSequencerIfNeeded(Bludger bludger);
+
+        bool FreezeBludgerIfNeeded(Bludger bludger);
+
     }
 }

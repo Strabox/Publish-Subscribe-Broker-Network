@@ -81,7 +81,7 @@ namespace Broker
             }
             else if (orderingPolicy.Equals("TOTAL"))
             {
-                //TODO
+                this.order = new TotalOrdering(this);
             }
             this.pool = new CommonTypes.ThreadPool(10);
             this.topicSubscribers = new TopicSubscriberCollection();
@@ -135,6 +135,11 @@ namespace Broker
             return brokers;
         }
 
+        public List<IBroker> GetChildren()
+        {
+            return this.childSites.Values.ToList();
+        }
+
         public void AddEventToDiffusion(Event e)
         {
             order.AddNewMessage(e.Publisher, e.SequenceNumber);
@@ -166,6 +171,52 @@ namespace Broker
             //TODO
         }
 
+        public void Sequence(Bludger bludger)
+        {
+            if (order.FreezeSequencerIfNeeded(bludger))
+            {
+                return;
+            }
+
+            DoSequence(bludger);
+
+        }
+
+        public void DoSequence(Bludger bludger)
+        {
+            if (this.IsRoot)
+            {
+                this.Bludger(bludger);
+            }
+            else
+            {
+                this.ParentSiteBroker.Sequence(bludger);
+            }
+        }
+
+        public void Bludger(Bludger bludger)
+        {
+            if (order.FreezeBludgerIfNeeded(bludger))
+            {
+                return;
+            }
+
+            DoBludger(bludger);
+
+        }
+
+        public void DoBludger(Bludger bludger)
+        {
+            this.router.DiffuseBludger(bludger);
+
+            ICollection<NodePair<ISubscriber>> subscribersToSend = Data.SubscribersFor(bludger.Topic);
+
+            foreach (var subscriberPair in subscribersToSend)
+            {
+                subscriberPair.Node.Bludger(bludger);
+            }
+        }
+
         // Private methods 
 
         private void Diffuse(Object o)
@@ -186,7 +237,7 @@ namespace Broker
             {
                 subscriberPair.Node.Receive(newEvent);
             }
-            order.ConfirmDeliver(e.Publisher);
+            order.ConfirmDeliver(e);
         }
 
         private void ProcessUnsubscribe(Object subscription)

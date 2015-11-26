@@ -58,5 +58,10 @@ namespace Subscriber
         {
             subscriber.Unfreeze();
         }
+
+        public void Bludger(Bludger bludger)
+        {
+            subscriber.Bludger(bludger);
+        }
     }
 }

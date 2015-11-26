@@ -1,0 +1,11 @@
+﻿Subscriber subscriber1 Subscribe /a
+Subscriber subscriber1 Subscribe /b
+Subscriber subscriber2 Subscribe /a
+Subscriber subscriber2 Subscribe /b
+Wait 4000
+Publisher publisher1 Publish 10 Ontopic /a Interval 10
+Publisher publisher1 Publish 10 Ontopic /b Interval 15
+Publisher publisher2 Publish 10 Ontopic /b Interval 20
+Publisher publisher2 Publish 10 Ontopic /d Interval 23
+Wait 5000
+Status

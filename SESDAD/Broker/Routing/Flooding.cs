@@ -1,3 +1,4 @@
+using System;
 using CommonTypes;
 
 namespace Broker
@@ -44,6 +45,14 @@ namespace Broker
         public void RemoveRoute(Route route)
         {
             //Do Nothing
+        }
+
+        public void DiffuseBludger(Bludger b)
+        {
+            foreach (var c in this.broker.GetChildren())
+            {
+                c.Bludger(b);
+            }
         }
     }
 }

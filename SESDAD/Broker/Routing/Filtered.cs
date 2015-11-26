@@ -56,7 +56,7 @@ namespace Broker
 
                 foreach (var b in broker.GetNeighbours())
                 {
-                        b.Node.AddRoute(route);
+                        b.Node.RemoveRoute(route);
 
                 }
             }
@@ -65,7 +65,7 @@ namespace Broker
         public void AddRoute(Route route)
         {
             bool inform = broker.Data.AddRoute(route.Topic, route.SiteName, route.Broker);
-
+            System.Console.WriteLine("[{0}] AddRoute to {1} on topic {2}", this.broker.BrokerName, route.SiteName, route.Topic);
             if (inform)
             {
                 Route newRoute = new Route(route.Topic, broker.SiteName, broker.RemoteProxy);
@@ -94,6 +94,19 @@ namespace Broker
                     {
                         b.Node.RemoveRoute(newRoute);
                     }
+                }
+            }
+        }
+
+        public void DiffuseBludger(Bludger b)
+        {
+            ICollection<NodePair<IBroker>> brokersToSend = broker.Data.RoutingFor(b.Topic);
+
+            foreach (NodePair<IBroker> brokerPair in brokersToSend)
+            {
+                if (!brokerPair.Name.Equals(this.broker.ParentName))
+                {
+                    brokerPair.Node.Bludger(b);
                 }
             }
         }

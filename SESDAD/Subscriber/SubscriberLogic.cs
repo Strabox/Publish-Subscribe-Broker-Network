@@ -23,6 +23,9 @@ namespace Subscriber
         private ISubscriber myProxy;
         public ISubscriber MyProxy { get { return myProxy; } }
 
+        private List<Event> freezer;
+
+        private string ordering;
 
         public SubscriberLogic(ISubscriber myProxy,string orderingPolicy, string name,
             string pmLogServerUrl, string loggingLevel)
@@ -31,6 +34,8 @@ namespace Subscriber
             this.myProxy = myProxy;
             this.name = name;
             this.loggingLevel = loggingLevel;
+            this.ordering = orderingPolicy;
+            this.freezer = new List<Event>();
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
                 as IPuppetMasterLog;
         }
@@ -54,7 +59,37 @@ namespace Subscriber
 
         public void Receive(Event e)
         {
-            pool.AssyncInvoke(new WaitCallback(ProcessReceive), e);
+            this.BlockWhileFrozen();
+
+            lock (this)
+            {
+                if (ordering.Equals("TOTAL"))
+                {
+                    freezer.Add(e);
+                }
+                else
+                {
+                    Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher, e.Topic, e.GetSequenceNumber());
+                    logServer.LogAction("SubEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
+                }
+            }
+        }
+
+        public void Bludger(Bludger bludger)
+        {
+            this.BlockWhileFrozen();
+            lock (this)
+            {
+                foreach (var e in freezer)
+                {
+                    if (e.SequenceNumber == bludger.Sequence && e.Publisher == bludger.Publisher)
+                    {
+                        Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher, e.Topic, e.GetSequenceNumber());
+                        logServer.LogAction("SubEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
+                        return;
+                    }
+                }
+            }
         }
 
         public void Subscribe(string topicName)

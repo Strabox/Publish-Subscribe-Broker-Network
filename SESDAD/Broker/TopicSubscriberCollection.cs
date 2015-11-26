@@ -232,7 +232,7 @@ namespace Broker
 		{
 			lock (this)
 			{
-				bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
+				bool result = ! this.subscribers.HasNodesFor(topic);
 				this.subscribers.Add(topic, new SubscriberPair(name, subscriber));
 				return result;
 			}			
@@ -270,9 +270,17 @@ namespace Broker
 		{
 			lock (this)
 			{
-				bool result = ( ! this.brokers.HasNodesFor(topic)) && ( ! this.subscribers.HasNodesFor(topic));
-				this.brokers.Add(topic, new BrokerPair(name, broker));
-				return result;
+                foreach (var pair in this.brokers.NodesFor(topic))
+                {
+                    if (pair.Name.Equals(name))
+                    {
+                        return false;
+                    }
+                }
+
+                this.brokers.Add(topic, new BrokerPair(name, broker));
+
+                return true;
 			}
 		}
 		

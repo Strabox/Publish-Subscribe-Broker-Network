@@ -1,6 +1,8 @@
 ﻿using Broker.Order;
 using System.Collections.Generic;
 using System.Threading;
+using System;
+using CommonTypes;
 
 namespace Broker.Ordering
 {
@@ -64,8 +66,9 @@ namespace Broker.Ordering
             }
         }
 
-        public void ConfirmDeliver(string publisherId)
+        public void ConfirmDeliver(Event e)
         {
+            String publisherId = e.Publisher;
             lock (controlOrder[publisherId])
             {
                 controlOrder[publisherId].DequeueLast();
@@ -82,5 +85,19 @@ namespace Broker.Ordering
             }
         }
 
+        public bool HasMessage(string id, int seq)
+        {
+            return false;
+        }
+
+        public bool FreezeBludgerIfNeeded(Bludger bludger)
+        {
+           return false;
+        }
+
+        public bool FreezeSequencerIfNeeded(Bludger bludger)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

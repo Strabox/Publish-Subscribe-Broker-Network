@@ -29,6 +29,7 @@ namespace CommonTypes
                 (Activator.GetObject(typeof(IBroker), broker.Url) as IBroker).Diffuse(e);
             }
             */
+            
             if (brokers.Count > 0)      //Call the first only for now.
                 (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).Diffuse(e);
         }
@@ -91,5 +92,18 @@ namespace CommonTypes
             return res;
         }
 
+        public void Sequence(Bludger bludger)
+        {
+
+            if (brokers.Count > 0)      //Call the first only for now.
+                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).Sequence(bludger);
+        }
+
+        public void Bludger(Bludger bludger)
+        {
+
+            if (brokers.Count > 0)      //Call the first only for now.
+                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).Bludger(bludger);
+        }
     }
 }
