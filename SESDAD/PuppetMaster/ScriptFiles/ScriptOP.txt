@@ -1,1 +1,10 @@
-﻿
+﻿Subscriber subscriber1 Subscribe /p1-1
+Subscriber subscriber1 Subscribe /p2-1
+Subscriber subscriber2 Subscribe /p1-1
+Subscriber subscriber2 Subscribe /p2-1
+Publisher publisher1 Publish 12 Ontopic /p1-0 Interval 1
+Publisher publisher1 Publish 12 Ontopic /p1-1 Interval 1
+Publisher publisher2 Publish 12 Ontopic /p2-0 Interval 1
+Publisher publisher2 Publish 12 Ontopic /p2-1 Interval 1
+Wait 10000
+Status

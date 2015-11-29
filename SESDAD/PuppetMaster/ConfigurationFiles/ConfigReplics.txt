@@ -3,16 +3,13 @@ Site site1 Parent site0
 Site site2 Parent site0
 Process broker0-0 Is broker On site0 URL tcp://localhost:6500/broker
 Process broker0-1 Is broker On site0 URL tcp://localhost:6501/broker
-Process broker0-2 Is broker On site0 URL tcp://localhost:6502/broker
 Process broker1-0 Is broker On site1 URL tcp://localhost:3500/broker
 Process broker1-1 Is broker On site1 URL tcp://localhost:3501/broker
-Process broker1-2 Is broker On site1 URL tcp://localhost:3502/broker
 Process broker2-0 Is broker On site2 URL tcp://localhost:7500/broker
 Process broker2-1 Is broker On site2 URL tcp://localhost:7501/broker
-Process broker2-2 Is broker On site2 URL tcp://localhost:7502/broker
 Process publisher0 Is publisher On site0 URL tcp://localhost:3334/pub
 Process subscriber0 Is subscriber On site0 URL tcp://localhost:3335/sub
 Process subscriber1 Is subscriber On site1 URL tcp://localhost:3336/sub
-RoutingPolicy flooding
-Ordering NO
+RoutingPolicy filter
+Ordering FIFO
 LoggingLevel full

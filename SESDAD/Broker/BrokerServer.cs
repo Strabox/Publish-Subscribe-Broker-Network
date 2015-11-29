@@ -45,6 +45,7 @@ namespace Broker
         {
             lock (this)
             {
+                Console.WriteLine("Add {0} {1} to diffuse", e.SequenceNumber, e.Publisher);
                 broker.AddEventToDiffusion(e);
             }
         }

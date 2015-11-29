@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace CommonTypes
 {   
@@ -14,6 +15,8 @@ namespace CommonTypes
 
         private List<BrokerPairDTO> brokers;
 
+        private int primaryIndex = 0;
+
         public BrokerSiteFrontEnd(ICollection<BrokerPairDTO> brokers,string siteName)
         {
             this.brokers = brokers.ToList();
@@ -23,87 +26,123 @@ namespace CommonTypes
 
         public void Diffuse(Event e)
         {
-            /*
-            foreach(BrokerPairDTO broker in brokers)
+            for (; primaryIndex < brokers.Count; primaryIndex++)
             {
-                (Activator.GetObject(typeof(IBroker), broker.Url) as IBroker).Diffuse(e);
+                try
+                {
+                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Diffuse(e);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Diffuse Failed: Trying next broker...");
+                    continue;
+                }
+                Console.WriteLine("Diffuse Success");
+                return;
             }
-            */
-            
-            if (brokers.Count > 0)      //Call the first only for now.
-                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).Diffuse(e);
+            Console.WriteLine("Diffuse Failed: No more brokers system is now broken pray for the new gods and the old ones....");
         }
 
         public void AddRoute(Route route)
         {
-            /*
-            foreach (BrokerPairDTO broker in brokers)
+            for (; primaryIndex < brokers.Count; primaryIndex++)
             {
-                (Activator.GetObject(typeof(IBroker), broker.Url) as IBroker).AddRoute(route);
+                try
+                {
+                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).AddRoute(route);
+                }
+                catch (Exception)
+                {
+                    //Do nothing
+                }
             }
-            */
-            if (brokers.Count > 0)      //Call the first only for now.
-                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).AddRoute(route);
         }
 
         public void RemoveRoute(Route route)
         {
-            /*
-            foreach (BrokerPairDTO broker in brokers)
+            for (; primaryIndex < brokers.Count; primaryIndex++)
             {
-                (Activator.GetObject(typeof(IBroker), broker.Url) as IBroker).RemoveRoute(route);
+                try
+                {
+                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).RemoveRoute(route);
+                }
+                catch (Exception)
+                {
+                    //Do nothing
+                }
             }
-            */
-            if (brokers.Count > 0)      //Call the first only for now.
-                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).RemoveRoute(route);
         }
 
         public void Subscribe(Subscription subscription)
         {
-            /*
-            foreach (BrokerPairDTO broker in brokers)
+            for (; primaryIndex < brokers.Count; primaryIndex++)
             {
-                (Activator.GetObject(typeof(IBroker), broker.Url) as IBroker).Subscribe(subscription);
+                try
+                {
+                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Subscribe(subscription);
+                }
+                catch (Exception)
+                {
+                   //Do nothing
+                }
             }
-            */
-            if (brokers.Count > 0)      //Call the first only for now.
-                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).Subscribe(subscription);
         }
 
         public void Unsubscribe(Subscription subscription)
         {
-            /*
-            foreach (BrokerPairDTO broker in brokers)
+            for (; primaryIndex < brokers.Count; primaryIndex++)
             {
-                (Activator.GetObject(typeof(IBroker), broker.Url) as IBroker).Unsubscribe(subscription);
+                try
+                {
+                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Unsubscribe(subscription);
+                }
+                catch (Exception)
+                {
+                    //Do nothing
+                }
             }
-            */
-            if (brokers.Count > 0)      //Call the first only for now.
-                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).Unsubscribe(subscription);
+        }
+
+        public void Sequence(Bludger bludger)
+        {
+            for (; primaryIndex < brokers.Count; primaryIndex++)
+            {
+                try
+                {
+                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Sequence(bludger);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+                return;
+            }
+        }
+
+        public void Bludger(Bludger bludger)
+        {
+            for (; primaryIndex < brokers.Count; primaryIndex++)
+            {
+                try
+                {
+                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Bludger(bludger);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+                return;
+            }
         }
 
         public override string ToString()
         {
             string res = siteName + " :" + Environment.NewLine;
-            foreach(BrokerPairDTO dto in brokers)
+            foreach (BrokerPairDTO dto in brokers)
             {
                 res += dto.ToString() + Environment.NewLine;
             }
             return res;
-        }
-
-        public void Sequence(Bludger bludger)
-        {
-
-            if (brokers.Count > 0)      //Call the first only for now.
-                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).Sequence(bludger);
-        }
-
-        public void Bludger(Bludger bludger)
-        {
-
-            if (brokers.Count > 0)      //Call the first only for now.
-                (Activator.GetObject(typeof(IBroker), brokers[0].Url) as IBroker).Bludger(bludger);
         }
     }
 }

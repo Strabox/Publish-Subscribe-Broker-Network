@@ -10,13 +10,9 @@ namespace CommonTypes
         void Diffuse(Event e);
         void Sequence(Bludger b);
         void Bludger(Bludger b); 
-        [OneWay]
         void Subscribe(Subscription subscription);
-        [OneWay]
         void Unsubscribe(Subscription subscription);
-        [OneWay]
         void AddRoute(Route route);
-        [OneWay]
         void RemoveRoute(Route route);
     }
 
@@ -24,11 +20,6 @@ namespace CommonTypes
     {
         void Receive(Event e);
         void Bludger(Bludger bludger);
-    }
-
-    public interface IPublisher
-    {
-        // Nothing here for now
     }
 
     // Interfaces to test and control of system processes.
@@ -45,6 +36,7 @@ namespace CommonTypes
 
     public interface IPublisherControlServices
     {
+        [OneWay]
         void Publish(string topicName,int numberOfEvents,int interval);
     }
 
