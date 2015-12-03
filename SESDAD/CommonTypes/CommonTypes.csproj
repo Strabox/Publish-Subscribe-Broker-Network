@@ -41,6 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrokerSiteFrontEnd.cs" />
+    <Compile Include="DetectRepeated\IDetectedMessagesRepeated.cs" />
+    <Compile Include="DetectRepeated\DetectRepeatedFIFO.cs" />
+    <Compile Include="DetectRepeated\DetectRepeatedMessageNO.cs" />
     <Compile Include="SerializableTypes.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

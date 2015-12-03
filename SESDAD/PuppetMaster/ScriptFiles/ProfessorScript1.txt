@@ -1,2 +1,9 @@
 ﻿Subscriber subscriber1 Subscribe /testtopic
-Wait 200
+Publisher publisher0 Publish 12 Ontopic /testtopic Interval 5000
+Wait 12000
+Crash broker00
+Wait 18000
+Status
+Subscriber subscriber1 Unsubscribe /testtopic
+Wait 3000
+Status

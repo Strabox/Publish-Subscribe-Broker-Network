@@ -26,7 +26,7 @@ namespace Broker.Order
         }
 
 
-        public void AddNewMessage(string publisherId, int messageSequenceNumber)
+        public Boolean AddNewMessage(string publisherId, int messageSequenceNumber)
         {
             lock (this)
             {
@@ -41,6 +41,7 @@ namespace Broker.Order
                 }
                 
             }
+            return false;
         }
 
         public void ConfirmDeliver(Event e)

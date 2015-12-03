@@ -233,6 +233,7 @@ namespace Broker
 			lock (this)
 			{
 				bool result = ! this.subscribers.HasNodesFor(topic);
+                Console.WriteLine("Interested: " + result);
 				this.subscribers.Add(topic, new SubscriberPair(name, subscriber));
 				return result;
 			}			

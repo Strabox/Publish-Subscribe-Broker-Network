@@ -15,14 +15,16 @@ namespace Broker
 
         public void Subscribe(Subscription subscription)
         {
+            Console.WriteLine("Router goind process subscription");
             bool inform = broker.Data.AddSubscriber(subscription.Topic, subscription.SubscriberName, subscription.Subscriber);
 
             if (inform)
             {
                 Route route = new Route(subscription.Topic, broker.SiteName, broker.RemoteProxy);
-
+                Console.WriteLine("Router Going spread routes with neighboors: {0}",route.SiteName);
                 foreach (var b in broker.GetNeighbours())
                 {
+                    Console.WriteLine("RemoteCall Spread Route to {0}",b.Name);
                     b.Node.AddRoute(route);
                 }
             }
@@ -65,7 +67,7 @@ namespace Broker
         public void AddRoute(Route route)
         {
             bool inform = broker.Data.AddRoute(route.Topic, route.SiteName, route.Broker);
-            System.Console.WriteLine("[{0}] AddRoute to {1} on topic {2}", this.broker.BrokerName, route.SiteName, route.Topic);
+            Console.WriteLine("[{0}] AddRoute to {1} on topic {2}", this.broker.BrokerName, route.SiteName, route.Topic);
             if (inform)
             {
                 Route newRoute = new Route(route.Topic, broker.SiteName, broker.RemoteProxy);

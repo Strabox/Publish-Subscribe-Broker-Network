@@ -27,6 +27,8 @@ namespace Subscriber
 
         private string ordering;
 
+        private IDetectMessagesRepeated repeated;
+
         public SubscriberLogic(ISubscriber myProxy,string orderingPolicy, string name,
             string pmLogServerUrl, string loggingLevel)
         {
@@ -36,6 +38,14 @@ namespace Subscriber
             this.loggingLevel = loggingLevel;
             this.ordering = orderingPolicy;
             this.freezer = new List<Event>();
+            if (orderingPolicy.Equals("FIFO"))
+            {
+                this.repeated = new DetectRepeatedFIFO();
+            }
+            else if (orderingPolicy.Equals("NO"))
+            {
+                this.repeated = new DetectRepeatedMessageNO();
+            }
             logServer = Activator.GetObject(typeof(IPuppetMasterLog), pmLogServerUrl)
                 as IPuppetMasterLog;
         }
@@ -69,8 +79,11 @@ namespace Subscriber
                 }
                 else
                 {
-                    Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher, e.Topic, e.GetSequenceNumber());
-                    logServer.LogAction("SubEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
+                    if (!repeated.IsRepeated(e.SequenceNumber, e.Publisher))
+                    {
+                        Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher, e.Topic, e.GetSequenceNumber());
+                        logServer.LogAction("SubEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
+                    }
                 }
             }
         }

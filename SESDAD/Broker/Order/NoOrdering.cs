@@ -9,9 +9,9 @@ namespace Broker.Order
 {
     class NoOrdering : IOrder
     {
-        public void AddNewMessage(string publisherId, int msgSequenceNumber)
+        public Boolean AddNewMessage(string publisherId, int msgSequenceNumber)
         {
-            //Do Nothing
+            return false;
         }
 
         public void ConfirmDeliver(Event e)

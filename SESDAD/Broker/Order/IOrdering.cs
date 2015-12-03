@@ -9,7 +9,7 @@ namespace Broker.Order
 {
     public interface IOrder
     {
-        void AddNewMessage(string publisherId, int msgSequenceNumber);
+        Boolean AddNewMessage(string publisherId, int msgSequenceNumber);
 
         void ConfirmDeliver(Event e);
 

@@ -100,6 +100,7 @@ namespace Broker
             Console.Write(site);
             IsRoot = site.IsRoot;
             SiteName = site.Name;
+            this.remoteProxy = new BrokerSiteFrontEnd(site.Brokers, SiteName);
             if (!IsRoot)
             {
                 parentSiteBroker = new BrokerSiteFrontEnd(site.Parent.Brokers, site.Parent.Name);
@@ -142,7 +143,10 @@ namespace Broker
 
         public void AddEventToDiffusion(Event e)
         {
-            order.AddNewMessage(e.Publisher, e.SequenceNumber);
+            if(order.AddNewMessage(e.Publisher, e.SequenceNumber))
+            {
+                return;
+            }
             pool.AssyncInvoke(new WaitCallback(Diffuse), e);
         }
 
@@ -249,15 +253,15 @@ namespace Broker
 
         private void ProcessSubscribe(Object subscription)
         {
+            Console.WriteLine("Console going process the Subscription");
             this.BlockWhileFrozen();
-
             this.router.Subscribe(subscription as Subscription);
         }
 
         private void ProcessAddRoute(Object route)
         {
             this.BlockWhileFrozen();
-
+            Console.WriteLine("Console going process the route");
             this.router.AddRoute(route as Route);
         }
 

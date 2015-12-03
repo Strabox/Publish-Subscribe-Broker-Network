@@ -16,17 +16,31 @@ namespace Broker.Ordering
 
             private Queue<int> sequenceNumbers;
 
+            int recentMessage;
+
             public Publisher(string publisherId,int sequenceNumber)
             {
                 this.publisherId = publisherId;
+                this.recentMessage = sequenceNumber;
                 this.sequenceNumbers = new Queue<int>();
                 sequenceNumbers.Enqueue(sequenceNumber);
+            }
+
+            public int GetRecent()
+            {
+                return recentMessage;
+            }
+
+            public void SetRecent(int sequenceNumber)
+            {
+                recentMessage = sequenceNumber;
             }
 
             public int GetFirst()
             {
                 return sequenceNumbers.Peek();
             }
+
 
             public void DequeueLast()
             {
@@ -48,7 +62,7 @@ namespace Broker.Ordering
         }
 
 
-        public void AddNewMessage(string publisherId,int messageSequenceNumber)
+        public Boolean AddNewMessage(string publisherId,int messageSequenceNumber)
         {
             lock (this)
             {
@@ -60,10 +74,19 @@ namespace Broker.Ordering
                 {
                     lock (controlOrder[publisherId])
                     {
-                        controlOrder[publisherId].Enqueue(messageSequenceNumber);
+                        if (messageSequenceNumber <= controlOrder[publisherId].GetRecent())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            controlOrder[publisherId].SetRecent(messageSequenceNumber);
+                            controlOrder[publisherId].Enqueue(messageSequenceNumber);
+                        }
                     }
                 }
             }
+            return false;
         }
 
         public void ConfirmDeliver(Event e)

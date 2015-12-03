@@ -9,140 +9,170 @@ namespace CommonTypes
     /// <summary>
     ///     BrokerSite hides the replication in a site making the calls transparent.
     /// </summary>
+    [Serializable]
     public class BrokerSiteFrontEnd : IBroker
     {
         private string siteName;
 
-        private List<BrokerPairDTO> brokers;
+        private List<BrokerPairDTO> brokersAlive;
 
-        private int primaryIndex = 0;
 
         public BrokerSiteFrontEnd(ICollection<BrokerPairDTO> brokers,string siteName)
         {
-            this.brokers = brokers.ToList();
+            this.brokersAlive = brokers.ToList();
             this.siteName = siteName;
+        }
+
+        private void RemoveCrashedBrokers(string brokerName)
+        {
+            lock (this)
+            {
+                foreach (BrokerPairDTO pair in brokersAlive)
+                {
+                    if (pair.LogicName.Equals(brokerName))
+                    {
+                        brokersAlive.Remove(pair);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private BrokerPairDTO[] GetCopy()
+        {
+            lock (this)
+            {
+                return brokersAlive.ToArray();
+            }
         }
 
 
         public void Diffuse(Event e)
         {
-            for (; primaryIndex < brokers.Count; primaryIndex++)
+            BrokerPairDTO[] brokers = GetCopy();
+            foreach (BrokerPairDTO pair in brokers)
             {
                 try
                 {
-                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Diffuse(e);
+                    (Activator.GetObject(typeof(IBroker), pair.Url) as IBroker).Diffuse(e);
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Diffuse Failed: Trying next broker...");
-                    continue;
+                    RemoveCrashedBrokers(pair.LogicName);
                 }
-                Console.WriteLine("Diffuse Success");
-                return;
             }
-            Console.WriteLine("Diffuse Failed: No more brokers system is now broken pray for the new gods and the old ones....");
         }
 
         public void AddRoute(Route route)
         {
-            for (; primaryIndex < brokers.Count; primaryIndex++)
+            Console.WriteLine("FRONT END: Trying add Routes");
+            BrokerPairDTO[] brokers = GetCopy();
+            foreach (BrokerPairDTO pair in brokers)
             {
                 try
                 {
-                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).AddRoute(route);
+                    (Activator.GetObject(typeof(IBroker), pair.Url) as IBroker).AddRoute(route);
+                    Console.WriteLine("AddRoute sent to {0}", pair.Url);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    //Do nothing
+                    RemoveCrashedBrokers(pair.LogicName);
+                    Console.WriteLine(e);
                 }
             }
         }
 
         public void RemoveRoute(Route route)
         {
-            for (; primaryIndex < brokers.Count; primaryIndex++)
+            BrokerPairDTO[] brokers = GetCopy();
+            foreach (BrokerPairDTO pair in brokers)
             {
                 try
                 {
-                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).RemoveRoute(route);
+                    (Activator.GetObject(typeof(IBroker), pair.Url) as IBroker).RemoveRoute(route);
                 }
                 catch (Exception)
                 {
-                    //Do nothing
+                    RemoveCrashedBrokers(pair.LogicName);
                 }
             }
         }
 
         public void Subscribe(Subscription subscription)
         {
-            for (; primaryIndex < brokers.Count; primaryIndex++)
+            BrokerPairDTO[] brokers = GetCopy();
+            foreach (BrokerPairDTO pair in brokers)
             {
                 try
                 {
-                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Subscribe(subscription);
+                    (Activator.GetObject(typeof(IBroker), pair.Url) as IBroker).Subscribe(subscription);
                 }
                 catch (Exception)
                 {
-                   //Do nothing
+                    RemoveCrashedBrokers(pair.LogicName);
                 }
             }
         }
 
         public void Unsubscribe(Subscription subscription)
         {
-            for (; primaryIndex < brokers.Count; primaryIndex++)
+            BrokerPairDTO[] brokers = GetCopy();
+            foreach (BrokerPairDTO pair in brokers)
             {
                 try
                 {
-                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Unsubscribe(subscription);
+                    (Activator.GetObject(typeof(IBroker), pair.Url) as IBroker).Unsubscribe(subscription);
                 }
                 catch (Exception)
                 {
-                    //Do nothing
+                    RemoveCrashedBrokers(pair.LogicName);
                 }
             }
         }
 
         public void Sequence(Bludger bludger)
         {
-            for (; primaryIndex < brokers.Count; primaryIndex++)
+            BrokerPairDTO[] brokers = GetCopy();
+            foreach (BrokerPairDTO pair in brokers)
             {
                 try
                 {
-                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Sequence(bludger);
+                    (Activator.GetObject(typeof(IBroker), pair.Url) as IBroker).Sequence(bludger);
                 }
                 catch (Exception)
                 {
-                    continue;
+                    RemoveCrashedBrokers(pair.LogicName);
                 }
-                return;
             }
         }
 
         public void Bludger(Bludger bludger)
         {
-            for (; primaryIndex < brokers.Count; primaryIndex++)
+            BrokerPairDTO[] brokers = GetCopy();
+            foreach (BrokerPairDTO pair in brokers)
             {
                 try
                 {
-                    (Activator.GetObject(typeof(IBroker), brokers[primaryIndex].Url) as IBroker).Bludger(bludger);
+                    (Activator.GetObject(typeof(IBroker), pair.Url) as IBroker).Bludger(bludger);
                 }
                 catch (Exception)
                 {
-                    continue;
+                    RemoveCrashedBrokers(pair.LogicName);
                 }
-                return;
             }
         }
 
         public override string ToString()
         {
-            string res = siteName + " :" + Environment.NewLine;
-            foreach (BrokerPairDTO dto in brokers)
+            lock (this)
             {
-                res += dto.ToString() + Environment.NewLine;
+                string res = siteName + " :" + Environment.NewLine;
+                foreach (BrokerPairDTO dto in brokersAlive)
+                {
+                    res += dto.ToString() + Environment.NewLine;
+                }
+                return res;
             }
-            return res;
         }
     }
 }

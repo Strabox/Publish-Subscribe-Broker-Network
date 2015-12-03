@@ -1,8 +1,5 @@
 ﻿Subscriber subscriber1 Subscribe /Ist/Wtf
-Subscriber subscriber1 Subscribe /Coisas
-Subscriber subscriber1 Subscribe /Mais
 Wait 5000
-Publisher publisher0 Publish 20 Ontopic /Ist/Wtf Interval 200
-Wait 3000
-Crash broker0-0
+Publisher publisher3 Publish 5 Ontopic /Ist/Wtf Interval 200
+Wait 2000
 Wait 5000
