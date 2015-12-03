@@ -83,7 +83,15 @@ namespace Broker
             {
                 this.order = new TotalOrdering(this);
             }
-            this.pool = new CommonTypes.ThreadPool(10);
+
+            if (orderingPolicy.Equals("TOTAL"))
+            {
+            	this.pool = new CommonTypes.ThreadPool(1);
+            }
+            else
+            {
+            	this.pool = new CommonTypes.ThreadPool(10);
+            }
             this.topicSubscribers = new TopicSubscriberCollection();
             childSites = new Dictionary<string, IBroker>();
         }
@@ -177,6 +185,12 @@ namespace Broker
 
         public void Sequence(Bludger bludger)
         {
+        	pool.AssyncInvoke(new WaitCallback(ProcessSequence), bludger);
+        }
+
+        public void ProcessSequence(Object b)
+        {
+        	Bludger bludger = b as Bludger;
             if (order.FreezeSequencerIfNeeded(bludger))
             {
                 return;
@@ -200,6 +214,13 @@ namespace Broker
 
         public void Bludger(Bludger bludger)
         {
+        	pool.AssyncInvoke(new WaitCallback(ProcessBludger), bludger);
+        }
+
+        public void ProcessBludger(Object b)
+        {
+        	Bludger bludger = b as Bludger;
+
             if (order.FreezeBludgerIfNeeded(bludger))
             {
                 return;
