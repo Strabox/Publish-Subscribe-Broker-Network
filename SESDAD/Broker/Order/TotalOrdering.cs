@@ -2,15 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Broker.Order
 {
     class TotalOrdering : IOrder
     {
         private Dictionary<string, Queue<int>> messages;
+
+        private DetectRepeatedMessageNO detectRepeatedMessages;
 
         private BrokerLogic broker;
 
@@ -20,6 +20,7 @@ namespace Broker.Order
         public TotalOrdering(BrokerLogic broker)
         {
             messages = new Dictionary<string, Queue<int>>();
+            detectRepeatedMessages = new DetectRepeatedMessageNO();
             this.broker = broker;
             this.sequencers = new Queue<Bludger>();
             this.bludgers = new Queue<Bludger>();
@@ -28,8 +29,13 @@ namespace Broker.Order
 
         public Boolean AddNewMessage(string publisherId, int messageSequenceNumber)
         {
+            
             lock (this)
             {
+                if (detectRepeatedMessages.IsRepeated(messageSequenceNumber, publisherId))
+                {
+                    return true;
+                }
                 if (!messages.ContainsKey(publisherId))
                 {
                     messages.Add(publisherId, new Queue<int>());

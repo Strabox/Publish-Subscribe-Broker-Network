@@ -29,6 +29,8 @@ namespace Subscriber
 
         private IDetectMessagesRepeated repeated;
 
+        private DetectRepeatedMessageNO blu = new DetectRepeatedMessageNO();
+
         public SubscriberLogic(ISubscriber myProxy,string orderingPolicy, string name,
             string pmLogServerUrl, string loggingLevel)
         {
@@ -42,7 +44,7 @@ namespace Subscriber
             {
                 this.repeated = new DetectRepeatedFIFO();
             }
-            else if (orderingPolicy.Equals("NO"))
+            else if (orderingPolicy.Equals("NO") || orderingPolicy.Equals("TOTAL"))
             {
                 this.repeated = new DetectRepeatedMessageNO();
             }
@@ -75,7 +77,10 @@ namespace Subscriber
             {
                 if (ordering.Equals("TOTAL"))
                 {
-                    freezer.Add(e);
+                    if (!repeated.IsRepeated(e.SequenceNumber, e.Publisher))
+                    {
+                        freezer.Add(e);
+                    }
                 }
                 else
                 {
@@ -93,6 +98,11 @@ namespace Subscriber
             this.BlockWhileFrozen();
             lock (this)
             {
+                if (blu.IsRepeated(bludger.Sequence, bludger.Publisher))
+                {
+                    return;
+                }
+
                 foreach (var e in freezer)
                 {
                     if (e.SequenceNumber == bludger.Sequence && e.Publisher == bludger.Publisher)
@@ -116,16 +126,6 @@ namespace Subscriber
         }
 
         // Private methods
-
-        private void ProcessReceive(Object o)
-        {
-            this.BlockWhileFrozen();
-
-            Event e = o as Event;
-            Console.WriteLine("Publisher: {0} Topic: {1} SN: {2}", e.Publisher, e.Topic, e.GetSequenceNumber());
-            logServer.LogAction("SubEvent " + name + " " + e.Publisher + " " + e.Topic + " " + e.SequenceNumber);
-        }
-
 
         private void ProcessUnsubscribe(Object o)
         {

@@ -137,6 +137,7 @@
     <Content Include="ConfigurationFiles\Configuration1.txt" />
     <Content Include="ConfigurationFiles\ProfessorConfig1.txt" />
     <Content Include="ConfigurationFiles\ProfessorConfig2.txt" />
+    <Content Include="ConfigurationFiles\QuidditchConfigRep.txt" />
     <Content Include="ConfigurationFiles\QuidditchConfig.txt" />
     <Content Include="ScriptFiles\ProfessorScript2.txt" />
     <Content Include="ScriptFiles\ProfessorScript1.txt" />

@@ -6,7 +6,10 @@ Publisher publisher00 Publish 12 Ontopic /p00-0 Interval 5000
 Publisher publisher00 Publish 12 Ontopic /p00-1 Interval 5000
 Publisher publisher01 Publish 12 Ontopic /p01-0 Interval 5000
 Publisher publisher01 Publish 12 Ontopic /p01-1 Interval 5000
-Wait 30000
+Wait 10000
+Crash broker00
+Crash broker10
+Wait 20000
 Status
 Subscriber subscriber1 Unsubscribe /p00-0
 Subscriber subscriber2 Unsubscribe /p01-0

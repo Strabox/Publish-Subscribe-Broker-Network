@@ -1,5 +1,4 @@
 ﻿Subscriber subscriber1 Subscribe /Ist/Wtf
 Wait 5000
 Publisher publisher3 Publish 5 Ontopic /Ist/Wtf Interval 200
-Wait 2000
 Wait 5000

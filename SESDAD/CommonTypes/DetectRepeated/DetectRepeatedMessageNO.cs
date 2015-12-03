@@ -25,17 +25,17 @@ namespace CommonTypes
                 {
                     messages.Add(publisherId, new HashSet<int>());
                 }
-            }
-            lock (messages[publisherId])
-            {
-                if (messages[publisherId].Contains(sequenceNumber))
+                lock (messages[publisherId])
                 {
-                    return true;
-                }
-                else
-                {
-                    messages[publisherId].Add(sequenceNumber);
-                    return false;
+                    if (messages[publisherId].Contains(sequenceNumber))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        messages[publisherId].Add(sequenceNumber);
+                        return false;
+                    }
                 }
             }
         }

@@ -65,14 +65,12 @@ namespace CommonTypes
 
         public void AddRoute(Route route)
         {
-            Console.WriteLine("FRONT END: Trying add Routes");
             BrokerPairDTO[] brokers = GetCopy();
             foreach (BrokerPairDTO pair in brokers)
             {
                 try
                 {
                     (Activator.GetObject(typeof(IBroker), pair.Url) as IBroker).AddRoute(route);
-                    Console.WriteLine("AddRoute sent to {0}", pair.Url);
                 }
                 catch (Exception e)
                 {

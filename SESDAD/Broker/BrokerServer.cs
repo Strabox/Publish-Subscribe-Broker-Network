@@ -54,13 +54,11 @@ namespace Broker
                 if (repeated.IsRepeated(e.SequenceNumber, e.Publisher))
                     return;
             }
-            Console.WriteLine("Add {0} {1} to diffuse", e.SequenceNumber, e.Publisher);
             broker.AddEventToDiffusion(e);
         }
 
         public void Subscribe(Subscription subscription)
         {
-            Console.WriteLine("Broker Server: Going put Subscription in queue");
             lock (this)
             {
                 broker.AddSubscription(subscription);
@@ -77,10 +75,8 @@ namespace Broker
         
         public void AddRoute(Route route)
         {
-            Console.WriteLine("Receiving route from other broker");
             lock (this)
             {
-                Console.WriteLine("Receiving route from other broker InLock");
                 broker.AddRoute(route);
             }
         }

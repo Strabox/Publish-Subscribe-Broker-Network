@@ -54,6 +54,10 @@ namespace Broker
 
         private List<IBroker> brothers = new List<IBroker>();
 
+        private IDetectMessagesRepeated sequencerRep = new DetectRepeatedFIFO();
+
+        private IDetectMessagesRepeated bludgerRep = new DetectRepeatedFIFO();
+
         public BrokerLogic(IBroker myProxy,string name, string orderingPolicy, string routingPolicy,
             string loggingLevel, string pmLogServerUrl)
         {
@@ -185,6 +189,10 @@ namespace Broker
 
         public void Sequence(Bludger bludger)
         {
+            if (sequencerRep.IsRepeated(bludger.Sequence, bludger.Publisher))
+            {
+                return;
+            }
         	pool.AssyncInvoke(new WaitCallback(ProcessSequence), bludger);
         }
 
@@ -214,7 +222,11 @@ namespace Broker
 
         public void Bludger(Bludger bludger)
         {
-        	pool.AssyncInvoke(new WaitCallback(ProcessBludger), bludger);
+            if (bludgerRep.IsRepeated(bludger.Sequence, bludger.Publisher))
+            {
+                return;
+            }
+            pool.AssyncInvoke(new WaitCallback(ProcessBludger), bludger);
         }
 
         public void ProcessBludger(Object b)
@@ -274,7 +286,6 @@ namespace Broker
 
         private void ProcessSubscribe(Object subscription)
         {
-            Console.WriteLine("Console going process the Subscription");
             this.BlockWhileFrozen();
             this.router.Subscribe(subscription as Subscription);
         }
@@ -282,7 +293,6 @@ namespace Broker
         private void ProcessAddRoute(Object route)
         {
             this.BlockWhileFrozen();
-            Console.WriteLine("Console going process the route");
             this.router.AddRoute(route as Route);
         }
 

@@ -1,4 +1,4 @@
-﻿RoutingPolicy flooding
+﻿RoutingPolicy filter
 Ordering TOTAL
 LoggingLevel full
 Site site0 Parent none
