@@ -59,34 +59,22 @@ namespace Broker
 
         public void Subscribe(Subscription subscription)
         {
-            lock (this)
-            {
-                broker.AddSubscription(subscription);
-            }
+            broker.AddSubscription(subscription);
         }
    
         public void Unsubscribe(Subscription subscription)
         {
-            lock (this)
-            {
-                broker.AddUnsubscription(subscription);
-            }
+            broker.AddUnsubscription(subscription);
         }
         
         public void AddRoute(Route route)
         {
-            lock (this)
-            {
-                broker.AddRoute(route);
-            }
+            broker.AddRoute(route);
         }
 
         public void RemoveRoute(Route route)
         {
-            lock (this)
-            {
-                broker.RemoveRoute(route);
-            }
+            broker.RemoveRoute(route);
         }
 
         public void Sequence(Bludger bludger)

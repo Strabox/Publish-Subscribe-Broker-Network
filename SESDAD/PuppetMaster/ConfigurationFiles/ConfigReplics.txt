@@ -14,6 +14,6 @@ Process publisher0 Is publisher On site0 URL tcp://localhost:3334/pub
 Process publisher3 Is publisher On site3 URL tcp://localhost:3367/pub
 Process subscriber0 Is subscriber On site0 URL tcp://localhost:3335/sub
 Process subscriber1 Is subscriber On site1 URL tcp://localhost:3336/sub
-RoutingPolicy filter
-Ordering TOTAL
+RoutingPolicy flooding
+Ordering NO
 LoggingLevel full

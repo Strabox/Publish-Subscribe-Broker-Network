@@ -5,12 +5,13 @@ Subscriber subscriber2 Subscribe /b
 Subscriber subscriber2 Subscribe /d
 Subscriber subscriber1 Subscribe /d
 Wait 4000
-Publisher publisher3 Publish 5 Ontopic /b Interval 30
+Publisher publisher3 Publish 5 Ontopic /b Interval 500
 Publisher publisher3 Publish 5 Ontopic /a Interval 25
 Publisher publisher1 Publish 5 Ontopic /a Interval 20
 Publisher publisher1 Publish 5 Ontopic /b Interval 20
 Publisher publisher2 Publish 5 Ontopic /b Interval 20
 Publisher publisher2 Publish 5 Ontopic /d Interval 25
-Wait 55
+Wait 1000
+Subscriber subscriber1 Unsubscribe /b
 Wait 5000
 Status

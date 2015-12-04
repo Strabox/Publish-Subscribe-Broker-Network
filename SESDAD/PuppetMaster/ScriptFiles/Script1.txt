@@ -1,4 +1,10 @@
 ﻿Subscriber subscriber1 Subscribe /Ist/Wtf
+Subscriber subscriber0 Subscribe /Ist/Stuff
 Wait 5000
-Publisher publisher3 Publish 5 Ontopic /Ist/Wtf Interval 200
+Publisher publisher3 Publish 10 Ontopic /Ist/Wtf Interval 500
+Publisher publisher0 Publish 20 Ontopic /Ist/Stuff Interval 500
+Wait 10000
+Crash broker0-0
+Crash broker1-0
+Subscriber subscriber0 Unsubscribe /Ist/Stuff
 Wait 5000
